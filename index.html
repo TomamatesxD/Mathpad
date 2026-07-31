@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MathPad - Entorno de Estudio Matemático</title>
-    
+
     <!-- Librerías externas vía CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
@@ -519,7 +519,7 @@ body {
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .calculator-panel {
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -942,7 +942,7 @@ window.addEventListener('load', function() {
     if (navigator.storage && navigator.storage.persist) {
         navigator.storage.persist();
     }
-    
+
     const canvasWrapper = document.getElementById('canvasWrapper');
     const calcPanel     = document.getElementById('calcPanel');
 
@@ -979,7 +979,7 @@ window.addEventListener('load', function() {
     let rulerCurrentLine = null;
     let rulerSnapAngle = 15;
     let rulerSnapLength = 50;
-    let pages = [null]; 
+    let pages = [null];
     let currentPage = 0;
 
     function hexToRgba(hex, alpha) {
@@ -1124,7 +1124,7 @@ window.addEventListener('load', function() {
             const a = toCanvas(pts.x1, pts.y1), b = toCanvas(pts.x2, pts.y2);
             segments.push({ a, b });
         } else if (['rect', 'triangle', 'image', 'i-text', 'text'].includes(obj.type)) {
-            const coords = obj.getCoords(); 
+            const coords = obj.getCoords();
             segments.push({ a: coords[0], b: coords[1] });
             segments.push({ a: coords[1], b: coords[2] });
             segments.push({ a: coords[2], b: coords[3] });
@@ -1355,7 +1355,7 @@ window.addEventListener('load', function() {
         ctx.setTransform(retina, 0, 0, retina, 0, 0);
         var isLight = document.documentElement.classList.contains('light-mode');
         var isMobile = window.innerWidth < 768;
-        var RULER_SIZE = isMobile ? 28 : 24; 
+        var RULER_SIZE = isMobile ? 28 : 24;
         var fontSize = isMobile ? 12 : 10;
         var bg = isLight ? '#f8fafc' : '#1e293b';
         var fg = isLight ? '#475569' : '#94a3b8';
@@ -1387,7 +1387,7 @@ window.addEventListener('load', function() {
         var firstX = Math.ceil(startX / step) * step;
         for (var x = firstX; x * zoom + panX < w; x += step) {
             var sx = x * zoom + panX;
-            if (sx < RULER_SIZE) continue; 
+            if (sx < RULER_SIZE) continue;
             ctx.beginPath();
             ctx.moveTo(sx, RULER_SIZE - (isMobile ? 4 : 6));
             ctx.lineTo(sx, RULER_SIZE);
@@ -1524,7 +1524,7 @@ window.addEventListener('load', function() {
             canvasWrapper.classList.add('cursor-eraser');
             canvas.renderAll();
         } else if (tool === 'text') { canvasWrapper.classList.add('cursor-text'); }
-        else if (tool === 'eraser-stroke') { 
+        else if (tool === 'eraser-stroke') {
             canvas.isDrawingMode = false;
             canvasWrapper.classList.add('cursor-eraser');
             canvas.forEachObject(o => { if (o.isEraserMask !== true) { o.evented = true; o.selectable = false; } });
@@ -1588,7 +1588,7 @@ window.addEventListener('load', function() {
     if (savedTheme === 'light') { document.documentElement.classList.add('light-mode'); }
 
     async function exportPDF() {
-        saveCurrentPage(); 
+        saveCurrentPage();
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvas.width, canvas.height] });
         var vpt = canvas.viewportTransform.slice(0);
@@ -2085,5 +2085,6 @@ window.addEventListener('load', function() {
     </script>
 </body>
 </html>
+
 
 
