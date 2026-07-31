@@ -701,33 +701,33 @@ body {
 <body>
 <div id="recoverBar">
   <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
-  <div style="display:flex;gap:8px;flex-shrink:0">
-    <button type="button" id="btnDoRecover">Recuperar</button>
-    <button type="button" id="btnDiscardRecover">Descartar</button>
+  <div>
+    <button type="button" id="btnDoRecover" aria-label="Acción">Recuperar</button>
+    <button type="button" id="btnDiscardRecover" aria-label="Acción">Descartar</button>
   </div>
 </div>
 
     <!-- TOP BAR -->
     <div class="top-bar" role="toolbar" aria-label="Barra de sistema">
         <div class="tool-group">
-            <button type="button" id="btnSaveProj" title="Guardar Sesión en PC">
+            <button type="button" id="btnSaveProj" title="Guardar Sesión en PC" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h10"/></svg>
             </button>
-            <button type="button" id="btnLoadProj" title="Cargar Sesión desde PC">
+            <button type="button" id="btnLoadProj" title="Cargar Sesión desde PC" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </button>
-            <button type="button" id="btnExportPDF" title="Exportar PDF">
+            <button type="button" id="btnExportPDF" title="Exportar PDF" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
             </button>
-            <button type="button" id="btnExport" title="Exportar PNG">
+            <button type="button" id="btnExport" title="Exportar PNG" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
             </button>
         </div>
         <div class="tool-group">
-            <button type="button" id="btnUndo" title="Deshacer [Ctrl+Z]">
+            <button type="button" id="btnUndo" title="Deshacer [Ctrl+Z]" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 015 5v2M3 10l5-5M3 10l5 5"/></svg>
             </button>
-            <button type="button" id="btnRedo" title="Rehacer [Ctrl+Y]">
+            <button type="button" id="btnRedo" title="Rehacer [Ctrl+Y]" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M21 10H11a5 5 0 00-5 5v2M21 10l-5-5M21 10l-5 5"/></svg>
             </button>
         </div>
@@ -743,7 +743,7 @@ body {
             <button type="button" id="btnCalcToggle" title="Mostrar/Ocultar Calculadora" aria-label="Toggle calculadora">
                 <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
             </button>
-            <button type="button" id="btnClear" class="btn-danger" title="Limpiar todo">
+            <button type="button" id="btnClear" class="btn-danger" title="Limpiar todo" aria-label="Acción">
                 <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
             </button>
         </div>
@@ -751,57 +751,57 @@ body {
 
     <!-- LEFT SIDEBAR -->
     <div class="left-sidebar" role="toolbar" aria-label="Herramientas de dibujo">
-        <button type="button" id="btnSelect" class="active" title="Seleccionar [V]">
+        <button type="button" id="btnSelect" class="active" title="Seleccionar [V]" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M4 4l7 18 2.5-7.5L21 12z"/></svg>
         </button>
-        <button type="button" id="btnPan" title="Mover lienzo [H]">
+        <button type="button" id="btnPan" title="Mover lienzo [H]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 11V4a2 2 0 0 0-4 0v6"/><path d="M10 11V5a2 2 0 0 0-4 0v9l-3-3a2 2 0 0 0-3 3l5 7h9a5 5 0 0 0 5-5v-6Z"/>
             </svg>
         </button>
-        <button type="button" id="btnPen" title="Lápiz [P]">
+        <button type="button" id="btnPen" title="Lápiz [P]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
-        <button type="button" id="btnHighlight" title="Resaltador">
+        <button type="button" id="btnHighlight" title="Resaltador" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 6.5 14C5.5 15 5 16 5 17.5 5 19 6.5 20 8 20c1.5 0 2.5-.5 3.5-1.5L14 16"/><path d="m14 7-3 3"/><path d="M17 3l4 4L11 17l-4-4z"/></svg>
         </button>
-        <button type="button" id="btnText" title="Texto [T]">
+        <button type="button" id="btnText" title="Texto [T]" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M4 4h6v10H4zM14 4h6v10h-6zM4 18h16v2H4z"/></svg>
         </button>
         <div class="tool-separator"></div>
-        <button type="button" id="btnEraserStroke" title="Borrar Trazo [E]">
+        <button type="button" id="btnEraserStroke" title="Borrar Trazo [E]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         </button>
-        <button type="button" id="btnEraserNormal" title="Borrado Normal [Shift+E]">
+        <button type="button" id="btnEraserNormal" title="Borrado Normal [Shift+E]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
         </button>
-        <button type="button" id="btnRuler" title="Regla/Compás [R]">
+        <button type="button" id="btnRuler" title="Regla/Compás [R]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="10" y1="8" x2="10" y2="12"/><line x1="14" y1="8" x2="14" y2="12"/><line x1="18" y1="8" x2="18" y2="12"/></svg>
         </button>
-        <button type="button" id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]">
+        <button type="button" id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 22 4 4 22 4"/><path d="M8 4v4"/><path d="M12 4v4"/><path d="M16 4v4"/><path d="M4 8h4"/><path d="M4 12h4"/><path d="M4 16h4"/></svg>
         </button>
         <div class="tool-separator"></div>
-        <button type="button" id="menuBtnLine" title="Línea">
+        <button type="button" id="menuBtnLine" title="Línea" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg>
         </button>
-        <button type="button" id="menuBtnRect" title="Rectángulo">
+        <button type="button" id="menuBtnRect" title="Rectángulo" aria-label="Acción">
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/></svg>
         </button>
-        <button type="button" id="menuBtnCircle" title="Círculo">
+        <button type="button" id="menuBtnCircle" title="Círculo" aria-label="Acción">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
         </button>
-        <button type="button" id="menuBtnTriangle" title="Triángulo">
+        <button type="button" id="menuBtnTriangle" title="Triángulo" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M12 4L20 20H4z"/></svg>
         </button>
         <div class="tool-separator"></div>
-        <button type="button" id="menuBtnLatex" title="Fórmula LaTeX">
+        <button type="button" id="menuBtnLatex" title="Fórmula LaTeX" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M4 8h4v8H4zM10 8h4v8h-4zM16 8h4v8h-4z"/></svg>
         </button>
-        <button type="button" id="menuBtnImage" title="Insertar imagen">
+        <button type="button" id="menuBtnImage" title="Insertar imagen" aria-label="Acción">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </button>
-        <button type="button" id="menuBtnPlot" title="Graficar función">
+        <button type="button" id="menuBtnPlot" title="Graficar función" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M3 20L21 4M3 20h18M3 20v-18"/></svg>
         </button>
     </div>
@@ -822,14 +822,14 @@ body {
 
     <!-- BOTTOM BAR -->
     <div class="bottom-bar" role="navigation" aria-label="Navegación de páginas">
-        <button type="button" id="btnPrevPage" title="Página anterior">
+        <button type="button" id="btnPrevPage" title="Página anterior" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <span id="pageIndicator" title="Página actual">1 / 1</span>
-        <button type="button" id="btnNextPage" title="Página siguiente">
+        <button type="button" id="btnNextPage" title="Página siguiente" aria-label="Acción">
             <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
         </button>
-        <button type="button" id="btnAddPage" title="Nueva página">
+        <button type="button" id="btnAddPage" title="Nueva página" aria-label="Acción">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -853,38 +853,38 @@ body {
             </div>
             <div class="calc-controls">
                 <label><input type="checkbox" id="toggleSci"> Científica</label>
-                <button type="button" id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)">M</button>
+                <button type="button" id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)" aria-label="Acción">M</button>
             </div>
             <div class="calc-keys" id="calcKeys">
-                <button type="button" class="sci-btn operator" data-val="sin(">sin</button>
-                <button type="button" class="sci-btn operator" data-val="cos(">cos</button>
-                <button type="button" class="sci-btn operator" data-val="tan(">tan</button>
-                <button type="button" class="sci-btn operator" data-val="sqrt(">√x</button>
-                <button type="button" class="sci-btn operator" data-val="^">xʸ</button>
-                <button type="button" class="sci-btn operator" data-val="log(">log</button>
-                <button type="button" class="sci-btn operator" data-val="(">(</button>
-                <button type="button" class="sci-btn operator" data-val=")">)</button>
-                <button type="button" class="sci-btn operator" data-val="pi">π</button>
-                <button type="button" class="sci-btn operator" data-val="e">e</button>
-                <button type="button" class="action" id="calcClear">C</button>
-                <button type="button" class="action" id="calcDel">⌫</button>
-                <button type="button" class="operator" data-val="%">%</button>
-                <button type="button" class="operator" data-val="/">÷</button>
-                <button type="button" data-val="7">7</button>
-                <button type="button" data-val="8">8</button>
-                <button type="button" data-val="9">9</button>
-                <button type="button" class="operator" data-val="*">×</button>
-                <button type="button" data-val="4">4</button>
-                <button type="button" data-val="5">5</button>
-                <button type="button" data-val="6">6</button>
-                <button type="button" class="operator" data-val="-">−</button>
-                <button type="button" data-val="1">1</button>
-                <button type="button" data-val="2">2</button>
-                <button type="button" data-val="3">3</button>
-                <button type="button" class="operator" data-val="+">+</button>
-                <button type="button" data-val="0" style="grid-column: span 2;">0</button>
-                <button type="button" data-val=".">.</button>
-                <button type="button" class="equals" id="calcEquals">=</button>
+                <button type="button" class="sci-btn operator" data-val="sin(" aria-label="Acción">sin</button>
+                <button type="button" class="sci-btn operator" data-val="cos(" aria-label="Acción">cos</button>
+                <button type="button" class="sci-btn operator" data-val="tan(" aria-label="Acción">tan</button>
+                <button type="button" class="sci-btn operator" data-val="sqrt(" aria-label="Acción">√x</button>
+                <button type="button" class="sci-btn operator" data-val="^" aria-label="Acción">xʸ</button>
+                <button type="button" class="sci-btn operator" data-val="log(" aria-label="Acción">log</button>
+                <button type="button" class="sci-btn operator" data-val="(" aria-label="Acción">(</button>
+                <button type="button" class="sci-btn operator" data-val=")" aria-label="Acción">)</button>
+                <button type="button" class="sci-btn operator" data-val="pi" aria-label="Acción">π</button>
+                <button type="button" class="sci-btn operator" data-val="e" aria-label="Acción">e</button>
+                <button type="button" class="action" id="calcClear" aria-label="Acción">C</button>
+                <button type="button" class="action" id="calcDel" aria-label="Acción">⌫</button>
+                <button type="button" class="operator" data-val="%" aria-label="Acción">%</button>
+                <button type="button" class="operator" data-val="/" aria-label="Acción">÷</button>
+                <button type="button" data-val="7" aria-label="Acción">7</button>
+                <button type="button" data-val="8" aria-label="Acción">8</button>
+                <button type="button" data-val="9" aria-label="Acción">9</button>
+                <button type="button" class="operator" data-val="*" aria-label="Acción">×</button>
+                <button type="button" data-val="4" aria-label="Acción">4</button>
+                <button type="button" data-val="5" aria-label="Acción">5</button>
+                <button type="button" data-val="6" aria-label="Acción">6</button>
+                <button type="button" class="operator" data-val="-" aria-label="Acción">−</button>
+                <button type="button" data-val="1" aria-label="Acción">1</button>
+                <button type="button" data-val="2" aria-label="Acción">2</button>
+                <button type="button" data-val="3" aria-label="Acción">3</button>
+                <button type="button" class="operator" data-val="+" aria-label="Acción">+</button>
+                <button type="button" data-val="0" aria-label="Acción">0</button>
+                <button type="button" data-val="." aria-label="Acción">.</button>
+                <button type="button" class="equals" id="calcEquals" aria-label="Acción">=</button>
             </div>
             <div class="calc-history" id="calcHistory">
                 <div class="calc-history-header">Historial</div>
@@ -894,44 +894,44 @@ body {
     </div>
 
     <!-- Function Plotter Modal -->
-    <div id="plotModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9000; align-items:center; justify-content:center;">
-      <div style="background:#1e1e1e; border:1px solid #444; border-radius:14px; padding:28px 32px; width:90%; max-width:500px;">
-        <h3 style="color:#bb86fc; margin-bottom:20px; font-size:16px">📈 Graficar función</h3>
-        <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">
-          f(x) = <small style="color:#666">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
+    <div id="plotModal">
+      <div>
+        <h3>📈 Graficar función</h3>
+        <label>
+          f(x) = <small>(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
         </label>
-        <input id="plotExpr" type="text" value="x^2" style="width:100%; background:#121212; border:1px solid #555; border-radius:8px; padding:10px 12px; color:#e0e0e0; font-family:monospace; font-size:15px; margin-bottom:14px; outline:none;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px">
+        <input id="plotExpr" type="text" value="x^2">
+        <div>
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x mínimo</label>
-            <input id="plotXMin" type="number" value="-5" style="width:100%; background:#121212; border:1px solid #555; border-radius:8px; padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
+            <label>x mínimo</label>
+            <input id="plotXMin" type="number" value="-5">
           </div>
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x máximo</label>
-            <input id="plotXMax" type="number" value="5" style="width:100%; background:#121212; border:1px solid #555; border-radius:8px; padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
+            <label>x máximo</label>
+            <input id="plotXMax" type="number" value="5">
           </div>
         </div>
-        <div style="margin-bottom:14px">
-          <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">Funciones graficadas:</label>
-          <div id="plotFunctionsList" style="background:#121212; border:1px solid #555; border-radius:8px; padding:8px; min-height:40px; max-height:120px; overflow-y:auto; font-size:13px; color:#888;">
-            <span style="font-style:italic">Ninguna función graficada aún</span>
+        <div>
+          <label>Funciones graficadas:</label>
+          <div id="plotFunctionsList">
+            <span>Ninguna función graficada aún</span>
           </div>
         </div>
-        <div style="display:flex; gap:10px">
-          <button type="button" id="plotBtnAdd" style="flex:1; background:#bb86fc; color:#000; border:none; border-radius:8px; padding:11px; font-weight:700; cursor:pointer; font-size:14px">+ Agregar</button>
-          <button type="button" id="plotBtnClear" style="background:transparent; color:#cf6679; border:1px solid #cf6679; border-radius:8px; padding:11px 14px; cursor:pointer; font-size:13px">Limpiar</button>
-          <button type="button" id="plotBtnClose" style="background:transparent; color:#999; border:1px solid #444; border-radius:8px; padding:11px 18px; cursor:pointer; font-size:14px">Cerrar</button>
+        <div>
+          <button type="button" id="plotBtnAdd" aria-label="Acción">+ Agregar</button>
+          <button type="button" id="plotBtnClear" aria-label="Acción">Limpiar</button>
+          <button type="button" id="plotBtnClose" aria-label="Acción">Cerrar</button>
         </div>
-        <p id="plotError" style="color:#f87171; font-size:12px; margin-top:10px; display:none"></p>
+        <p id="plotError"></p>
       </div>
     </div>
 
     <!-- Inputs ocultos -->
-    <input type="file" id="fileInput" accept=".json" style="display: none;">
-    <input type="file" id="imgFileInput" accept="image/*" style="display: none;">
-    <button type="button" id="btnLatex" style="display: none;"></button>
-    <button type="button" id="btnInsertImage" style="display: none;"></button>
-    <button type="button" id="btnPlot" style="display: none;"></button>
+    <input type="file" id="fileInput" accept=".json">
+    <input type="file" id="imgFileInput" accept="image/*">
+    <button type="button" id="btnLatex" aria-label="Acción"></button>
+    <button type="button" id="btnInsertImage" aria-label="Acción"></button>
+    <button type="button" id="btnPlot" aria-label="Acción"></button>
 
     <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -1488,7 +1488,7 @@ window.addEventListener('load', function() {
         modal = document.createElement('div');
         modal.id = 'mpConfirm';
         modal.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:99998; align-items:center; justify-content:center;';
-        modal.innerHTML = '<div style="background:#1e1e1e;border:1px solid #444;border-radius:12px;padding:24px 28px;max-width:340px;width:90%;text-align:center;"><p id="mpConfirmMsg" style="color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5"></p><div style="display:flex;gap:10px;justify-content:center"><button type="button" id="mpConfirmOk" style="background:#bb86fc;color:#000;border:none;border-radius:8px;padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px">Confirmar</button><button type="button" id="mpConfirmCancel" style="background:transparent;color:#999;border:1px solid #444;border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px">Cancelar</button></div></div>';
+        modal.innerHTML = '<div><p id="mpConfirmMsg"></p><div><button type="button" id="mpConfirmOk" aria-label="Acción">Confirmar</button><button type="button" id="mpConfirmCancel" aria-label="Acción">Cancelar</button></div></div>';
         document.body.appendChild(modal);
         document.getElementById('mpConfirmCancel').onclick = () => modal.style.display = 'none';
       }
@@ -1752,10 +1752,10 @@ window.addEventListener('load', function() {
     function updatePlottedFunctionsList() {
       const listEl = document.getElementById('plotFunctionsList');
       if (!listEl) return;
-      if (plottedFunctions.length === 0) { listEl.innerHTML = '<span style="font-style:italic">Ninguna función graficada aún</span>'; return; }
+      if (plottedFunctions.length === 0) { listEl.innerHTML = '<span>Ninguna función graficada aún</span>'; return; }
       listEl.innerHTML = plottedFunctions.map((func, index) => {
-        const colorDot = '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + func.color + ';margin-right:6px;vertical-align:middle;"></span>';
-        return '<div style="padding:4px 0;border-bottom:1px solid #333;">' + colorDot + 'f(x) = ' + func.expr + '</div>';
+        const colorDot = '<span></span>';
+        return '<div>' + colorDot + 'f(x) = ' + func.expr + '</div>';
       }).join('');
     }
 
@@ -1865,7 +1865,7 @@ window.addEventListener('load', function() {
     function updateCalcHistoryUI() {
         const historyList = document.getElementById('calcHistoryList');
         if (!historyList) return;
-        if (calcHistory.length === 0) { historyList.innerHTML = '<div style="color:#666;font-style:italic;padding:8px 0;">Sin historial</div>'; return; }
+        if (calcHistory.length === 0) { historyList.innerHTML = '<div>Sin historial</div>'; return; }
         const recentHistory = calcHistory.slice(-10).reverse();
         historyList.innerHTML = recentHistory.map((item, index) => {
             const date = new Date(item.timestamp);
@@ -1916,7 +1916,7 @@ window.addEventListener('load', function() {
             menu = document.createElement('div');
             menu.id = 'calcMemoryMenu';
             menu.style.cssText = 'position:absolute;background:#1e1e1e;border:1px solid #444;border-radius:8px;padding:6px 0;min-width:120px;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:9999;';
-            menu.innerHTML = '<div class="calc-memory-option" data-action="M+" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">M+ (Sumar)</div><div class="calc-memory-option" data-action="M-" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">M- (Restar)</div><div class="calc-memory-option" data-action="MR" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">MR (Leer)</div><div class="calc-memory-option" data-action="MC" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">MC (Borrar)</div>';
+            menu.innerHTML = '<div class="calc-memory-option" data-action="M+" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">M+ (Sumar)</div><div class="calc-memory-option" data-action="M-" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">M- (Restar)</div><div class="calc-memory-option" data-action="MR" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">MR (Leer)</div><div class="calc-memory-option" data-action="MC" onmouseover="this.style.background=\'rgba(255,255,255,0.1)\'" onmouseout="this.style.background=\'transparent\'">MC (Borrar)</div>';
             document.body.appendChild(menu);
             menu.querySelectorAll('.calc-memory-option').forEach(opt => {
                 opt.addEventListener('click', function(e) {
@@ -2085,3 +2085,4 @@ window.addEventListener('load', function() {
     </script>
 </body>
 </html>
+
