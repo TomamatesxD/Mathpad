@@ -2,19 +2,20 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MathPad - Entorno de Estudio Matemático</title>
     <!-- Favicon en formato Data URI (SVG integrado) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bb86fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 9c0-3 2-4 7-4s7 1 7 4'/><path d='M5 9l1.5 10a4 4 0 0 0 11 0L19 9'/><line x1='15' y1='2' x2='13' y2='8'/></svg>">
+    <link rel="manifest" href="manifest.json">
     
-    <!-- Librerías externas vía CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.6/dist/dexie.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <!-- Librerías locales (Offline) -->
+    <script src="fabric.min.js"></script>
+    <script src="math.min.js"></script>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="dexie.min.js"></script>
+    <script src="tex-svg.js"></script>
 
-    <style>
+<style>
 /* ═══════════════════════════════════════════════════════════════
    MATH PAD — ESTILOS COMPLETOS
    Fuente: mathpad.css (consolidado)
@@ -43,6 +44,12 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     -webkit-user-select: none;
     user-select: none;
+}
+
+/* Permitir selección de texto en inputs y textareas (Bug 4) */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 body {
@@ -82,7 +89,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
     TOP BAR
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .top-bar {
     position: relative;
     width: 100%;
@@ -199,7 +206,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    LEFT SIDEBAR
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .left-sidebar {
     position: fixed;
     top: var(--toolbar-h);
@@ -254,7 +261,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    BOTTOM BAR
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .bottom-bar {
     position: fixed;
     bottom: 20px;
@@ -310,7 +317,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    MAIN CONTENT
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .main-content {
     display: flex;
     flex: 1;
@@ -322,7 +329,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    CANVAS
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .canvas-wrapper {
     flex: 1;
     position: relative;
@@ -345,7 +352,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    CALCULADORA
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .calculator-panel {
     width: var(--calc-w);
     background-color: var(--bg-panel);
@@ -500,7 +507,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    CURSORES
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .cursor-pen    { cursor: crosshair !important; }
 .cursor-text   { cursor: text !important; }
 .cursor-eraser { cursor: cell !important; }
@@ -510,7 +517,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
     .top-bar {
         justify-content: flex-start;
@@ -577,7 +584,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    TRANSICIONES GLOBALES
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .top-bar button,
 .top-bar select,
 .left-sidebar button,
@@ -593,7 +600,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    MODO CLARO
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 :root.light-mode {
     --bg-dark: #f5f5f5;
     --bg-panel: #ffffff;
@@ -662,6 +669,10 @@ body {
 :root.light-mode #plotModal label { color: #666; }
 :root.light-mode #plotModal input { background: #f5f5f5; border-color: var(--border-color); color: var(--text-main); }
 
+:root.light-mode #latexModal > div { background: #ffffff; border-color: var(--border-color); }
+:root.light-mode #latexModal label { color: #666; }
+:root.light-mode #latexModal textarea { background: #f5f5f5; border-color: var(--border-color); color: var(--text-main); }
+
 /* Theme toggle */
 .theme-toggle {
     width: 40px;
@@ -690,7 +701,7 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    CONTEXT MENU
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
 .context-menu {
     position: fixed;
     top: calc(var(--toolbar-h) + 8px);
@@ -764,7 +775,7 @@ body {
 
 #widthValue { color: var(--text-main); font-size: 12px; min-width: 16px; text-align: center; }
 .context-menu.hidden { display: none !important; }
-    </style>
+</style>
 </head>
 <body>
 <div id="recoverBar">
@@ -990,6 +1001,18 @@ body {
             <input id="plotXMax" type="number" value="5" style="width:100%; background:#121212; border:1px solid #555; border-radius:8px; padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
           </div>
         </div>
+        <div style="display:flex; gap:14px; margin-bottom:14px; align-items:center;">
+          <div>
+            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">Color</label>
+            <input id="plotColorPicker" type="color" value="#bb86fc" style="width:40px; height:32px; background:transparent; border:1px solid #555; border-radius:6px; cursor:pointer;">
+          </div>
+          <div style="padding-top: 16px;">
+            <label style="color:#e0e0e0; font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input id="plotOnlyLine" type="checkbox" style="width:16px; height:16px; accent-color:#bb86fc;">
+              Fondo transparente (Solo línea)
+            </label>
+          </div>
+        </div>
         <div style="margin-bottom:14px">
           <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">Funciones graficadas:</label>
           <div id="plotFunctionsList" style="background:#121212; border:1px solid #555; border-radius:8px; padding:8px; min-height:40px; max-height:120px; overflow-y:auto; font-size:13px; color:#888;">
@@ -1005,6 +1028,22 @@ body {
       </div>
     </div>
 
+    <!-- LaTeX Formula Modal -->
+    <div id="latexModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9000; align-items:center; justify-content:center;">
+      <div style="background:#1e1e1e; border:1px solid #444; border-radius:14px; padding:28px 32px; width:90%; max-width:500px;">
+        <h3 style="color:#bb86fc; margin-bottom:20px; font-size:16px">📐 Insertar fórmula LaTeX</h3>
+        <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">
+          Escribe tu ecuación <small style="color:#666">(ej: \int_{a}^{b} x^2 dx, \frac{1}{2}, \sqrt{x})</small>
+        </label>
+        <textarea id="latexInput" rows="4" placeholder="\int_{a}^{b} x^2 dx" style="width:100%; background:#121212; border:1px solid #555; border-radius:8px; padding:10px 12px; color:#e0e0e0; font-family:monospace; font-size:15px; margin-bottom:14px; outline:none; resize:vertical; min-height:80px;"></textarea>
+        <div style="display:flex; gap:10px">
+          <button id="latexBtnInsert" style="flex:1; background:#bb86fc; color:#000; border:none; border-radius:8px; padding:11px; font-weight:700; cursor:pointer; font-size:14px">Insertar</button>
+          <button id="latexBtnClose" style="background:transparent; color:#999; border:1px solid #444; border-radius:8px; padding:11px 18px; cursor:pointer; font-size:14px">Cerrar</button>
+        </div>
+        <p id="latexError" style="color:#f87171; font-size:12px; margin-top:10px; display:none"></p>
+      </div>
+    </div>
+
     <!-- Inputs ocultos -->
     <input type="file" id="fileInput" accept=".json" style="display: none;">
     <input type="file" id="imgFileInput" accept="image/*" style="display: none;">
@@ -1012,11 +1051,20 @@ body {
     <button id="btnInsertImage" style="display: none;"></button>
     <button id="btnPlot" style="display: none;"></button>
 
-    <script>
+<script>
 /* ═══════════════════════════════════════════════════════════════
    MATH PAD — LÓGICA COMPLETA
    Fuente: mathpad.js (consolidado)
-╔═══════════════════════════════════════════════════════════════ */
+╚═══════════════════════════════════════════════════════════════ */
+// Registro del Service Worker para funcionamiento Offline (PWA)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado:', reg.scope))
+            .catch(err => console.error('Error registrando Service Worker:', err));
+    });
+}
+
 window.addEventListener('load', function() {
     if (navigator.storage && navigator.storage.persist) {
         navigator.storage.persist();
@@ -1044,7 +1092,6 @@ window.addEventListener('load', function() {
     let currentTool     = 'pen';
     let isPanning       = false;
     let isPointerDown   = false;
-    let isErasing       = false;
     let isSpaceDown     = false;
     let lastPosX = 0, lastPosY = 0;
     let clipboard = null;
@@ -1058,6 +1105,10 @@ window.addEventListener('load', function() {
     let rulerSnapLength = 50;
     let pages = [null]; 
     let currentPage = 0;
+    let eraserStrokeRemoved = false;
+    let plottedFunctions = [];
+    const plotColors = ['#bb86fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
+    const SERIALIZE_PROPS = ['globalCompositeOperation', 'isEraserMask', 'selectable', 'evented'];
 
     function hexToRgba(hex, alpha) {
         var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
@@ -1174,8 +1225,14 @@ window.addEventListener('load', function() {
             var pointer = canvas.getPointer(evt);
             rulerStartPoint = { x: pointer.x, y: pointer.y };
             var color = document.getElementById('colorPicker').value;
+            var currentZoom = canvas.getZoom();
+            // Compensar el zoom para que la regla se vea del mismo tamaño en pantalla
             rulerCurrentLine = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
-                stroke: color, strokeWidth: 2, selectable: false, evented: false, strokeDashArray: [5, 5]
+                stroke: color,
+                strokeWidth: 2 / currentZoom,
+                selectable: false,
+                evented: false,
+                strokeDashArray: [5 / currentZoom, 5 / currentZoom]
             });
             canvas.add(rulerCurrentLine);
         }
@@ -1267,17 +1324,13 @@ window.addEventListener('load', function() {
     canvas.on('mouse:move', function(opt) {
         var isDragging = isPointerDown;
         if (currentTool === 'eraser-stroke' && isDragging) {
-            const target = canvas.findTarget(opt.e, false);
+            var pointer = canvas.getPointer(opt.e);
+            const target = findObjectAtPointer(canvas, pointer);
             if (target && !target.isBackground && target.isEraserMask !== true) {
                 canvas.remove(target);
                 canvas.requestRenderAll();
-                saveHistory();
+                eraserStrokeRemoved = true;
             }
-            return;
-        }
-        if (currentTool === 'select') return;
-        if (isDragging && (currentTool === 'pen' || currentTool === 'highlight')) {
-            canvas.requestRenderAll();
             return;
         }
         if (isPanning) {
@@ -1329,6 +1382,11 @@ window.addEventListener('load', function() {
 
     canvas.on('mouse:up', function(opt) {
         isPointerDown = false;
+
+        if (currentTool === 'eraser-stroke' && eraserStrokeRemoved) {
+            saveHistory();
+            eraserStrokeRemoved = false;
+        }
         if (isPanning) {
             canvas.setViewportTransform(canvas.viewportTransform);
             isPanning = false; canvasWrapper.classList.remove('cursor-panning');
@@ -1432,20 +1490,45 @@ window.addEventListener('load', function() {
 
     canvas.on('path:created', function(opt) {
         if (currentTool === 'eraser-normal') {
-            opt.path.set({ globalCompositeOperation: 'destination-out', selectable: false, evented: false, isEraserMask: true });
-            canvas.requestRenderAll();
+            var eraserPath = opt.path;
+            canvas.remove(eraserPath);
+
+            var targets = canvas.getObjects().filter(function(obj) {
+                return obj !== eraserPath && !obj.isBackground && obj.intersectsWithObject(eraserPath);
+            });
+
+            if (targets.length > 0) {
+                targets.forEach(function(obj) {
+                    eraserPath.clone(function(clone) {
+                        clone.set({
+                            globalCompositeOperation: 'destination-out',
+                            stroke: '#000000',
+                            opacity: 1
+                        });
+
+                        if (obj.type === 'group' && obj.isEraserGroup) {
+                            obj.addWithUpdate(clone);
+                            obj.set('dirty', true);
+                        } else {
+                            var newGroup = new fabric.Group([obj, clone], {
+                                isEraserGroup: true,
+                                objectCaching: true
+                            });
+                            canvas.remove(obj);
+                            canvas.add(newGroup);
+                        }
+                        canvas.requestRenderAll();
+                    });
+                });
+            }
         }
         saveHistory();
     });
 
-    canvas.on('object:added',    scheduleAutoSave);
-    canvas.on('object:modified', scheduleAutoSave);
-    canvas.on('object:removed', function() { scheduleAutoSave(); saveHistory(); });
-
     function saveHistory() {
         if (isHistoryAction) return;
         redoStack = [];
-        historyStack.push(JSON.stringify(canvas.toJSON(['isEraserMask'])));
+        historyStack.push(JSON.stringify(canvas.toJSON(SERIALIZE_PROPS)));
         if (historyStack.length > 50) historyStack.shift();
     }
 
@@ -1454,25 +1537,26 @@ window.addEventListener('load', function() {
         canvas.loadFromJSON(jsonStr, function() { canvas.renderAll(); isHistoryAction = false; setTool(currentTool); });
     }
 
-    function saveCurrentPage() { pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask'])); }
-    function renderPageInfo() { document.getElementById('pageIndicator').innerText = (currentPage + 1) + ' / ' + pages.length; }
+    function saveCurrentPage() { pages[currentPage] = JSON.stringify(canvas.toJSON(SERIALIZE_PROPS)); }
+    function updatePageIndicator() { document.getElementById('pageIndicator').innerText = (currentPage + 1) + ' / ' + pages.length; }
+    function loadPage(idx) { if (pages[idx] !== null && pages[idx] !== undefined) loadState(pages[idx]); }
 
     document.getElementById('btnAddPage').onclick = () => {
         saveCurrentPage();
         canvas.clear();
         canvas.setBackgroundColor('', canvas.renderAll.bind(canvas));
-        pages.push(JSON.stringify(canvas.toJSON(['isEraserMask'])));
+        pages.push(JSON.stringify(canvas.toJSON(SERIALIZE_PROPS)));
         currentPage = pages.length - 1;
-        renderPageInfo();
+        updatePageIndicator();
         historyStack = []; redoStack = []; saveHistory();
     };
 
     document.getElementById('btnPrevPage').onclick = () => {
-        if (currentPage > 0) { saveCurrentPage(); currentPage--; loadState(pages[currentPage]); renderPageInfo(); }
+        if (currentPage > 0) { saveCurrentPage(); currentPage--; loadState(pages[currentPage]); updatePageIndicator(); }
     };
 
     document.getElementById('btnNextPage').onclick = () => {
-        if (currentPage < pages.length - 1) { saveCurrentPage(); currentPage++; loadState(pages[currentPage]); renderPageInfo(); }
+        if (currentPage < pages.length - 1) { saveCurrentPage(); currentPage++; loadState(pages[currentPage]); updatePageIndicator(); }
     };
 
     function showToast(msg, type = 'info', duration = 3000) {
@@ -1533,12 +1617,10 @@ window.addEventListener('load', function() {
             canvas.renderAll();
         } else if (tool === 'eraser-normal') {
             canvas.isDrawingMode = true;
-            var eraserBrush = new fabric.PencilBrush(canvas);
-            eraserBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
-            eraserBrush.color = '#000000';
-            canvas.freeDrawingBrush = eraserBrush;
+            canvas.freeDrawingBrush = standardBrush;
+            canvas.freeDrawingBrush.color = 'rgba(255, 255, 255, 0.5)';
+            canvas.freeDrawingBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
             canvasWrapper.classList.add('cursor-eraser');
-            canvas.renderAll();
         } else if (tool === 'text') { canvasWrapper.classList.add('cursor-text'); }
         else if (tool === 'eraser-stroke') { 
             canvas.isDrawingMode = false;
@@ -1590,7 +1672,10 @@ window.addEventListener('load', function() {
     });
 
     document.getElementById('bgSelect').addEventListener('change', function(e) {
-        var bg = e.target.value; canvasWrapper.className = 'canvas-wrapper ' + bg; syncBackground();
+        var bg = e.target.value;
+        canvasWrapper.classList.remove('bg-lined', 'bg-grid', 'bg-plain');
+        canvasWrapper.classList.add(bg);
+        syncBackground();
     });
 
     document.getElementById('themeToggle').onclick = function() {
@@ -1603,6 +1688,17 @@ window.addEventListener('load', function() {
     const savedTheme = localStorage.getItem('mathpad_theme');
     if (savedTheme === 'light') { document.documentElement.classList.add('light-mode'); }
 
+    // Sincronizar color de tinta por defecto según el tema (fix lápiz invisible en oscuro)
+    (function syncDefaultInkColor() {
+        var isLight = document.documentElement.classList.contains('light-mode');
+        var defaultInk = isLight ? '#1a1a2e' : '#f5f5f5';
+        var picker = document.getElementById('colorPicker');
+        if (picker.value === '#000000') {
+            picker.value = defaultInk;
+            standardBrush.color = defaultInk;
+        }
+    })();
+
     function getCanvasBounds(canvas) {
         var objects = canvas.getObjects();
         var hasContent = false;
@@ -1610,7 +1706,6 @@ window.addEventListener('load', function() {
         for (var i = 0; i < objects.length; i++) {
             var obj = objects[i];
             if (obj.isEraserMask === true || obj.isBackground) continue;
-            if (obj.selectable === false && obj.evented === false && obj.type === 'rect') continue;
             var bounds = obj.getBoundingRect();
             minX = Math.min(minX, bounds.left);
             minY = Math.min(minY, bounds.top);
@@ -1635,16 +1730,22 @@ window.addEventListener('load', function() {
         };
     }
 
+    function getExportBgColor() {
+        var bg = getComputedStyle(document.documentElement).getPropertyValue('--paper-bg').trim();
+        return bg || '#ffffff';
+    }
+
     async function exportPDF() {
         saveCurrentPage(); 
         const { jsPDF } = window.jspdf;
         var vpt = canvas.viewportTransform.slice(0);
         var pdf = null;
         var firstPage = true;
+        var exportBg = getExportBgColor();
         for (let i = 0; i < pages.length; i++) {
             await new Promise(resolve => canvas.loadFromJSON(pages[i], resolve));
             canvas.setViewportTransform([1,0,0,1,0,0]);
-            await new Promise(resolve => canvas.setBackgroundColor('#1a1a1a', resolve));
+            await new Promise(resolve => canvas.setBackgroundColor(exportBg, resolve));
             var bounds = getCanvasBounds(canvas);
             var imgData = canvas.toDataURL({ format: 'png', quality: 1, left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height });
             await new Promise(resolve => canvas.setBackgroundColor('', resolve));
@@ -1664,7 +1765,7 @@ window.addEventListener('load', function() {
 
     document.getElementById('btnExport').onclick = function() {
         var vpt = canvas.viewportTransform.slice(0); canvas.setViewportTransform([1,0,0,1,0,0]);
-        canvas.setBackgroundColor('#1a1a1a', function() {
+        canvas.setBackgroundColor(getExportBgColor(), function() {
             var bounds = getCanvasBounds(canvas);
             var link = document.createElement('a'); link.download = 'pizarra.png';
             link.href = canvas.toDataURL({ format: 'png', quality: 1, left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height }); link.click();
@@ -1673,9 +1774,13 @@ window.addEventListener('load', function() {
     };
 
     document.getElementById('btnSaveProj').onclick = function() {
-        var json = JSON.stringify(canvas.toJSON(['isEraserMask']));
-        var link = document.createElement('a'); link.download = 'sesion_mate.json';
-        link.href = URL.createObjectURL(new Blob([json], {type: "application/json"})); link.click();
+        saveCurrentPage(); // Asegurar que la página actual esté en el array
+        var allData = { mathpadVersion: 2, pages: pages, currentPage: currentPage };
+        var json = JSON.stringify(allData);
+        var link = document.createElement('a');
+        link.download = 'sesion_mate.json';
+        link.href = URL.createObjectURL(new Blob([json], {type: "application/json"}));
+        link.click();
     };
 
     var fileInput = document.getElementById('fileInput');
@@ -1683,7 +1788,21 @@ window.addEventListener('load', function() {
     fileInput.addEventListener('change', function(e) {
         var file = e.target.files[0]; if (!file) return;
         var reader = new FileReader();
-        reader.onload = function(f) { loadState(f.target.result); historyStack = [f.target.result]; redoStack = []; };
+        reader.onload = function(f) {
+            var data = JSON.parse(f.target.result);
+            if (data.pages && typeof data.currentPage !== 'undefined') {
+                // Nuevo formato multipágina
+                pages = data.pages;
+                currentPage = data.currentPage;
+            } else {
+                // Formato viejo (una sola página)
+                pages = [JSON.stringify(data)];
+                currentPage = 0;
+            }
+            loadPage(currentPage);
+            updatePageIndicator();
+            historyStack = [pages[currentPage]]; redoStack = [];
+        };
         reader.readAsText(file); fileInput.value = "";
     });
 
@@ -1738,10 +1857,7 @@ window.addEventListener('load', function() {
       catch { showToast('Solo se admiten imágenes', 'warn'); }
     });
 
-    let plottedFunctions = [];
-    const plotColors = ['#bb86fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
-
-    function plotFunction(exprStr, xMin, xMax, color) {
+    function plotFunction(exprStr, xMin, xMax, color, onlyLine) {
       let fn;
       try { fn = math.compile(exprStr); } catch(e) { throw new Error('Sintaxis inválida'); }
       const STEPS = 800;
@@ -1768,17 +1884,19 @@ window.addEventListener('load', function() {
       const BASE_LEFT = offX;
       const BASE_TOP  = offY;
       const group = [];
-      group.push(new fabric.Rect({ left: BASE_LEFT, top: BASE_TOP, width: plotW + margin * 2, height: plotH + margin * 2, fill: 'rgba(0,0,0,0.35)', stroke: 'rgba(255,255,255,0.08)', strokeWidth: 1, rx: 6, ry: 6, selectable: false, evented: false }));
-      const axisY = yMin <= 0 && yMax >= 0 ? toY(0) : toY(yMin);
-      group.push(new fabric.Line([BASE_LEFT + margin, BASE_TOP + axisY, BASE_LEFT + margin + plotW, BASE_TOP + axisY], { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }));
-      const axisX = xMin <= 0 && xMax >= 0 ? toX(0) : toX(xMin);
-      group.push(new fabric.Line([BASE_LEFT + axisX, BASE_TOP + margin, BASE_LEFT + axisX, BASE_TOP + margin + plotH], { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }));
-      const xTicks = 5;
-      for (let i = 0; i <= xTicks; i++) {
-        const xv = xMin + (xMax - xMin) * i / xTicks;
-        const cx = BASE_LEFT + toX(xv);
-        const cy = BASE_TOP  + axisY;
-        group.push(new fabric.Text(xv.toFixed(1), { left: cx - 12, top: cy + 4, fontSize: 9, fill: 'rgba(255,255,255,0.4)', selectable: false, evented: false }));
+      if (!onlyLine) {
+        group.push(new fabric.Rect({ left: BASE_LEFT, top: BASE_TOP, width: plotW + margin * 2, height: plotH + margin * 2, fill: 'rgba(0,0,0,0.35)', stroke: 'rgba(255,255,255,0.08)', strokeWidth: 1, rx: 6, ry: 6, selectable: false, evented: false }));
+        const axisY = yMin <= 0 && yMax >= 0 ? toY(0) : toY(yMin);
+        group.push(new fabric.Line([BASE_LEFT + margin, BASE_TOP + axisY, BASE_LEFT + margin + plotW, BASE_TOP + axisY], { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }));
+        const axisX = xMin <= 0 && xMax >= 0 ? toX(0) : toX(xMin);
+        group.push(new fabric.Line([BASE_LEFT + axisX, BASE_TOP + margin, BASE_LEFT + axisX, BASE_TOP + margin + plotH], { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }));
+        const xTicks = 5;
+        for (let i = 0; i <= xTicks; i++) {
+          const xv = xMin + (xMax - xMin) * i / xTicks;
+          const cx = BASE_LEFT + toX(xv);
+          const cy = BASE_TOP  + axisY;
+          group.push(new fabric.Text(xv.toFixed(1), { left: cx - 12, top: cy + 4, fontSize: 9, fill: 'rgba(255,255,255,0.4)', selectable: false, evented: false }));
+        }
       }
       let seg = [];
       const flush = () => {
@@ -1835,14 +1953,14 @@ window.addEventListener('load', function() {
       const exprRaw = document.getElementById('plotExpr').value.trim();
       const xMin    = parseFloat(document.getElementById('plotXMin').value);
       const xMax    = parseFloat(document.getElementById('plotXMax').value);
+      const color   = document.getElementById('plotColorPicker').value;
+      const onlyLine = document.getElementById('plotOnlyLine').checked;
       const errEl   = document.getElementById('plotError');
       errEl.style.display = 'none';
       if (!exprRaw) { errEl.textContent = 'Ingresá una expresión'; errEl.style.display = 'block'; return; }
       if (isNaN(xMin) || isNaN(xMax) || xMin >= xMax) { errEl.textContent = 'Rango x inválido'; errEl.style.display = 'block'; return; }
       try {
-        const colorIndex = plottedFunctions.length % plotColors.length;
-        const color = plotColors[colorIndex];
-        plotFunction(exprRaw, xMin, xMax, color);
+        plotFunction(exprRaw, xMin, xMax, color, onlyLine);
         document.getElementById('plotError').style.display = 'none';
       } catch(e) { errEl.textContent = 'Error en la expresión: ' + e.message; errEl.style.display = 'block'; }
     };
@@ -1850,17 +1968,83 @@ window.addEventListener('load', function() {
     document.getElementById('plotExpr').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('plotBtnAdd').click(); });
 
     document.getElementById('btnLatex').onclick = function() {
-        var ecuacion = prompt("Escribe tu ecuación en LaTeX (ej: \\int_{a}^{b} x^2 dx):");
-        if (!ecuacion) return;
-        try {
-            var svgElement = MathJax.tex2svg(ecuacion).querySelector('svg');
-            fabric.loadSVGFromString(new XMLSerializer().serializeToString(svgElement), function(objects, options) {
-                var obj = fabric.util.groupSVGElements(objects, options);
-                obj.set({ left: canvas.viewportTransform[4] * -1 + 100, top: canvas.viewportTransform[5] * -1 + 100, scaleX: 2, scaleY: 2, fill: document.getElementById('colorPicker').value, selectable: true, evented: true });
-                canvas.add(obj); canvas.setActiveObject(obj); setTool('select'); saveHistory();
-            });
-        } catch (e) { showToast("Error en la sintaxis LaTeX.", 'err'); }
+        var modal = document.getElementById('latexModal');
+        modal.style.display = 'flex';
+        var ta = document.getElementById('latexInput');
+        ta.value = '';
+        ta.focus();
+        var errEl = document.getElementById('latexError');
+        if (errEl) errEl.style.display = 'none';
     };
+    document.getElementById('latexBtnClose').onclick = () => document.getElementById('latexModal').style.display = 'none';
+    document.getElementById('latexBtnInsert').onclick = function() {
+        var ecuacion = document.getElementById('latexInput').value.trim();
+        var errEl = document.getElementById('latexError');
+        if (errEl) errEl.style.display = 'none';
+        if (!ecuacion) { if (errEl) { errEl.textContent = 'Ingresá una fórmula'; errEl.style.display = 'block'; } return; }
+        try {
+            // Verificar que MathJax esté cargado
+            if (typeof MathJax === 'undefined' || !MathJax.tex2svg) {
+                showToast("Cargando librerías matemáticas, intenta de nuevo.", "warn");
+                return;
+            }
+            
+            var mjxContainer = MathJax.tex2svg(ecuacion);
+            var svgElement = mjxContainer.querySelector('svg');
+            
+            if (!svgElement) throw new Error("No se pudo generar el SVG");
+
+            // FIX 1: Agregar el namespace XML (Obligatorio para que Fabric lo lea)
+            svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            
+            // FIX 2: Aplicar el color actual del colorPicker a los trazos de MathJax
+            var color = document.getElementById('colorPicker').value;
+            svgElement.querySelectorAll('use, path, rect').forEach(el => {
+                el.setAttribute('fill', color);
+                el.removeAttribute('stroke');
+            });
+
+            var svgString = new XMLSerializer().serializeToString(svgElement);
+
+            fabric.loadSVGFromString(svgString, function(objects, options) {
+                if (!objects || objects.length === 0) {
+                    showToast("Error al procesar la ecuación.", 'err');
+                    return;
+                }
+                var obj = fabric.util.groupSVGElements(objects, options);
+                
+                // FIX 3: Centrar el objeto y ajustar escala relativa al ZOOM actual
+                var vpt = canvas.viewportTransform;
+                var currentZoom = canvas.getZoom(); // Equivale a vpt[0]
+                
+                // Tomamos el tamaño de fuente actual. Usamos un factor multiplicador (ej. 1.5) 
+                // y LO DIVIDIMOS por el zoom actual para compensar la distancia de la cámara.
+                var baseFontSize = parseInt(document.getElementById('fontSizePicker').value, 10) || 16;
+                var scale = (baseFontSize * 1.5) / currentZoom; 
+                
+                obj.set({ 
+                    left: (canvas.getWidth() / 2 - vpt[4]) / currentZoom - (obj.width * scale) / 2, 
+                    top: (canvas.getHeight() / 2 - vpt[5]) / currentZoom - (obj.height * scale) / 2, 
+                    scaleX: scale, 
+                    scaleY: scale, 
+                    selectable: true, 
+                    evented: true 
+                });
+                
+                canvas.add(obj); 
+                canvas.setActiveObject(obj); 
+                setTool('select'); 
+                saveHistory();
+                showToast("Fórmula LaTeX insertada", "ok");
+                document.getElementById('latexModal').style.display = 'none';
+            });
+        } catch (e) { 
+            console.error("Error LaTeX:", e);
+            if (errEl) { errEl.textContent = 'Error en la sintaxis LaTeX.'; errEl.style.display = 'block'; }
+            showToast("Error en la sintaxis LaTeX.", 'err'); 
+        }
+    };
+    document.getElementById('latexInput').addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) document.getElementById('latexBtnInsert').click(); });
 
     window.addEventListener('paste', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -1907,7 +2091,7 @@ window.addEventListener('load', function() {
             var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr);
+            var res = math.evaluate(evalExpr, {});
             if (res !== undefined && typeof res !== 'function') resDisplay.textContent = math.format(res, { precision: 14 });
         } catch (ex) {}
     }
@@ -1959,7 +2143,7 @@ window.addEventListener('load', function() {
             var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr);
+            var res = math.evaluate(evalExpr, {});
             if (res !== undefined) { var formatted = math.format(res, { precision: 14 }); resDisplay.textContent = formatted; calcExpression = formatted; exprDisplay.textContent = evalExpr; addToHistory(evalExpr, formatted); }
         } catch(ex) { resDisplay.textContent = 'Error'; }
     };
@@ -2046,7 +2230,10 @@ window.addEventListener('load', function() {
     document.getElementById('btnClear').onclick = function() { showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => { canvas.clear(); canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); saveHistory(); }); };
 
     window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && document.getElementById('plotModal').style.display === 'flex') { document.getElementById('plotModal').style.display = 'none'; return; }
+        if (e.key === 'Escape') {
+            if (document.getElementById('plotModal').style.display === 'flex') { document.getElementById('plotModal').style.display = 'none'; return; }
+            if (document.getElementById('latexModal').style.display === 'flex') { document.getElementById('latexModal').style.display = 'none'; return; }
+        }
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (calcVisible) {
             var key = e.key;
@@ -2092,7 +2279,9 @@ window.addEventListener('load', function() {
 
     async function doAutoSave() {
       try {
-        const json = JSON.stringify(canvas.toJSON(['isEraserMask']));
+        saveCurrentPage(); // Asegurar que la página actual esté en el array
+        var allData = { mathpadVersion: 2, pages: pages, currentPage: currentPage };
+        const json = JSON.stringify(allData);
         if (json.length > 4_000_000) { showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return; }
         await db.autosave.put({ key: AS_KEY, value: json, timestamp: Date.now() });
         await db.autosave.put({ key: AS_TS, value: Date.now().toString(), timestamp: Date.now() });
@@ -2101,6 +2290,10 @@ window.addEventListener('load', function() {
     }
 
     function scheduleAutoSave() { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(doAutoSave, AS_DELAY); }
+
+    canvas.on('object:added', scheduleAutoSave);
+    canvas.on('object:modified', scheduleAutoSave);
+    canvas.on('object:removed', scheduleAutoSave);
 
     async function setupRecoveryBar() {
       try {
@@ -2122,7 +2315,27 @@ window.addEventListener('load', function() {
         const btnDiscard = document.getElementById('btnDiscardRecover');
         if (btnRecover) {
           btnRecover.onclick = async function() {
-            try { recoverBar.style.display = 'none'; await canvas.loadFromJSON(saved); canvas.requestRenderAll(); saveHistory(); showToast('✅ Sesión recuperada', 'ok'); }
+            try {
+              recoverBar.style.display = 'none';
+              var parsed = JSON.parse(saved);
+              if (parsed && parsed.mathpadVersion === 2 && Array.isArray(parsed.pages)) {
+                // Formato nuevo multipágina
+                pages = parsed.pages;
+                currentPage = Math.min(parsed.currentPage || 0, pages.length - 1);
+                loadState(pages[currentPage]);
+              } else {
+                // Formato viejo (un solo lienzo)
+                pages = [saved];
+                currentPage = 0;
+                loadState(saved);
+              }
+              updatePageIndicator();
+              historyStack = [pages[currentPage]];
+              redoStack = [];
+              canvas.requestRenderAll();
+              saveHistory();
+              showToast('✅ Sesión recuperada', 'ok');
+            }
             catch (e) { showToast('❌ Error al recuperar la sesión.', 'err'); console.error(e); }
           };
         }
@@ -2138,6 +2351,6 @@ window.addEventListener('load', function() {
 
     setTimeout(setupRecoveryBar, 500);
 });
-    </script>
+</script>
 </body>
 </html>
