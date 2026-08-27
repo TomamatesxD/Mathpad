@@ -88,7 +88,16 @@
             box-sizing: border-box;
             pointer-events: auto;
             padding-top: env(safe-area-inset-top, 0px);
+
+        /* ═══ Accesibilidad PC (#9): la barra se desplaza sin romper su diseño ═══ */
+            flex-wrap: nowrap;              /* nunca salta de línea */
+            overflow-x: auto;               /* scroll horizontal real */
+            overflow-y: hidden;
+            scrollbar-width: none;          /* Firefox: oculta la barra */
+            -ms-overflow-style: none;       /* IE/Edge legacy */
         }
+        .top-bar::-webkit-scrollbar { display: none; }          /* Chrome/Safari */
+        .top-bar > * { flex-shrink: 0; }   /* grupos y separadores no se comprimen */
 
         .tool-group {
             display: flex;
@@ -969,7 +978,7 @@
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </button>
             <button id="btnExportPDF" title="Exportar PDF">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><text text-anchor="middle" x="12.5" y="16.5" font-family="Arial, sans-serif" font-weight="bold" font-size="5.5" fill="currentColor" stroke="none">PDF</text></svg>
             </button>
             <button id="btnExport" title="Exportar PNG">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
@@ -1001,7 +1010,7 @@
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             </button>
             <button id="btnCalcToggle" title="Mostrar/Ocultar Calculadora" aria-label="Toggle calculadora">
-                <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><rect x="7" y="5" width="10" height="3" rx="0.5" fill="currentColor" fill-opacity="0.1"/><rect x="7" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="7" y="14" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="14" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="14" width="2.5" height="2" rx="0.5"/><rect x="7" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="17.5" width="2.5" height="2" rx="0.5"/></svg>
             </button>
             <button id="btnClear" class="btn-danger" title="Limpiar todo">
                 <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
@@ -3344,6 +3353,57 @@ window.addEventListener('load', function() {
         // Limpiar el estado de arrastre
         touchDragData = null;
     }, { passive: true });
+
+    /* ═══════════════════════════════════════════════════════════════
+       BARRA DE HERRAMIENTAS EN PC (#9): arrastre tipo "drag to scroll",
+       rueda del ratón vertical→horizontal y flechas ←/→ solo cuando el
+       cursor está sobre la barra (no interfiere con el canvas).
+    ═══════════════════════════════════════════════════════════════ */
+    (function initToolbarNav() {
+      var bar = document.querySelector('.top-bar');
+      if (!bar) return;
+
+      // ── Click & Drag para desplazar la barra ──
+      var isDown = false, startX = 0, scrollLeft0 = 0, dragged = false;
+      bar.addEventListener('mousedown', function(e) {
+        isDown = true; dragged = false;
+        startX = e.pageX; scrollLeft0 = bar.scrollLeft;
+      });
+      bar.addEventListener('mouseleave', function() { isDown = false; });
+      bar.addEventListener('mouseup', function() { isDown = false; });
+      window.addEventListener('mouseup', function() { isDown = false; });
+      window.addEventListener('mousemove', function(e) {
+        if (!isDown) return;
+        var dx = e.pageX - startX;
+        if (!dragged && Math.abs(dx) > 3) dragged = true; // umbral anti-clic fantasma
+        if (dragged) bar.scrollLeft = scrollLeft0 - dx;
+      });
+
+      // Un arrastre no debe activar el botón donde terminó el clic
+      bar.addEventListener('click', function(e) {
+        if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; }
+      }, true);
+
+      // ── Rueda del ratón: convierte deltaY en scroll horizontal ──
+      bar.addEventListener('wheel', function(e) {
+        var d = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (!d) return;
+        e.preventDefault();
+        bar.scrollLeft += d;
+      }, { passive: false });
+
+      // ── Flechas ←/→ solo con el cursor sobre la barra ──
+      var barHover = false;
+      bar.addEventListener('mouseenter', function() { barHover = true; });
+      bar.addEventListener('mouseleave', function() { barHover = false; });
+      document.addEventListener('keydown', function(e) {
+        if (!barHover) return;
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        bar.scrollLeft += (e.key === 'ArrowRight' ? 60 : -60);
+        e.preventDefault();
+        e.stopPropagation(); // captura: no llega al manejador global ni al canvas
+      }, true);
+    })();
 
 /* ═══════════════════════════════════════════════════════════════
    ATAJOS DE TECLADO (KEYDOWN / KEYUP)
