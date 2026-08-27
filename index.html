@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Entorno de Estudio MatemÃ¡tico</title>
+    <title>Entorno de Estudio Matemático</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bb86fc' stroke-width='1.55' stroke-linecap='round' stroke-linejoin='round'>
     <link rel="manifest" href="./manifest.json">
     <style>
@@ -43,7 +43,7 @@
             overscroll-behavior: none; /* NUEVO: Blindaje PWA */
         }
 
-        /* â”€â”€ BARRA DE RECUPERACIÃ“N DE SESIÃ“N (CRÃTICO) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* ── BARRA DE RECUPERACIÓN DE SESIÓN (CRÍTICO) ──────────────── */
         #recoverBar {
             display: none;
             position: fixed;
@@ -69,9 +69,9 @@
         :root.light-mode #btnDoRecover { background: #7c3aed; color: #fff; }
         :root.light-mode #btnDiscardRecover { color: #92400e; border-color: #f59e0b; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-            TOP BAR - Cabecera sÃ³lida (Docked)
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+            TOP BAR - Cabecera sólida (Docked)
+        ════════════════════════════════════════════════════════════════ */
         .top-bar {
             position: relative;
             width: 100%;
@@ -193,9 +193,9 @@
 
         .top-bar select:hover { border-color: var(--accent); }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            LEFT SIDEBAR - Barra lateral de herramientas
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .left-sidebar {
             position: fixed;
             top: var(--toolbar-h);
@@ -248,9 +248,9 @@
             color: var(--accent);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           BOTTOM BAR - Barra inferior de navegaciÃ³n
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+           BOTTOM BAR - Barra inferior de navegación
+        ════════════════════════════════════════════════════════════════ */
         .bottom-bar {
             position: fixed;
             bottom: 20px;
@@ -304,9 +304,9 @@
             text-align: center;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           MAIN CONTENT - Ãrea del canvas (Docked)
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+           MAIN CONTENT - Área del canvas (Docked)
+        ════════════════════════════════════════════════════════════════ */
         .main-content {
             display: flex;
             flex: 1;
@@ -316,9 +316,9 @@
             margin-bottom: var(--bottom-bar-h);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CANVAS
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .canvas-wrapper {
             flex: 1;
             position: relative;
@@ -340,9 +340,9 @@
 
         .canvas-container { position: absolute !important; top: 0; left: 0; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CALCULADORA
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .calculator-panel {
             width: var(--calc-w);
             background-color: var(--bg-panel);
@@ -451,12 +451,12 @@
         }
         .calc-keys button.equals:hover { background: var(--accent-hover); }
 
-        /* CientÃ­ficas */
+        /* Científicas */
         .sci-btn { display: none !important; }
         .sci-mode .sci-btn { display: flex !important; }
         .sci-mode .calc-keys { grid-template-columns: repeat(5, 1fr); }
 
-        /* BotÃ³n de memoria */
+        /* Botón de memoria */
         .calc-memory-btn {
             background: rgba(187,134,252,0.15);
             color: var(--accent);
@@ -508,9 +508,9 @@
             font-weight: 500;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CURSORES
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .cursor-pen    { cursor: crosshair !important; }
         .cursor-text   { cursor: text !important; }
         .cursor-eraser { cursor: cell !important; }
@@ -519,9 +519,9 @@
         .cursor-cross  { cursor: crosshair !important; }
         .cursor-fill { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M19 11l-8-8-8 8h16z"/><path d="M3 11v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8H3z"/><path d="M12 11v10"/></svg>') 12 12, pointer !important; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            RESPONSIVE LAYOUT
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         @media (max-width: 768px) {
             .top-bar {
                 justify-content: flex-start;
@@ -597,9 +597,9 @@
             }
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            TRANSICIONES GLOBALES
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .top-bar button,
         .top-bar select,
         .left-sidebar button,
@@ -614,9 +614,9 @@
                         opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            MODO CLARO
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         :root.light-mode {
             --bg-dark: #f5f5f5;
             --bg-panel: #ffffff;
@@ -733,7 +733,7 @@
             border-color: #f59e0b;
         }
 
-        /* BotÃ³n de toggle para modo claro/oscuro */
+        /* Botón de toggle para modo claro/oscuro */
         .theme-toggle {
             width: 40px;
             height: 40px;
@@ -759,9 +759,9 @@
             border-color: var(--border-color);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
             CONTEXT-MENU PANEL - Controles contextuales
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+         ════════════════════════════════════════════════════════════════ */
         .context-menu {
             position: fixed;
             top: calc(var(--toolbar-h) + 8px);
@@ -795,9 +795,9 @@
             cursor: pointer;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
             SVG ICON STYLING
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+         ════════════════════════════════════════════════════════════════ */
         .left-sidebar button svg,
         .top-bar button svg {
             width: 20px;
@@ -867,7 +867,7 @@
 <body>
 
 <div id="recoverBar">
-  <span>ðŸ“‹ SesiÃ³n guardada el <strong id="recoverDate"></strong> â€” Â¿Recuperar?</span>
+  <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
   <div style="display:flex;gap:8px;flex-shrink:0">
     <button id="btnDoRecover">
       Recuperar
@@ -882,10 +882,10 @@
     <div class="top-bar" role="toolbar" aria-label="Barra de sistema">
         <!-- Archivo -->
         <div class="tool-group">
-            <button id="btnSaveProj" title="Guardar SesiÃ³n en PC">
+            <button id="btnSaveProj" title="Guardar Sesión en PC">
                 <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h10"/></svg>
             </button>
-            <button id="btnLoadProj" title="Cargar SesiÃ³n desde PC">
+            <button id="btnLoadProj" title="Cargar Sesión desde PC">
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </button>
             <button id="btnExportPDF" title="Exportar PDF">
@@ -909,9 +909,9 @@
         <!-- Entorno -->
         <div class="tool-group">
             <select id="bgSelect" title="Tipo de fondo" aria-label="Tipo de fondo">
-                <option value="bg-lined" selected>ðŸ“„ Rayado</option>
-                <option value="bg-grid">ðŸ“Š CuadrÃ­cula</option>
-                <option value="bg-plain">â¬œ Liso</option>
+                <option value="bg-lined" selected>📄 Rayado</option>
+                <option value="bg-grid">📊 Cuadrícula</option>
+                <option value="bg-plain">⬜ Liso</option>
             </select>
             <!-- NUEVO: Selector de color de fondo -->
             <label title="Color de la hoja" style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:6px; margin-left:4px;">
@@ -987,7 +987,7 @@
                 <path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 11V4a2 2 0 0 0-4 0v6"/><path d="M10 11V5a2 2 0 0 0-4 0v9l-3-3a2 2 0 0 0-3 3l5 7h9a5 5 0 0 0 5-5v-6Z"/>
             </svg>
         </button>
-        <button id="btnPen" title="LÃ¡piz [P]">
+        <button id="btnPen" title="Lápiz [P]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
         <button id="btnHighlight" title="Resaltador">
@@ -1008,7 +1008,7 @@
         <button id="btnEraserNormal" title="Borrado Normal [Shift+E]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
         </button>
-        <button id="btnRuler" title="Regla/CompÃ¡s [R]">
+        <button id="btnRuler" title="Regla/Compás [R]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="10" y1="8" x2="10" y2="12"/><line x1="14" y1="8" x2="14" y2="12"/><line x1="18" y1="8" x2="18" y2="12"/></svg>
         </button>
         <button id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]">
@@ -1017,29 +1017,29 @@
         
         <div class="tool-separator"></div>
         
-        <!-- Formas e InserciÃ³n (acceso directo) -->
-        <button id="menuBtnLine" title="LÃ­nea">
+        <!-- Formas e Inserción (acceso directo) -->
+        <button id="menuBtnLine" title="Línea">
             <svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg>
         </button>
-        <button id="menuBtnRect" title="RectÃ¡ngulo">
+        <button id="menuBtnRect" title="Rectángulo">
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/></svg>
         </button>
-        <button id="menuBtnCircle" title="CÃ­rculo">
+        <button id="menuBtnCircle" title="Círculo">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
         </button>
-        <button id="menuBtnTriangle" title="TriÃ¡ngulo">
+        <button id="menuBtnTriangle" title="Triángulo">
             <svg viewBox="0 0 24 24"><path d="M12 4L20 20H4z"/></svg>
         </button>
         
         <div class="tool-separator"></div>
         
-        <button id="menuBtnLatex" title="FÃ³rmula LaTeX">
+        <button id="menuBtnLatex" title="Fórmula LaTeX">
             <svg viewBox="0 0 24 24"><path d="M4 8h4v8H4zM10 8h4v8h-4zM16 8h4v8h-4z"/></svg>
         </button>
         <button id="menuBtnImage" title="Insertar imagen">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </button>
-        <button id="menuBtnPlot" title="Graficar funciÃ³n">
+        <button id="menuBtnPlot" title="Graficar función">
             <svg viewBox="0 0 24 24"><path d="M3 20L21 4M3 20h18M3 20v-18"/></svg>
         </button>
     </div>
@@ -1047,27 +1047,27 @@
     <!-- CONTEXT-MENU PANEL - Controles contextuales (color, grosor, fuente) -->
     <div id="contextMenu" class="context-menu hidden">
         <div class="context-menu-group">
-            <label title="Color del trazo">ðŸŽ¨ <input type="color" id="colorPicker" value="#000000"></label>
+            <label title="Color del trazo">🎨 <input type="color" id="colorPicker" value="#000000"></label>
         </div>
         <div class="context-menu-group">
-            <label title="Grosor del trazo">ðŸ“ <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
+            <label title="Grosor del trazo">📏 <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
             <span id="widthValue">3</span>
         </div>
         <div class="context-menu-group">
-            <label title="TamaÃ±o de fuente">ðŸ”¤ <input type="number" id="fontSizePicker" min="8" max="120" value="16"></label>
+            <label title="Tamaño de fuente">🔤 <input type="number" id="fontSizePicker" min="8" max="120" value="16"></label>
         </div>
     </div>
 
-    <!-- BOTTOM BAR - NavegaciÃ³n de pÃ¡ginas -->
-    <div class="bottom-bar" role="navigation" aria-label="NavegaciÃ³n de pÃ¡ginas">
-        <button id="btnPrevPage" title="PÃ¡gina anterior">
+    <!-- BOTTOM BAR - Navegación de páginas -->
+    <div class="bottom-bar" role="navigation" aria-label="Navegación de páginas">
+        <button id="btnPrevPage" title="Página anterior">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <span id="pageIndicator" title="PÃ¡gina actual">1 / 1</span>
-        <button id="btnNextPage" title="PÃ¡gina siguiente">
+        <span id="pageIndicator" title="Página actual">1 / 1</span>
+        <button id="btnNextPage" title="Página siguiente">
             <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
         </button>
-        <button id="btnAddPage" title="Nueva pÃ¡gina">
+        <button id="btnAddPage" title="Nueva página">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -1092,38 +1092,38 @@
             </div>
         <div class="calc-controls">
             <label>
-                <input type="checkbox" id="toggleSci"> CientÃ­fica
+                <input type="checkbox" id="toggleSci"> Científica
             </label>
             <button id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)">M</button>
         </div>
         <div class="calc-keys" id="calcKeys">
-            <!-- CientÃ­ficas -->
+            <!-- Científicas -->
             <button class="sci-btn operator" data-val="sin(">sin</button>
             <button class="sci-btn operator" data-val="cos(">cos</button>
             <button class="sci-btn operator" data-val="tan(">tan</button>
-            <button class="sci-btn operator" data-val="sqrt(">âˆšx</button>
-            <button class="sci-btn operator" data-val="^">xÊ¸</button>
+            <button class="sci-btn operator" data-val="sqrt(">√x</button>
+            <button class="sci-btn operator" data-val="^">xʸ</button>
             <button class="sci-btn operator" data-val="log(">log</button>
             <button class="sci-btn operator" data-val="(">(</button>
             <button class="sci-btn operator" data-val=")">)</button>
-            <button class="sci-btn operator" data-val="pi">Ï€</button>
+            <button class="sci-btn operator" data-val="pi">π</button>
             <button class="sci-btn operator" data-val="e">e</button>
 
-            <!-- BÃ¡sicas -->
+            <!-- Básicas -->
             <button class="action" id="calcClear">C</button>
-            <button class="action" id="calcDel">âŒ«</button>
+            <button class="action" id="calcDel">⌫</button>
             <button class="operator" data-val="%">%</button>
-            <button class="operator" data-val="/">Ã·</button>
+            <button class="operator" data-val="/">÷</button>
 
             <button data-val="7">7</button>
             <button data-val="8">8</button>
             <button data-val="9">9</button>
-            <button class="operator" data-val="*">Ã—</button>
+            <button class="operator" data-val="*">×</button>
 
             <button data-val="4">4</button>
             <button data-val="5">5</button>
             <button data-val="6">6</button>
-            <button class="operator" data-val="-">âˆ’</button>
+            <button class="operator" data-val="-">−</button>
 
             <button data-val="1">1</button>
             <button data-val="2">2</button>
@@ -1147,10 +1147,10 @@
       z-index:9000; align-items:center; justify-content:center;">
       <div style="background:#1e1e1e; border:1px solid #444; border-radius:14px;
         padding:28px 32px; width:90%; max-width:500px;">
-        <h3 style="color:#bb86fc; margin-bottom:20px; font-size:16px">ðŸ“ˆ Graficar funciÃ³n</h3>
+        <h3 style="color:#bb86fc; margin-bottom:20px; font-size:16px">📈 Graficar función</h3>
 
         <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">
-          f(x) = <small style="color:#666">(usÃ¡: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
+          f(x) = <small style="color:#666">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
         </label>
         <input id="plotExpr" type="text" value="x^2"
           style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
@@ -1159,13 +1159,13 @@
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px">
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x mÃ­nimo</label>
+            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x mínimo</label>
             <input id="plotXMin" type="number" value="-5"
               style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
                 padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
           </div>
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x mÃ¡ximo</label>
+            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x máximo</label>
             <input id="plotXMax" type="number" value="5"
               style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
                 padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
@@ -1181,7 +1181,7 @@
           <div style="padding-top: 16px;">
             <label style="color:#e0e0e0; font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
               <input id="plotOnlyLine" type="checkbox" style="width:16px; height:16px; accent-color:#bb86fc;">
-              Fondo transparente (Solo lÃ­nea)
+              Fondo transparente (Solo línea)
             </label>
           </div>
         </div>
@@ -1190,7 +1190,7 @@
           <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">Funciones graficadas:</label>
           <div id="plotFunctionsList" style="background:#121212; border:1px solid #555; border-radius:8px;
             padding:8px; min-height:40px; max-height:120px; overflow-y:auto; font-size:13px; color:#888;">
-            <span style="font-style:italic">Ninguna funciÃ³n graficada aÃºn</span>
+            <span style="font-style:italic">Ninguna función graficada aún</span>
           </div>
         </div>
 
@@ -1285,7 +1285,7 @@ self.addEventListener('fetch', event => {
           var blob = new Blob([code], {type: 'text/javascript'});
           var url = URL.createObjectURL(blob);
           navigator.serviceWorker.register(url)
-            .then(function(r){ console.log('Service Worker registrado con Ã©xito:', r.scope); })
+            .then(function(r){ console.log('Service Worker registrado con éxito:', r.scope); })
             .catch(function(err){ console.error('Error al registrar Service Worker', err); });
         });
       }
@@ -1294,7 +1294,7 @@ self.addEventListener('fetch', event => {
     <script>
 
 window.addEventListener('load', function() {
-    const GRID_BASE = 30; // TamaÃ±o fijo de la celda de cuadrÃ­cula en pÃ­xeles
+    const GRID_BASE = 30; // Tamaño fijo de la celda de cuadrícula en píxeles
 
     // Solicitar persistencia de almacenamiento (evita que el navegador borre los datos)
     if (navigator.storage && navigator.storage.persist) {
@@ -1312,18 +1312,18 @@ window.addEventListener('load', function() {
         skipTargetFind: false
     });
 
-    // NUEVO: SelecciÃ³n exacta sobre trazos con un pequeÃ±o margen de comodidad
+    // NUEVO: Selección exacta sobre trazos con un pequeño margen de comodidad
     fabric.Object.prototype.perPixelTargetFind = true;
     canvas.targetFindTolerance = 8;
 
-        /* PINCEL LÃPIZ NORMAL */
+        /* PINCEL LÁPIZ NORMAL */
     const standardBrush = new fabric.PencilBrush(canvas);
     standardBrush.color = document.getElementById('colorPicker').value;
     standardBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
     canvas.freeDrawingBrush = standardBrush;
 
-        // PORTADO DESDE INDEX.HTML: Sincroniza el color de la tinta segÃºn el tema activo
-    // (evita que el lÃ¡piz quede invisible sobre fondos claros/oscuros)
+        // PORTADO DESDE INDEX.HTML: Sincroniza el color de la tinta según el tema activo
+    // (evita que el lápiz quede invisible sobre fondos claros/oscuros)
     // Reutilizable: se llama al iniciar y al cambiar de tema
     var syncDefaultInkColor = function() {
         var isLight = document.documentElement.classList.contains('light-mode');
@@ -1347,15 +1347,15 @@ window.addEventListener('load', function() {
     let clipboard = null;
     let isHistoryAction = false, historyStack = [], redoStack = [];
     let calcVisible = false;
-    let showAxes = false; // Control de las reglas de mediciÃ³n
+    let showAxes = false; // Control de las reglas de medición
     let activeShape = null, startX = 0, startY = 0;
-    // Variables para herramienta de regla/compÃ¡s
+    // Variables para herramienta de regla/compás
     let rulerStartPoint = null;
     let rulerCurrentLine = null;
-    let rulerSnapAngle = 15; // Grados para snapping (15Â°, 30Â°, 45Â°, 60Â°, 75Â°, 90Â°)
+    let rulerSnapAngle = 15; // Grados para snapping (15°, 30°, 45°, 60°, 75°, 90°)
     let rulerSnapLength = 50; // Pixeles para snapping de longitud
 
-    /* VARIABLES PAGINACIÃ“N Y RESALTADOR */
+    /* VARIABLES PAGINACIÓN Y RESALTADOR */
     let pages = [null]; 
     let currentPage = 0;
 
@@ -1364,9 +1364,9 @@ window.addEventListener('load', function() {
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    RESIZE Y FONDO
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     function resizeCanvas() {
         canvas.setWidth(canvasWrapper.clientWidth);
         canvas.setHeight(canvasWrapper.clientHeight);
@@ -1376,7 +1376,7 @@ window.addEventListener('load', function() {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Alinear el fondo del canvas con el valor del menÃº al iniciar
+    // Alinear el fondo del canvas con el valor del menú al iniciar
     // (evita desajuste entre la clase del contenedor y el <select>)
     var initBg = document.getElementById('bgSelect').value;
     canvasWrapper.className = 'canvas-wrapper ' + initBg;
@@ -1397,7 +1397,7 @@ window.addEventListener('load', function() {
         syncBackground();
     });
 
-    // Gestos tÃ¡ctiles: pinch-to-zoom y pan con dos dedos (detecciÃ³n nativa, sin Event.js)
+    // Gestos táctiles: pinch-to-zoom y pan con dos dedos (detección nativa, sin Event.js)
     let lastTouchDistance = 0;
     let lastTouchCenter = null;
     let isTouchPanning = false;
@@ -1408,14 +1408,14 @@ window.addEventListener('load', function() {
         isTouchPanning = false;
     }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    EVENTOS UNIFICADOS DE PUNTERO (mouse/touch/pen)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     canvas.on('mouse:down', function(opt) {
         if (currentTool === 'select') return;
         var evt = opt.e;
 
-        // Gesto tÃ¡ctil nativo de 2 dedos: pinch-to-zoom y pan
+        // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan
         if (evt.touches && evt.touches.length === 2) {
             isTouchPanning = true;
             lastTouchDistance = Math.hypot(
@@ -1430,7 +1430,7 @@ window.addEventListener('load', function() {
             return;
         }
 
-        // BotÃ³n 1 (izquierdo) o touch
+        // Botón 1 (izquierdo) o touch
         var isPrimaryAction = evt.button === 0 || evt.pointerType === 'touch' || evt.pointerType === 'pen';
         
         if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser-normal')) {
@@ -1452,14 +1452,14 @@ window.addEventListener('load', function() {
             return; 
         } // El borrado por trazo se maneja en mouse:move sin activar isErasing
 
-        // --- INICIO HERRAMIENTA DE RELLENO HÃBRIDO ---
+        // --- INICIO HERRAMIENTA DE RELLENO HÍBRIDO ---
         if (currentTool === 'fill') {
             const target = canvas.findTarget(opt.e, false);
             const color = document.getElementById('colorPicker').value;
             
             // 1. RELLENO VECTORIAL INTELIGENTE (Solo figuras cerradas perfectas)
             if (target && !target.isBackground && !target.isEraserMask) {
-                // Solo pintar fill directamente en polÃ­gonos cerrados nativos
+                // Solo pintar fill directamente en polígonos cerrados nativos
                 if (['rect', 'circle', 'triangle', 'ellipse'].includes(target.type)) {
                     target.set('fill', color);
                     canvas.requestRenderAll();
@@ -1467,13 +1467,13 @@ window.addEventListener('load', function() {
                     return;
                 }
                 // Si es imagen, texto, path o grupo, NO HAREMOS RETURN.
-                // Dejamos que el cÃ³digo continÃºe hacia el Flood Fill.
+                // Dejamos que el código continúe hacia el Flood Fill.
             }
 
             // 2. FLOOD FILL RASTER (Lectura Directa 1:1)
             var retina = canvas.getRetinaScaling(); // Conservado para el vectorizado posterior (fromURL)
             var rectEl = canvas.lowerCanvasEl.getBoundingClientRect();
-            // Escala real entre los pÃ­xeles lÃ³gicos del canvas y su tamaÃ±o fÃ­sico en el DOM
+            // Escala real entre los píxeles lógicos del canvas y su tamaño físico en el DOM
             var scaleX = canvas.lowerCanvasEl.width / rectEl.width;
             var scaleY = canvas.lowerCanvasEl.height / rectEl.height;
 
@@ -1485,7 +1485,7 @@ window.addEventListener('load', function() {
                 clientY = opt.e.touches[0].clientY;
             }
 
-            // Mapeo exacto de pÃ­xeles fÃ­sicos
+            // Mapeo exacto de píxeles físicos
             var px = Math.round((clientX - rectEl.left) * scaleX);
             var py = Math.round((clientY - rectEl.top) * scaleY);
             
@@ -1493,7 +1493,7 @@ window.addEventListener('load', function() {
             var h = canvas.lowerCanvasEl.height;
             if (px < 0 || px >= w || py < 0 || py >= h) return;
 
-            // Aislamiento sÃ­ncrono de la Regla (El navegador no lo renderiza visualmente)
+            // Aislamiento síncrono de la Regla (El navegador no lo renderiza visualmente)
             var prevAxes = typeof showAxes !== 'undefined' ? showAxes : false;
             if (prevAxes) {
                 showAxes = false;
@@ -1508,7 +1508,7 @@ window.addEventListener('load', function() {
                 data = imgData.data;
             } catch (e) {
                 if (prevAxes) { showAxes = true; canvas.renderAll(); }
-                showToast('ðŸ”’ Error: Imagen externa bloquea la pintura', 'err');
+                showToast('🔒 Error: Imagen externa bloquea la pintura', 'err');
                 return;
             }
 
@@ -1580,9 +1580,9 @@ window.addEventListener('load', function() {
             }
 
             if (touchesBorder) {
-                // FIX: El bote de pintura NUNCA debe alterar el fondo automÃ¡ticamente. 
-                // El fondo solo se cambia con la herramienta especÃ­fica de color de hoja.
-                showToast('âš ï¸ Ãrea abierta. Cierra la lÃ­nea o usa el selector de fondo arriba.', 'warn', 4000);
+                // FIX: El bote de pintura NUNCA debe alterar el fondo automáticamente. 
+                // El fondo solo se cambia con la herramienta específica de color de hoja.
+                showToast('⚠️ Área abierta. Cierra la línea o usa el selector de fondo arriba.', 'warn', 4000);
                 return; 
             }
 
@@ -1597,7 +1597,7 @@ window.addEventListener('load', function() {
                 var pImgData = pCtx.createImageData(pW, pH);
                 var pData = pImgData.data;
 
-                // Mapear solo los pÃ­xeles afectados al nuevo minicanvas
+                // Mapear solo los píxeles afectados al nuevo minicanvas
                 for (var y = minY; y <= maxY; y++) {
                     for (var x = minX; x <= maxX; x++) {
                         var srcIdx = (y * w + x) * 4;
@@ -1612,7 +1612,7 @@ window.addEventListener('load', function() {
                 }
                 pCtx.putImageData(pImgData, 0, 0);
 
-                // Inyectar en Fabric ajustando la cÃ¡mara
+                // Inyectar en Fabric ajustando la cámara
                 fabric.Image.fromURL(patchCanvas.toDataURL(), function(img) {
                     var vpt = canvas.viewportTransform;
                     img.set({
@@ -1629,7 +1629,7 @@ window.addEventListener('load', function() {
                     canvas.add(img);
                     if (target) {
                         var targetIdx = canvas.getObjects().indexOf(target);
-                        // Si es dibujo a mano (path/group), el relleno va DETRÃS del trazo
+                        // Si es dibujo a mano (path/group), el relleno va DETRÁS del trazo
                         if (['path', 'group'].includes(target.type)) {
                             img.moveTo(Math.max(0, targetIdx));
                         } else {
@@ -1637,7 +1637,7 @@ window.addEventListener('load', function() {
                             img.moveTo(targetIdx + 1);
                         }
                     } else {
-                        // Si se hizo clic en el vacÃ­o
+                        // Si se hizo clic en el vacío
                         img.sendToBack();
                     }
                     canvas.requestRenderAll();
@@ -1646,7 +1646,7 @@ window.addEventListener('load', function() {
             }
             return;
         }
-        // --- FIN HERRAMIENTA DE RELLENO HÃBRIDO ---
+        // --- FIN HERRAMIENTA DE RELLENO HÍBRIDO ---
 
         if (['line', 'rect', 'circle', 'triangle'].includes(currentTool)) {
             var pointer = canvas.getPointer(evt);
@@ -1674,7 +1674,7 @@ window.addEventListener('load', function() {
             itext.enterEditing(); itext.selectAll(); canvas.requestRenderAll();
         }
 
-        // Herramienta regla: iniciar lÃ­nea con snapping
+        // Herramienta regla: iniciar línea con snapping
         if (currentTool === 'ruler') {
             var pointer = canvas.getPointer(evt);
             rulerStartPoint = { x: pointer.x, y: pointer.y };
@@ -1690,7 +1690,7 @@ window.addEventListener('load', function() {
         }
     });
 
-    // Distancia mÃ­nima de un punto p a un segmento a-b (proyecciÃ³n clamped)
+    // Distancia mínima de un punto p a un segmento a-b (proyección clamped)
     function distToSegment(p, a, b) {
         const abx = b.x - a.x, aby = b.y - a.y;
         const lenSq = abx * abx + aby * aby;
@@ -1739,7 +1739,7 @@ window.addEventListener('load', function() {
         return segments;
     }
 
-    // FunciÃ³n helper para encontrar el objeto bajo el puntero
+    // Función helper para encontrar el objeto bajo el puntero
     function findObjectAtPointer(canvas, pointer) {
         const objects = canvas.getObjects();
         const tolerance = 15;
@@ -1749,14 +1749,14 @@ window.addEventListener('load', function() {
             const obj = objects[i];
             if (obj.isEraserMask === true || obj.isBackground) continue;
 
-            // Filtro rÃ¡pido: bounding box (con tolerancia)
+            // Filtro rápido: bounding box (con tolerancia)
             const bounds = obj.getBoundingRect();
             if (pointer.x < bounds.left - tolerance || pointer.x > bounds.left + bounds.width + tolerance ||
                 pointer.y < bounds.top - tolerance || pointer.y > bounds.top + bounds.height + tolerance) {
                 continue;
             }
 
-            // Para paths de lÃ¡piz: distancia punto-a-segmento contra el trazo
+            // Para paths de lápiz: distancia punto-a-segmento contra el trazo
             if (obj.type === 'path' && obj.path) {
                 const localPt = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
                 const px = localPt.x + (obj.pathOffset ? obj.pathOffset.x : 0);
@@ -1777,7 +1777,7 @@ window.addEventListener('load', function() {
 
                 if (minDist < tolerance) return obj;
             } else {
-                // Para otros objetos: detecciÃ³n de colisiÃ³n estricta contra el contorno
+                // Para otros objetos: detección de colisión estricta contra el contorno
                 const segments = getShapeSegmentsInCanvasSpace(obj);
                 for (const seg of segments) {
                     if (distToSegment(pointer, seg.a, seg.b) < tolerance) {
@@ -1792,7 +1792,7 @@ window.addEventListener('load', function() {
     canvas.on('mouse:move', function(opt) {
         var e = opt.e;
 
-        // Gesto tÃ¡ctil nativo: pinch-to-zoom y pan con dos dedos
+        // Gesto táctil nativo: pinch-to-zoom y pan con dos dedos
         if (isTouchPanning && e.touches && e.touches.length === 2) {
             var distance = Math.hypot(
                 e.touches[1].clientX - e.touches[0].clientX,
@@ -1823,18 +1823,18 @@ window.addEventListener('load', function() {
             return;
         }
 
-        // Si ya no hay 2 dedos, resetear el gesto tÃ¡ctil
+        // Si ya no hay 2 dedos, resetear el gesto táctil
         if (isTouchPanning && (!e.touches || e.touches.length !== 2)) {
             resetTouchGesture();
         }
 
-        // DetecciÃ³n universal de arrastre: usar el tracker de mouse:down como fuente de verdad
-        // (mÃ¡s confiable que e.buttons/touches que Fabric.js puede no propagar correctamente)
+        // Detección universal de arrastre: usar el tracker de mouse:down como fuente de verdad
+        // (más confiable que e.buttons/touches que Fabric.js puede no propagar correctamente)
         var isDragging = isPointerDown;
 
         // Borrador por trazo: eliminar objetos mientras se mueve el mouse
         if (currentTool === 'eraser-stroke' && isDragging) {
-            // Usar el mÃ©todo nativo findTarget de Fabric.js que respeta:
+            // Usar el método nativo findTarget de Fabric.js que respeta:
             // - perPixelTargetFind = true
             // - targetFindTolerance = 8
             // - evented/selectable flags
@@ -1850,7 +1850,7 @@ window.addEventListener('load', function() {
 
         if (currentTool === 'select') return;
 
-        // Forzar renderizado en tiempo real para lÃ¡piz y resaltador
+        // Forzar renderizado en tiempo real para lápiz y resaltador
         if (isDragging && (currentTool === 'pen' || currentTool === 'highlight')) {
             canvas.requestRenderAll();
             return;
@@ -1889,7 +1889,7 @@ window.addEventListener('load', function() {
             canvas.requestRenderAll();
         }
 
-        // Herramienta regla: actualizar lÃ­nea con snapping
+        // Herramienta regla: actualizar línea con snapping
         if (currentTool === 'ruler' && rulerStartPoint && isDragging) {
             var pointer = canvas.getPointer(opt.e);
             var dx = pointer.x - rulerStartPoint.x;
@@ -1897,7 +1897,7 @@ window.addEventListener('load', function() {
             var length = Math.sqrt(dx * dx + dy * dy);
             var angle = Math.atan2(dy, dx) * 180 / Math.PI;
             
-            // Snapping a Ã¡ngulos
+            // Snapping a ángulos
             var snappedAngle = Math.round(angle / rulerSnapAngle) * rulerSnapAngle;
             var angleRad = snappedAngle * Math.PI / 180;
             
@@ -1908,7 +1908,7 @@ window.addEventListener('load', function() {
             var endX = rulerStartPoint.x + Math.cos(angleRad) * snappedLength;
             var endY = rulerStartPoint.y + Math.sin(angleRad) * snappedLength;
             
-            // Actualizar lÃ­nea
+            // Actualizar línea
             rulerCurrentLine.set({ x2: endX, y2: endY });
             canvas.requestRenderAll();
         }
@@ -1930,7 +1930,7 @@ window.addEventListener('load', function() {
             activeShape = null; saveHistory();
         }
 
-        // Finalizar herramienta regla: convertir lÃ­nea en objeto permanente
+        // Finalizar herramienta regla: convertir línea en objeto permanente
         if (currentTool === 'ruler' && rulerCurrentLine) {
             rulerCurrentLine.setCoords();
             var isSelect = (currentTool === 'select');
@@ -1942,9 +1942,9 @@ window.addEventListener('load', function() {
         }
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       REGLAS DE BORDE DINÃMICAS (ESTILO WORD / PHOTOSHOP)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════════════════════════════════════════════
+       REGLAS DE BORDE DINÁMICAS (ESTILO WORD / PHOTOSHOP)
+    ═══════════════════════════════════════════════════════════════ */
     canvas.on('after:render', function(opt) {
         if (!showAxes) return;
         if (!opt || !opt.ctx) return;
@@ -1965,19 +1965,19 @@ window.addEventListener('load', function() {
         var isLight = document.documentElement.classList.contains('light-mode');
         var isMobile = window.innerWidth < 768;
 
-        // DiseÃ±o: Proporciones legibles. MÃ¡s grueso y con mejor tipografÃ­a en mÃ³viles.
+        // Diseño: Proporciones legibles. Más grueso y con mejor tipografía en móviles.
         var RULER_SIZE = isMobile ? 28 : 24; 
         var fontSize = isMobile ? 12 : 10;
         var bg = isLight ? '#f8fafc' : '#1e293b';
         var fg = isLight ? '#475569' : '#94a3b8';
         var lineCol = isLight ? '#cbd5e1' : '#334155';
 
-        // 1. Dibujar fondos sÃ³lidos de la regla (Borde superior e izquierdo)
+        // 1. Dibujar fondos sólidos de la regla (Borde superior e izquierdo)
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, w, RULER_SIZE);
         ctx.fillRect(0, 0, RULER_SIZE, h);
 
-        // 2. LÃ­neas separadoras entre la regla y el lienzo
+        // 2. Líneas separadoras entre la regla y el lienzo
         ctx.strokeStyle = lineCol;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -1985,7 +1985,7 @@ window.addEventListener('load', function() {
         ctx.moveTo(RULER_SIZE, 0); ctx.lineTo(RULER_SIZE, h);
         ctx.stroke();
 
-        // 3. LÃ³gica matemÃ¡tica de escala dinÃ¡mica (GeoGebra style)
+        // 3. Lógica matemática de escala dinámica (GeoGebra style)
         ctx.fillStyle = fg;
         ctx.strokeStyle = fg;
         ctx.font = fontSize + 'px "Segoe UI", sans-serif';
@@ -2049,7 +2049,7 @@ window.addEventListener('load', function() {
             ctx.restore();
         }
 
-        // 4. Bloque de la esquina superior izquierda (para que no se crucen los nÃºmeros)
+        // 4. Bloque de la esquina superior izquierda (para que no se crucen los números)
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, RULER_SIZE, RULER_SIZE);
         ctx.strokeStyle = lineCol;
@@ -2058,15 +2058,15 @@ window.addEventListener('load', function() {
         ctx.restore();
     });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   MÃSCARAS E HISTORIAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   MÁSCARAS E HISTORIAL
+═══════════════════════════════════════════════════════════════ */
     canvas.on('path:created', function(opt) {
         if (currentTool === 'eraser-normal') {
             var eraserPath = opt.path;
             canvas.remove(eraserPath); // Quitar trazo temporal del lienzo global
 
-            // Buscar quÃ© objetos cruzÃ³ la goma
+            // Buscar qué objetos cruzó la goma
             var targets = canvas.getObjects().filter(function(obj) {
                 return obj !== eraserPath && !obj.isBackground && obj.intersectsWithObject(eraserPath);
             });
@@ -2100,7 +2100,7 @@ window.addEventListener('load', function() {
             return; // Prevenir guardado duplicado
         }
         
-        // Mantener comportamiento para otras herramientas (lÃ¡piz, resaltador)
+        // Mantener comportamiento para otras herramientas (lápiz, resaltador)
         if (currentTool !== 'eraser-normal') {
             saveHistory();
         }
@@ -2110,7 +2110,7 @@ window.addEventListener('load', function() {
     canvas.on('object:modified', scheduleAutoSave);
     canvas.on('object:removed', function() {
         scheduleAutoSave();
-        // Guardar historial (el borrador de trazo lo hace aquÃ­)
+        // Guardar historial (el borrador de trazo lo hace aquí)
         saveHistory();
     });
 
@@ -2128,9 +2128,9 @@ window.addEventListener('load', function() {
         });
     }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   PAGINACIÃ“N
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   PAGINACIÓN
+═══════════════════════════════════════════════════════════════ */
     function saveCurrentPage() { pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask'])); }
     function renderPageInfo() { document.getElementById('pageIndicator').innerText = (currentPage + 1) + ' / ' + pages.length; }
 
@@ -2152,9 +2152,9 @@ window.addEventListener('load', function() {
         if (currentPage < pages.length - 1) { saveCurrentPage(); currentPage++; loadState(pages[currentPage]); renderPageInfo(); }
     };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    HERRAMIENTAS Y BOTONES UI
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     function showToast(msg, type = 'info', duration = 3000) {
       let t = document.getElementById('mpToast');
       if (!t) {
@@ -2235,14 +2235,14 @@ window.addEventListener('load', function() {
                 o.hoverCursor = isSelect ? null : 'default';
             }
         });
-        // (Nota: Si la herramienta es 'fill', su propia rama sobreescribirÃ¡ evented=true mÃ¡s abajo)
+        // (Nota: Si la herramienta es 'fill', su propia rama sobreescribirá evented=true más abajo)
 
         let btnMap = { 'pen':'btnPen', 'highlight':'btnHighlight', 'fill':'btnFill', 'text':'btnText', 'eraser-stroke':'btnEraserStroke', 'eraser-normal':'btnEraserNormal', 'select':'btnSelect', 'pan':'btnPan', 'line':'menuBtnLine', 'rect':'menuBtnRect', 'circle':'menuBtnCircle', 'triangle':'menuBtnTriangle', 'ruler':'btnRuler' };
         
         let targetBtnId = btnMap[tool];
         if (targetBtnId) {
             let btn = document.getElementById(targetBtnId);
-            if (btn) btn.classList.add('active'); // Solo agrega la clase si el botÃ³n existe en el HTML
+            if (btn) btn.classList.add('active'); // Solo agrega la clase si el botón existe en el HTML
         }
 
         if (tool === 'pen') {
@@ -2283,7 +2283,7 @@ window.addEventListener('load', function() {
         else if (tool === 'eraser-stroke') { 
             canvas.isDrawingMode = false; // Asegurar que no dibuje
             canvasWrapper.classList.add('cursor-eraser');
-            // Hacer que los objetos (excepto las mÃ¡scaras de borrador normal) sean detectables
+            // Hacer que los objetos (excepto las máscaras de borrador normal) sean detectables
             // para findTarget() pero no seleccionables manualmente
             canvas.forEachObject(o => {
                 if (o.isEraserMask !== true) {
@@ -2299,7 +2299,7 @@ window.addEventListener('load', function() {
         else if (tool === 'pan') { canvasWrapper.classList.add('cursor-pan'); }
         else if (['line', 'rect', 'circle', 'triangle'].includes(tool)) { canvasWrapper.classList.add('cursor-cross'); }
 
-        // Mostrar/ocultar menÃº contextual segÃºn la herramienta
+        // Mostrar/ocultar menú contextual según la herramienta
         const contextMenu = document.getElementById('contextMenu');
         const showColorControls = ['pen', 'highlight', 'fill', 'text', 'line', 'rect', 'circle', 'triangle', 'ruler'].includes(tool);
         if (contextMenu) {
@@ -2319,7 +2319,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
 
-    // Formas e inserciÃ³n â€” acceso directo desde el sidebar
+    // Formas e inserción — acceso directo desde el sidebar
     document.getElementById('menuBtnLine').onclick = () => setTool('line');
     document.getElementById('menuBtnRect').onclick = () => setTool('rect');
     document.getElementById('menuBtnCircle').onclick = () => setTool('circle');
@@ -2365,14 +2365,14 @@ window.addEventListener('load', function() {
         const isLight = document.documentElement.classList.contains('light-mode');
         localStorage.setItem('mathpad_theme', isLight ? 'light' : 'dark');
         
-        // Restaurar color de hoja predeterminado segÃºn el tema
+        // Restaurar color de hoja predeterminado según el tema
         var newBg = isLight ? '#ffffff' : '#1a1a1a';
         document.documentElement.style.setProperty('--paper-bg', newBg);
         if (bgColorPicker) bgColorPicker.value = newBg;
         
-        showToast(isLight ? 'â˜€ï¸ Modo claro' : 'ðŸŒ™ Modo oscuro', 'info', 1500);
+        showToast(isLight ? '☀️ Modo claro' : '🌙 Modo oscuro', 'info', 1500);
         
-                // Sincronizar el lÃ¡piz si estaba usando un color neutro (reutiliza funciÃ³n unificada)
+                // Sincronizar el lápiz si estaba usando un color neutro (reutiliza función unificada)
         syncDefaultInkColor();
 
         // Redibujar el lienzo para que los ejes/regla (dibujados en after:render)
@@ -2390,12 +2390,12 @@ window.addEventListener('load', function() {
     syncDefaultInkColor();
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    EXPORTAR PDF, JSON Y PNG
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     // Lee el color de fondo actual de la hoja desde la variable CSS --paper-bg
     // Calcula el bounding box del contenido activo (con padding), para exportar
-    // exactamente lo que hay dibujado en lugar de recortar al tamaÃ±o por defecto.
+    // exactamente lo que hay dibujado en lugar de recortar al tamaño por defecto.
     function getCanvasBounds(canvas) {
         var objects = canvas.getObjects();
         var hasContent = false;
@@ -2509,7 +2509,7 @@ window.addEventListener('load', function() {
         setTool('select');
         canvas.requestRenderAll();
         saveHistory();
-        showToast('ðŸ–¼ Imagen insertada', 'ok');
+        showToast('🖼 Imagen insertada', 'ok');
       });
     }
 
@@ -2545,7 +2545,7 @@ window.addEventListener('load', function() {
       if (textData && textData.trim() !== '') {
           var vpt = canvas.viewportTransform;
           var rect = cw.getBoundingClientRect();
-          // Calcular coordenadas exactas donde se soltÃ³ el mouse
+          // Calcular coordenadas exactas donde se soltó el mouse
           var canvasX = (e.clientX - rect.left - vpt[4]) / vpt[0];
           var canvasY = (e.clientY - rect.top - vpt[5]) / vpt[3];
           
@@ -2567,17 +2567,17 @@ window.addEventListener('load', function() {
           return;
       }
 
-      // 2. LÃ³gica original para imÃ¡genes
+      // 2. Lógica original para imágenes
       const file = e.dataTransfer.files[0];
       if (!file) return;
       try {
         const url = await fileToDataURL(file);
         insertImageOnCanvas(url);
         setTool('select');
-      } catch { showToast('Solo se admiten imÃ¡genes', 'warn'); }
+      } catch { showToast('Solo se admiten imágenes', 'warn'); }
     });
 
-    // Variables para mÃºltiples funciones
+    // Variables para múltiples funciones
     let plottedFunctions = []; // Array de {expr, xMin, xMax, color, group}
     const plotColors = ['#bb86fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
 
@@ -2585,9 +2585,9 @@ window.addEventListener('load', function() {
       // Reemplazar ^ por ** para Math.js si es necesario (Math.js acepta ^, ok)
       let fn;
       try { fn = math.compile(exprStr); }
-      catch(e) { throw new Error('Sintaxis invÃ¡lida'); }
+      catch(e) { throw new Error('Sintaxis inválida'); }
 
-      // Muestreo adaptativo â€” 800 puntos
+      // Muestreo adaptativo — 800 puntos
       const STEPS = 800;
       const pts = [];
       for (let i = 0; i <= STEPS; i++) {
@@ -2599,7 +2599,7 @@ window.addEventListener('load', function() {
         } catch { pts.push(null); }
       }
 
-      if (pts.filter(Boolean).length < 2) throw new Error('Sin puntos vÃ¡lidos en el rango');
+      if (pts.filter(Boolean).length < 2) throw new Error('Sin puntos válidos en el rango');
 
       // Rango Y (ignorar outliers extremos)
       const yVals = pts.filter(Boolean).map(p => p.y);
@@ -2613,7 +2613,7 @@ window.addEventListener('load', function() {
       const plotH  = canvas.getHeight() - margin * 2;
       const vpt    = canvas.viewportTransform;
 
-      // Convertir coords de funciÃ³n a canvas (con offset de viewport)
+      // Convertir coords de función a canvas (con offset de viewport)
       const toX = x  => margin + (x - xMin)  / (xMax - xMin) * plotW;
       const toY = y  => margin + plotH - (y - yMin) / (yMax - yMin) * plotH;
 
@@ -2625,7 +2625,7 @@ window.addEventListener('load', function() {
 
       const group = [];
 
-      // Fondo semitransparente + ejes (se omiten si solo se quiere la lÃ­nea)
+      // Fondo semitransparente + ejes (se omiten si solo se quiere la línea)
       if (!onlyLine) {
         group.push(new fabric.Rect({
           left: BASE_LEFT, top: BASE_TOP,
@@ -2663,7 +2663,7 @@ window.addEventListener('load', function() {
         }
       }
 
-      // Curva â€” segmentos continuos separados por null
+      // Curva — segmentos continuos separados por null
       let seg = [];
       const flush = () => {
         if (seg.length >= 2) {
@@ -2687,14 +2687,14 @@ window.addEventListener('load', function() {
       }
       flush();
 
-      // Etiqueta de la funciÃ³n
+      // Etiqueta de la función
       group.push(new fabric.Text('f(x) = ' + exprStr, {
         left: BASE_LEFT + margin + 4, top: BASE_TOP + 6,
         fontSize: 12, fill: color, fontFamily: 'monospace',
         selectable: false, evented: false
       }));
 
-      // Agrupar todo como un Ãºnico objeto Fabric
+      // Agrupar todo como un único objeto Fabric
       const grp = new fabric.Group(group, { selectable: true, evented: true });
       canvas.add(grp);
       canvas.setActiveObject(grp);
@@ -2706,7 +2706,7 @@ window.addEventListener('load', function() {
       updatePlottedFunctionsList();
       
       saveHistory();
-      showToast('ðŸ“ˆ f(x) = ' + exprStr + ' graficada', 'ok');
+      showToast('📈 f(x) = ' + exprStr + ' graficada', 'ok');
       
       return funcData;
     }
@@ -2716,7 +2716,7 @@ window.addEventListener('load', function() {
       if (!listEl) return;
       
       if (plottedFunctions.length === 0) {
-        listEl.innerHTML = '<span style="font-style:italic">Ninguna funciÃ³n graficada aÃºn</span>';
+        listEl.innerHTML = '<span style="font-style:italic">Ninguna función graficada aún</span>';
         return;
       }
       
@@ -2736,7 +2736,7 @@ window.addEventListener('load', function() {
       updatePlottedFunctionsList();
       canvas.requestRenderAll();
       saveHistory();
-      showToast('ðŸ—‘ï¸ Funciones limpiadas', 'info');
+      showToast('🗑️ Funciones limpiadas', 'info');
     }
     
     // Abrir modal
@@ -2756,9 +2756,9 @@ window.addEventListener('load', function() {
       const errEl   = document.getElementById('plotError');
       errEl.style.display = 'none';
 
-      if (!exprRaw) { errEl.textContent = 'IngresÃ¡ una expresiÃ³n'; errEl.style.display = 'block'; return; }
+      if (!exprRaw) { errEl.textContent = 'Ingresá una expresión'; errEl.style.display = 'block'; return; }
       if (isNaN(xMin) || isNaN(xMax) || xMin >= xMax) {
-        errEl.textContent = 'Rango x invÃ¡lido'; errEl.style.display = 'block'; return;
+        errEl.textContent = 'Rango x inválido'; errEl.style.display = 'block'; return;
       }
 
       try {
@@ -2767,7 +2767,7 @@ window.addEventListener('load', function() {
         plotFunction(exprRaw, xMin, xMax, color, onlyLine);
         document.getElementById('plotError').style.display = 'none';
       } catch(e) {
-        errEl.textContent = 'Error en la expresiÃ³n: ' + e.message;
+        errEl.textContent = 'Error en la expresión: ' + e.message;
         errEl.style.display = 'block';
       }
     };
@@ -2783,12 +2783,12 @@ window.addEventListener('load', function() {
     });
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
     LATEX Y PORTAPAPELES
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ═══════════════════════════════════════════════════════════════ */
 
     document.getElementById('btnLatex').onclick = function() {
-        var ecuacion = prompt("Escribe tu ecuaciÃ³n en LaTeX (ej: \int_{a}^{b} x^2 dx):");
+        var ecuacion = prompt("Escribe tu ecuación en LaTeX (ej: \int_{a}^{b} x^2 dx):");
         if (!ecuacion) return;
         try {
             var svgElement = MathJax.tex2svg(ecuacion).querySelector('svg');
@@ -2840,9 +2840,9 @@ window.addEventListener('load', function() {
         }
     });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LÃ“GICA CALCULADORA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   LÓGICA CALCULADORA
+═══════════════════════════════════════════════════════════════ */
     var btnCalcToggle = document.getElementById('btnCalcToggle');
     function toggleCalc() {
         calcVisible = !calcVisible; calcPanel.classList.toggle('hidden', !calcVisible);
@@ -2859,10 +2859,10 @@ window.addEventListener('load', function() {
         exprDisplay.textContent = calcExpression;
         if (!calcExpression) { resDisplay.textContent = '0'; return; }
         try {
-            var evalExpr = calcExpression.replace(/Ã—/g, '*').replace(/Ã·/g, '/');
+            var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecuciÃ³n: evita fugas de variables globales
+            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecución: evita fugas de variables globales
             if (res !== undefined && typeof res !== 'function') resDisplay.textContent = math.format(res, { precision: 14 });
         } catch (ex) {}
     }
@@ -2882,13 +2882,13 @@ window.addEventListener('load', function() {
             return;
         }
         
-        // Mostrar las Ãºltimas 10 entradas en orden inverso
+        // Mostrar las últimas 10 entradas en orden inverso
         const recentHistory = calcHistory.slice(-10).reverse();
         historyList.innerHTML = recentHistory.map((item, index) => {
             const date = new Date(item.timestamp);
             const timeStr = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
             return '<div class="calc-history-item" data-index="' + (calcHistory.length - 1 - index) + '" draggable="true">' +
-                   '<div class="history-expr">' + timeStr + ' â€” ' + item.expression + '</div>' +
+                   '<div class="history-expr">' + timeStr + ' — ' + item.expression + '</div>' +
                    '<div class="history-result">= ' + item.result + '</div>' +
                    '</div>';
         }).join('');
@@ -2942,10 +2942,10 @@ window.addEventListener('load', function() {
     document.getElementById('calcDel').onclick   = () => { calcExpression = calcExpression.slice(0, -1); calcUpdate(); };
     document.getElementById('calcEquals').onclick = function() {
         try {
-            var evalExpr = calcExpression.replace(/Ã—/g, '*').replace(/Ã·/g, '/');
+            var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecuciÃ³n: evita fugas de variables globales
+            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecución: evita fugas de variables globales
             if (res !== undefined) { 
                 var formatted = math.format(res, { precision: 14 }); 
                 resDisplay.textContent = formatted; 
@@ -2957,10 +2957,10 @@ window.addEventListener('load', function() {
     };
     document.getElementById('toggleSci').addEventListener('change', e => document.getElementById('calcKeys').parentElement.classList.toggle('sci-mode', e.target.checked));
     
-    // BotÃ³n de memoria - mostrar menÃº
+    // Botón de memoria - mostrar menú
     document.getElementById('calcMemory').onclick = function(e) {
         e.stopPropagation();
-        // Crear menÃº contextual de memoria
+        // Crear menú contextual de memoria
         let menu = document.getElementById('calcMemoryMenu');
         if (!menu) {
             menu = document.createElement('div');
@@ -2988,7 +2988,7 @@ window.addEventListener('load', function() {
             });
         }
         
-        // Posicionar menÃº
+        // Posicionar menú
         const btnRect = this.getBoundingClientRect();
         menu.style.right = (window.innerWidth - btnRect.right) + 'px';
         menu.style.left = 'auto'; // Anula cualquier left previo
@@ -2996,7 +2996,7 @@ window.addEventListener('load', function() {
         menu.style.display = 'block';
     };
     
-    // Cerrar menÃº de memoria al hacer clic fuera
+    // Cerrar menú de memoria al hacer clic fuera
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('calcMemoryMenu');
         if (menu && !menu.contains(e.target) && e.target !== document.getElementById('calcMemory')) {
@@ -3009,28 +3009,28 @@ window.addEventListener('load', function() {
         if (e.target.id === 'calcResult' || e.target.id === 'calcExpr') {
             e.dataTransfer.setData('text/plain', e.target.innerText);
         } else if (e.target.classList.contains('calc-history-item')) {
-            // Si arrastra el historial, tomamos la expresiÃ³n y el resultado (ej: "2+2 = 4")
-            const expr = e.target.querySelector('.history-expr').innerText.split('â€”')[1].trim();
+            // Si arrastra el historial, tomamos la expresión y el resultado (ej: "2+2 = 4")
+            const expr = e.target.querySelector('.history-expr').innerText.split('—')[1].trim();
             const res = e.target.querySelector('.history-result').innerText.replace('= ', '');
             e.dataTransfer.setData('text/plain', expr + ' = ' + res);
         }
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ARRASTRE TÃCTIL (Calculadora â†’ Lienzo)
-       Los eventos tÃ¡ctiles no activan el HTML5 Drag & Drop nativo,
-       asÃ­ que implementamos un sistema paralelo con touchstart/touchend.
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-    let touchDragData = null; // Almacena el texto a soltar durante el arrastre tÃ¡ctil
+    /* ═══════════════════════════════════════════════════════════════
+       ARRASTRE TÁCTIL (Calculadora → Lienzo)
+       Los eventos táctiles no activan el HTML5 Drag & Drop nativo,
+       así que implementamos un sistema paralelo con touchstart/touchend.
+    ═══════════════════════════════════════════════════════════════ */
+    let touchDragData = null; // Almacena el texto a soltar durante el arrastre táctil
 
     // touchstart: capturar el texto del elemento arrastrado
     document.getElementById('calcPanel').addEventListener('touchstart', function(e) {
         const target = e.target;
-        // Solo capturar si es un elemento arrastrable (resultado, expresiÃ³n o historial)
+        // Solo capturar si es un elemento arrastrable (resultado, expresión o historial)
         if (target.id === 'calcResult' || target.id === 'calcExpr') {
             touchDragData = target.innerText;
         } else if (target.classList.contains('calc-history-item')) {
-            const expr = target.querySelector('.history-expr').innerText.split('â€”')[1].trim();
+            const expr = target.querySelector('.history-expr').innerText.split('—')[1].trim();
             const res = target.querySelector('.history-result').innerText.replace('= ', '');
             touchDragData = expr + ' = ' + res;
         } else {
@@ -3041,18 +3041,18 @@ window.addEventListener('load', function() {
         // No hacemos preventDefault para no bloquear el scroll del historial
     }, { passive: true });
 
-    // touchend: verificar si se soltÃ³ sobre el canvas y crear el IText
+    // touchend: verificar si se soltó sobre el canvas y crear el IText
     document.addEventListener('touchend', function(e) {
         if (!touchDragData) return; // No hay datos de arrastre activo
 
         const touch = e.changedTouches[0];
         if (!touch) { touchDragData = null; return; }
 
-        // Verificar si el dedo se levantÃ³ sobre el canvas-wrapper
+        // Verificar si el dedo se levantó sobre el canvas-wrapper
         const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
         if (!elementAtTouch) { touchDragData = null; return; }
 
-        // Buscar si el elemento (o algÃºn padre) es el canvas-wrapper
+        // Buscar si el elemento (o algún padre) es el canvas-wrapper
         let el = elementAtTouch;
         let isOverCanvas = false;
         while (el) {
@@ -3087,19 +3087,19 @@ window.addEventListener('load', function() {
         canvas.setActiveObject(itext); 
         setTool('select');
         saveHistory();
-        showToast('ðŸ“ Texto insertado desde calculadora', 'ok');
+        showToast('📝 Texto insertado desde calculadora', 'ok');
 
         // Limpiar el estado de arrastre
         touchDragData = null;
     }, { passive: true });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    ATAJOS DE TECLADO (KEYDOWN / KEYUP)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { redoStack.push(historyStack.pop()); loadState(historyStack[historyStack.length - 1]); } };
     document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
     document.getElementById('btnClear').onclick = function() { 
-        showConfirm('Â¿Limpiar todo el lienzo? Esta acciÃ³n no se puede deshacer.', () => { 
+        showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => { 
             canvas.clear(); 
             canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); 
             saveHistory(); 
@@ -3152,7 +3152,7 @@ window.addEventListener('load', function() {
         if (e.ctrlKey && e.code === 'KeyS') {
             e.preventDefault();
             doAutoSave();
-            showToast('ðŸ’¾ Proyecto guardado (Ctrl+S)', 'ok');
+            showToast('💾 Proyecto guardado (Ctrl+S)', 'ok');
         }
         if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); document.getElementById('btnUndo').click(); }
         if (e.ctrlKey && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) { e.preventDefault(); document.getElementById('btnRedo').click(); }
@@ -3170,24 +3170,24 @@ window.addEventListener('load', function() {
     setTool('pen');
     saveHistory(); // Guardar el primer estado en blanco
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       LÃMITES DE ERROR GLOBALES (ERROR BOUNDARIES)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════════════════════════════════════════════
+       LÍMITES DE ERROR GLOBALES (ERROR BOUNDARIES)
+    ═══════════════════════════════════════════════════════════════ */
     window.addEventListener('error', function(e) {
         console.error('Error global interceptado:', e.error);
         if (typeof showToast === 'function') {
-            showToast('âš ï¸ OcurriÃ³ un error. Tu trabajo estÃ¡ protegido.', 'err', 4000);
+            showToast('⚠️ Ocurrió un error. Tu trabajo está protegido.', 'err', 4000);
         }
     });
 
     window.addEventListener('unhandledrejection', function(e) {
         console.error('Promesa rechazada interceptada:', e.reason);
         if (typeof showToast === 'function') {
-            showToast('âš ï¸ Advertencia de proceso en segundo plano.', 'warn', 3000);
+            showToast('⚠️ Advertencia de proceso en segundo plano.', 'warn', 3000);
         }
     });
 
-    /* ACTUALIZACIÃ“N DE SERVICE WORKER */
+    /* ACTUALIZACIÓN DE SERVICE WORKER */
     let swUpdateAvailable = false;
     
     function showSWUpdateBanner() {
@@ -3214,7 +3214,7 @@ window.addEventListener('load', function() {
             font-weight: 500;
         `;
         banner.innerHTML = `
-            <span>ðŸ“¦ Hay una actualizaciÃ³n disponible</span>
+            <span>📦 Hay una actualización disponible</span>
             <button id="btnReloadSW" style="
                 background: #000;
                 color: #fff;
@@ -3233,10 +3233,10 @@ window.addEventListener('load', function() {
         };
     }
     
-    // Escuchar cambios en el Service Worker (nueva versiÃ³n disponible)
+    // Escuchar cambios en el Service Worker (nueva versión disponible)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('controllerchange', function() {
-            // El SW cambiÃ³, mostrar banner de actualizaciÃ³n
+            // El SW cambió, mostrar banner de actualización
             showSWUpdateBanner();
         });
     }
@@ -3259,13 +3259,13 @@ window.addEventListener('load', function() {
         if (navigator.storage && navigator.storage.estimate) {
             try {
                 const estimate = await navigator.storage.estimate();
-                // Si hay estimaciÃ³n vÃ¡lida y cuota mayor a 0
+                // Si hay estimación válida y cuota mayor a 0
                 if (estimate.usage && estimate.quota) {
                     const percentUsed = (estimate.usage / estimate.quota) * 100;
                     if (percentUsed > 85) {
                         const usageMB = (estimate.usage / (1024 * 1024)).toFixed(1);
                         const quotaMB = (estimate.quota / (1024 * 1024)).toFixed(1);
-                        showToast(`âš ï¸ Almacenamiento casi lleno (${usageMB}MB / ${quotaMB}MB). Exporta tu sesiÃ³n en formato JSON.`, 'warn', 6000);
+                        showToast(`⚠️ Almacenamiento casi lleno (${usageMB}MB / ${quotaMB}MB). Exporta tu sesión en formato JSON.`, 'warn', 6000);
                     }
                 }
             } catch (e) {
@@ -3277,9 +3277,9 @@ window.addEventListener('load', function() {
     async function doAutoSave() {
       try {
         const json = JSON.stringify(canvas.toJSON(['isEraserMask']));
-        // Comprimir si es grande (solo base64 de imÃ¡genes puede ser enorme)
+        // Comprimir si es grande (solo base64 de imágenes puede ser enorme)
         if (json.length > 4_000_000) {
-          showToast('âš  SesiÃ³n muy grande para autoguardado', 'warn'); return;
+          showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return;
         }
         
         // Guardar en IndexedDB
@@ -3294,11 +3294,11 @@ window.addEventListener('load', function() {
           timestamp: Date.now()
         });
         
-        showToast('ðŸ’¾ Guardado automÃ¡ticamente', 'info', 1800);
+        showToast('💾 Guardado automáticamente', 'info', 1800);
         checkStorageQuota(); // Verificar espacio de dispositivo tras guardar
       } catch(e) {
         console.error('Error en autoguardado:', e);
-        showToast('Autoguardado fallÃ³ (almacenamiento lleno?)', 'warn');
+        showToast('Autoguardado falló (almacenamiento lleno?)', 'warn');
       }
     }
 
@@ -3308,7 +3308,7 @@ window.addEventListener('load', function() {
       autoSaveTimer = setTimeout(doAutoSave, AS_DELAY);
     }
     
-    // Esperar a que el canvas estÃ© completamente inicializado
+    // Esperar a que el canvas esté completamente inicializado
     async function setupRecoveryBar() {
       try {
         // Obtener datos de IndexedDB
@@ -3320,9 +3320,9 @@ window.addEventListener('load', function() {
         
         if (!saved || !ts) return;
 
-        // Verificar que el canvas estÃ© listo
+        // Verificar que el canvas esté listo
         if (!canvas || !canvas.toJSON) {
-          console.error('Canvas no estÃ¡ listo para recuperar sesiÃ³n');
+          console.error('Canvas no está listo para recuperar sesión');
           return;
         }
 
@@ -3335,7 +3335,7 @@ window.addEventListener('load', function() {
         const recoverDate = document.getElementById('recoverDate');
         
         if (!recoverBar || !recoverDate) {
-          console.error('Elementos de recuperaciÃ³n no encontrados');
+          console.error('Elementos de recuperación no encontrados');
           return;
         }
 
@@ -3354,9 +3354,9 @@ window.addEventListener('load', function() {
               await canvas.loadFromJSON(saved);
               canvas.requestRenderAll();
               saveHistory();
-              showToast('âœ… SesiÃ³n recuperada', 'ok');
+              showToast('✅ Sesión recuperada', 'ok');
             } catch (e) {
-              showToast('âŒ Error al recuperar la sesiÃ³n.', 'err');
+              showToast('❌ Error al recuperar la sesión.', 'err');
               console.error(e);
             }
           };
@@ -3368,21 +3368,21 @@ window.addEventListener('load', function() {
               await db.autosave.delete(AS_KEY);
               await db.autosave.delete(AS_TS);
               recoverBar.style.display = 'none';
-              showToast('SesiÃ³n descartada', 'info');
+              showToast('Sesión descartada', 'info');
             } catch (e) {
-              showToast('âŒ Error al descartar la sesiÃ³n.', 'err');
+              showToast('❌ Error al descartar la sesión.', 'err');
               console.error(e);
             }
           };
         }
         
-        console.log('Barra de recuperaciÃ³n configurada correctamente');
+        console.log('Barra de recuperación configurada correctamente');
     } catch (e) {
       console.error("Error setting up recovery bar:", e);
     }
   }
   
-  // Iniciar recuperaciÃ³n despuÃ©s de 500ms
+  // Iniciar recuperación después de 500ms
   setTimeout(setupRecoveryBar, 500);
 });
 

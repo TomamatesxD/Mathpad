@@ -2,12 +2,11 @@
 // MathPad - Service Worker
 // ============================================
 
-const CACHE_NAME = 'mathpad-v4';
+// Versión de caché incrementada a v5 para forzar la reinstalación del SW
+// y servir la versión corregida de index.html (UTF-8) + iconos frescos.
+const CACHE_NAME = 'mathpad-v5';
 const urlsToCache = [
   './index.html',
-  './mathpad.html',
-  './mathpad.css',
-  './mathpad.js',
   './fabric.min.js',
   './math.min.js',
   './jspdf.umd.min.js',
@@ -15,7 +14,8 @@ const urlsToCache = [
   './tex-svg.js',
   './manifest.json',
   './icono-192.png',
-  './icono-512.png'
+  './icono-512.png',
+  './icono-512-maskable.png'
 ];
 
 // Instalación: precarga la caché con los recursos del proyecto
@@ -73,7 +73,7 @@ self.addEventListener('fetch', event => {
           cache.put(event.request, responseToCache);
         });
         return response;
-      }).catch(() => caches.match('./mathpad.html'));
+      }).catch(() => caches.match('./index.html'));
     })
   );
 });
