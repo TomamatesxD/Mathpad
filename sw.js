@@ -4,7 +4,7 @@
 
 // Versión de caché incrementada a v6: rediseño de la herramienta LaTeX
 // (modal temático + centrado en viewport + icono Sigma).
-const CACHE_NAME = 'mathpad-v6';
+const CACHE_NAME = 'mathpad-v7';
 const urlsToCache = [
   './index.html',
   './fabric.min.js',

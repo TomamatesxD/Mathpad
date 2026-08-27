@@ -1074,10 +1074,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 6.5 14C5.5 15 5 16 5 17.5 5 19 6.5 20 8 20c1.5 0 2.5-.5 3.5-1.5L14 16"/><path d="m14 7-3 3"/><path d="M17 3l4 4L11 17l-4-4z"/></svg>
         </button>
         <button id="btnFill" title="Relleno de Color [F]">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11l-8-8-8 8h16z"/><path d="M3 11v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8H3z"/><path d="M12 11v10"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11L11 3 2.4 11.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L19 11z"/><path d="M5 2l5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 2-5 2-5s2 3.4 2 5z" fill="currentColor" stroke="none"/></svg>
         </button>
         <button id="btnText" title="Texto [T]">
-            <svg viewBox="0 0 24 24"><path d="M4 4h6v10H4zM14 4h6v10h-6zM4 18h16v2H4z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
         </button>
         
         <div class="tool-separator"></div>
@@ -1120,7 +1120,7 @@
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </button>
         <button id="menuBtnPlot" title="Graficar función">
-            <svg viewBox="0 0 24 24"><path d="M3 20L21 4M3 20h18M3 20v-18"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke-width="1.5"/><path d="M4 6 Q 12 24 20 6" stroke-width="2"/></svg>
         </button>
     </div>
 
@@ -1787,12 +1787,15 @@ window.addEventListener('load', function() {
             var pointer = canvas.getPointer(evt);
             rulerStartPoint = { x: pointer.x, y: pointer.y };
             var color = document.getElementById('colorPicker').value;
+            // Escala adaptativa: grosor/trazo inversos al zoom para que la regla
+            // se vea SIEMPRE con el mismo tamaño en el viewport visible
+            var rulZoom = canvas.getZoom() || 1;
             rulerCurrentLine = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
                 stroke: color,
-                strokeWidth: 2,
+                strokeWidth: 2 / rulZoom,
                 selectable: false,
                 evented: false,
-                strokeDashArray: [5, 5]
+                strokeDashArray: [5 / rulZoom, 5 / rulZoom]
             });
             canvas.add(rulerCurrentLine);
         }
@@ -2009,8 +2012,10 @@ window.addEventListener('load', function() {
             var snappedAngle = Math.round(angle / rulerSnapAngle) * rulerSnapAngle;
             var angleRad = snappedAngle * Math.PI / 180;
             
-            // Snapping a longitud
-            var snappedLength = Math.round(length / rulerSnapLength) * rulerSnapLength;
+            // Snapping a longitud (paso compensado por zoom: salto constante en pantalla)
+            var rulZm = canvas.getZoom() || 1;
+            var snapLen = rulerSnapLength / rulZm;
+            var snappedLength = Math.round(length / snapLen) * snapLen;
             
             // Calcular punto final con snapping
             var endX = rulerStartPoint.x + Math.cos(angleRad) * snappedLength;
@@ -2660,7 +2665,7 @@ window.addEventListener('load', function() {
           var itext = new fabric.IText(textData, { 
               left: canvasX, 
               top: canvasY, 
-              fontSize: parseInt(document.getElementById('fontSizePicker').value, 10), 
+              fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1), 
               fill: document.getElementById('colorPicker').value, 
               fontFamily: 'Segoe UI', 
               selectable: true, 
@@ -2801,12 +2806,26 @@ window.addEventListener('load', function() {
         fontSize: 12, fill: color, fontFamily: 'monospace',
         selectable: false, evented: false
       }));
-
       // Agrupar todo como un único objeto Fabric
       const grp = new fabric.Group(group, { selectable: true, evented: true });
+
+      // ESCALA ADAPTATIVA: factor inverso al zoom -> tamaño visual constante
+      const grZx = canvas.getZoom() || 1;
+      const grZy = canvas.viewportTransform[3] || grZx;
+      grp.set({ scaleX: 1 / grZx, scaleY: 1 / grZy });
+
+      // CENTRADO EXACTO en el centro del viewport VISIBLE (compensa pan/zoom)
+      const gvpt = canvas.viewportTransform;
+      grp.set({
+        left: (canvas.getWidth()  / 2 - gvpt[4]) / gvpt[0] - grp.getScaledWidth()  / 2,
+        top:  (canvas.getHeight() / 2 - gvpt[5]) / gvpt[3] - grp.getScaledHeight() / 2
+      });
+      grp.setCoords();
+
       canvas.add(grp);
       canvas.setActiveObject(grp);
       canvas.requestRenderAll();
+
       
       // Guardar referencia
       const funcData = { expr: exprStr, xMin, xMax, color, group: grp };
@@ -2962,6 +2981,14 @@ window.addEventListener('load', function() {
       if (e.key === 'Enter') { e.preventDefault(); document.getElementById('latexInsertBtn').click(); }
     });
     latexInputEl.addEventListener('input', latexUpdatePreview);
+    // BUGFIX: mientras se escribe la fórmula, ningún handler global (space/
+    // herramientas/Esc) debe procesar estas teclas. Solo Escape cierra el modal.
+    ['keydown', 'keypress', 'keyup'].forEach(function(evName) {
+      latexInputEl.addEventListener(evName, function(e) {
+        if (e.key === 'Escape') { e.stopPropagation(); closeLatexModal(); return; }
+        e.stopPropagation();
+      });
+    });
 
     // Chips de ejemplos rápidos: un clic carga la fórmula en el input
     (function buildLatexChips() {
@@ -3300,7 +3327,7 @@ window.addEventListener('load', function() {
         var itext = new fabric.IText(touchDragData, { 
             left: canvasX, 
             top: canvasY, 
-            fontSize: parseInt(document.getElementById('fontSizePicker').value, 10), 
+            fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1), 
             fill: document.getElementById('colorPicker').value, 
             fontFamily: 'Segoe UI', 
             selectable: true, 
@@ -3336,7 +3363,7 @@ window.addEventListener('load', function() {
             document.getElementById('plotModal').style.display = 'none';
             return;
         }
-        if (document.getElementById('latexModal').classList.contains('open')) {
+        if (e.key === 'Escape' && document.getElementById('latexModal').classList.contains('open')) {
             closeLatexModal();
             return;
         }
