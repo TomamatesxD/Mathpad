@@ -2,9 +2,9 @@
 // MathPad - Service Worker
 // ============================================
 
-// Versión de caché incrementada a v5 para forzar la reinstalación del SW
-// y servir la versión corregida de index.html (UTF-8) + iconos frescos.
-const CACHE_NAME = 'mathpad-v5';
+// Versión de caché incrementada a v6: rediseño de la herramienta LaTeX
+// (modal temático + centrado en viewport + icono Sigma).
+const CACHE_NAME = 'mathpad-v6';
 const urlsToCache = [
   './index.html',
   './fabric.min.js',
