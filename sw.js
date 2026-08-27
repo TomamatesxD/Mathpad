@@ -2,9 +2,9 @@
 // MathPad - Service Worker
 // ============================================
 
-// Versión de caché incrementada a v6: rediseño de la herramienta LaTeX
-// (modal temático + centrado en viewport + icono Sigma).
-const CACHE_NAME = 'mathpad-v8';
+// Versión de caché v9: liberación del zoom nativo (Ctrl/cmd+rueda) y
+// límites responsive de la calculadora (max 95vw/90vh + clamp por JS).
+const CACHE_NAME = 'mathpad-v9';
 const urlsToCache = [
   './index.html',
   './fabric.min.js',

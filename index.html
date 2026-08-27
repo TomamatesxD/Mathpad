@@ -362,6 +362,10 @@
             flex-shrink: 0;
             overflow: hidden;
             transition: width 0.25s ease, opacity 0.25s ease;
+            /* Anti-desbordamiento: jamás más grande que el viewport actual */
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;   /* scroll interno si el contenido se aplasta con zoom */
         }
 
         .calculator-panel.hidden {
@@ -3384,11 +3388,16 @@ window.addEventListener('load', function() {
         if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; }
       }, true);
 
-      // ── Rueda del ratón: convierte deltaY en scroll horizontal ──
+      // ── Rueda del ratón: vertical → scroll horizontal ──
+      // BUGFIX: Ctrl/Cmd + rueda pertenece al zoom nativo del navegador,
+      // se libera ANTES de cualquier preventDefault().
       bar.addEventListener('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          return; // Permite el zoom nativo del navegador (Ctrl/cmd + ruedita)
+        }
         var d = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         if (!d) return;
-        e.preventDefault();
+        e.preventDefault(); // Solo cancela lo nativo si NO hay Ctrl/Cmd
         bar.scrollLeft += d;
       }, { passive: false });
 
@@ -3403,6 +3412,52 @@ window.addEventListener('load', function() {
         e.preventDefault();
         e.stopPropagation(); // captura: no llega al manejador global ni al canvas
       }, true);
+    })();
+
+    /* ═══════════════════════════════════════════════════════════════
+       LÍMITES DE LA CALCULADORA (#responsive): con mucho zoom del
+       navegador o pantallas muy chicas, el panel debe permanecer
+       íntegramente dentro de la ventana visible y acotado al viewport.
+       Solo corrige posiciones definidas por JavaScript (inline left/top),
+       para no interferir con las transiciones CSS del modo móvil.
+    ═══════════════════════════════════════════════════════════════ */
+    (function clampCalcSetup() {
+      var panel = document.getElementById('calcPanel');
+      if (!panel) return;
+
+      function clampCalcToViewport() {
+        if (panel.classList.contains('hidden')) return;
+        var r = panel.getBoundingClientRect();
+        var vw = window.innerWidth  || document.documentElement.clientWidth;
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        if (!(r.width > 0) || !(r.height > 0)) return;
+
+        // Clamp de left/top cuando fueron asignados por JS (arrastre/posicionamiento)
+        var sl = parseFloat(panel.style.left);
+        var st = parseFloat(panel.style.top);
+        if (!isNaN(sl)) panel.style.left = Math.max(0, Math.min(sl, vw - r.width))  + 'px';
+        if (!isNaN(st)) panel.style.top  = Math.max(0, Math.min(st, vh - r.height)) + 'px';
+
+        // Reporte opcional en consola si algún borde sigue fuera (layout puro)
+        var rr = panel.getBoundingClientRect();
+        if ((rr.left < -4 || rr.right > vw + 4 || rr.top < -4 || rr.bottom > vh + 4) && window.console) {
+          console.info('[MathPad] calculadora fuera de viewport tras clamp:', Math.round(rr.left), Math.round(rr.right), '/', vw);
+        }
+      }
+
+      window.addEventListener('resize', clampCalcToViewport);
+      window.addEventListener('orientationchange', function() { setTimeout(clampCalcToViewport, 120); });
+
+      // Ejecutar al abrir/toggle la calculadora (respeta el handler ya asignado)
+      var tbtn = document.getElementById('btnCalcToggle');
+      if (tbtn && typeof tbtn.onclick === 'function') {
+        var _prevToggleCalc = tbtn.onclick;
+        tbtn.onclick = function(ev) {
+          _prevToggleCalc.call(this, ev || window.event);
+          setTimeout(clampCalcToViewport, 300); // espera la transición del panel
+        };
+      }
+      clampCalcToViewport();
     })();
 
 /* ═══════════════════════════════════════════════════════════════
