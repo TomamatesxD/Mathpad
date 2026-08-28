@@ -2,11 +2,12 @@
 // MathPad - Service Worker
 // ============================================
 
-// Versión de caché v9: liberación del zoom nativo (Ctrl/cmd+rueda) y
-// límites responsive de la calculadora (max 95vw/90vh + clamp por JS).
-const CACHE_NAME = 'mathpad-v9';
+// Versión de caché v10: favicon físico (favicon.svg) y plano cartesiano
+// completo con ejes cruzando en el origen y ticks ±X/±Y en el graficador.
+const CACHE_NAME = 'mathpad-v10';
 const urlsToCache = [
   './index.html',
+  './favicon.svg',
   './fabric.min.js',
   './math.min.js',
   './jspdf.umd.min.js',

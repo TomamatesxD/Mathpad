@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Entorno de Estudio Matemático</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bb86fc' stroke-width='1.55' stroke-linecap='round' stroke-linejoin='round'>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="manifest" href="./manifest.json">
     <style>
 :root {
@@ -2760,31 +2760,81 @@ window.addEventListener('load', function() {
           strokeWidth: 1, rx: 6, ry: 6, selectable: false, evented: false
         }));
 
-        // Eje X
-        const axisY = yMin <= 0 && yMax >= 0 ? toY(0) : toY(yMin);
+        // ═══ PLANO CARTESIANO COMPLETO: ejes cruzando en el origen,
+        //     ticks y números en las 4 direcciones (±X, ±Y) ═══
+        const AX_COL = 'rgba(255,255,255,0.30)'; // ejes sutiles -> la curva destaca encima
+        const TX_COL = 'rgba(255,255,255,0.42)'; // números discretos
+
+        const axL = BASE_LEFT + margin, axT = BASE_TOP + margin;
+        // Cruce exacto de ejes en el origen matemático (0,0); si 0 queda fuera
+        // del rango visible, el eje se ancla al borde más cercano a cero.
+        const crossX = Math.min(Math.max(toX(0), 0), plotW);
+        const crossY = Math.min(Math.max(toY(0), 0), plotH);
+
+        // Eje X (horizontal) y Eje Y (vertical)
         group.push(new fabric.Line(
-          [BASE_LEFT + margin, BASE_TOP + axisY,
-           BASE_LEFT + margin + plotW, BASE_TOP + axisY],
-          { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }
+          [axL, axT + crossY, axL + plotW, axT + crossY],
+          { stroke: AX_COL, strokeWidth: 1, selectable: false, evented: false }
+        ));
+        group.push(new fabric.Line(
+          [axL + crossX, axT, axL + crossX, axT + plotH],
+          { stroke: AX_COL, strokeWidth: 1, selectable: false, evented: false }
         ));
 
-        // Eje Y
-        const axisX = xMin <= 0 && xMax >= 0 ? toX(0) : toX(xMin);
-        group.push(new fabric.Line(
-          [BASE_LEFT + axisX, BASE_TOP + margin,
-           BASE_LEFT + axisX, BASE_TOP + margin + plotH],
-          { stroke:'rgba(255,255,255,0.25)', strokeWidth:1, selectable:false, evented:false }
-        ));
+        // Paso "bonito" (1·2·5×10^k) para que los números sean legibles
+        function niceStep(range, targetTicks) {
+          if (!(range > 0)) return 1;
+          const raw = range / targetTicks;
+          const p = Math.pow(10, Math.floor(Math.log10(raw)));
+          const mul = [1, 2, 5, 10];
+          for (let i = 0; i < mul.length; i++) if (raw <= mul[i] * p) return mul[i] * p;
+          return 10 * p;
+        }
+        const fmtTick = v =>
+          Math.abs(v) < 1e-10 ? '0' :
+          (Math.abs(v - Math.round(v)) < 1e-10 ? String(Math.round(v)) :
+           (Math.abs(v) >= 100 ? String(Math.round(v)) : v.toFixed(1)));
 
-        // Etiquetas eje X
-        const xTicks = 5;
-        for (let i = 0; i <= xTicks; i++) {
-          const xv = xMin + (xMax - xMin) * i / xTicks;
-          const cx = BASE_LEFT + toX(xv);
-          const cy = BASE_TOP  + axisY;
-          group.push(new fabric.Text(xv.toFixed(1), {
-            left: cx - 12, top: cy + 4,
-            fontSize: 9, fill: 'rgba(255,255,255,0.4)', selectable: false, evented: false
+        // ── Ticks + números del EJE X: iteración completa ±derecha/±izquierda ──
+        const stepX = niceStep(xMax - xMin, 8);
+        for (let xv = Math.ceil(xMin / stepX) * stepX; xv <= xMax + stepX * 1e-9; xv += stepX) {
+          if (xv === 0) continue; // el origen lleva su propia etiqueta
+          const cx = axL + Math.min(Math.max(toX(xv), 0), plotW);
+          const cy = axT + crossY;
+          group.push(new fabric.Line([cx, cy - 3, cx, cy + 3],
+            { stroke: TX_COL, strokeWidth: 1, selectable: false, evented: false }));
+          // Si el eje quedó anclado al borde inferior, los números van encima
+          const yLabOff = (yMin > 0) ? -15 : 5;
+          group.push(new fabric.Text(fmtTick(xv), {
+            left: cx - 8, top: cy + yLabOff,
+            fontSize: 9, fill: TX_COL, selectable: false, evented: false
+          }));
+        }
+
+        // ── Ticks + números del EJE Y: ±arriba/±abajo ──
+        const stepY = niceStep(yMax - yMin, 6);
+        for (let yv = Math.ceil(yMin / stepY) * stepY; yv <= yMax + stepY * 1e-9; yv += stepY) {
+          if (yv === 0) continue;
+          const cy = axT + Math.min(Math.max(toY(yv), 0), plotH);
+          const cx = axL + crossX;
+          group.push(new fabric.Line([cx - 3, cy, cx + 3, cy],
+            { stroke: TX_COL, strokeWidth: 1, selectable: false, evented: false }));
+          // Si el eje quedó anclado al borde derecho, los números van a la izquierda
+          const rightPinned = (xMax < 0);
+          group.push(new fabric.Text(fmtTick(yv), {
+            left: cx + (rightPinned ? -40 : 6),
+            top: cy - 6,
+            fontSize: 9, fill: TX_COL,
+            textAlign: rightPinned ? 'right' : 'left',
+            selectable: false, evented: false
+          }));
+        }
+
+        // Etiqueta del origen cuando ambos ejes cruzan dentro del área visible
+        if (crossX > 0 && crossX < plotW && crossY > 0 && crossY < plotH) {
+          group.push(new fabric.Text('0', {
+            left: axL + crossX - 13, top: axT + crossY + 4,
+            fontSize: 9, fill: TX_COL, selectable: false, evented: false
           }));
         }
       }
