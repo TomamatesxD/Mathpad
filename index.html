@@ -1511,8 +1511,23 @@ window.addEventListener('load', function() {
         else if (bg === 'bg-grid') canvasWrapper.style.backgroundSize = (GRID_BASE * scale) + 'px ' + (GRID_BASE * scale) + 'px';
     }
 
+
     canvas.on('mouse:wheel', function(opt) {
         var e = opt.e; e.preventDefault(); e.stopPropagation();
+        var z = canvas.getZoom() || 1;
+        if (e.ctrlKey || e.metaKey) {
+            // Ctrl/cmd + rueda: PANEO vertical del lienzo
+            canvas.relativePan(new fabric.Point(0, -e.deltaY / z));
+            syncBackground(); return;
+        }
+        if (e.shiftKey) {
+            // Shift + rueda: PANEO horizontal (algunos navegadores ya
+            // convierten el gesto en deltaX; unificamos ambos casos)
+            var dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            canvas.relativePan(new fabric.Point(-dx / z, 0));
+            syncBackground(); return;
+        }
+        // Rueda sola: ZOOM (comportamiento original intacto)
         var zoom = Math.min(Math.max(canvas.getZoom() * Math.pow(0.999, e.deltaY), 0.2), 5);
         canvas.zoomToPoint({ x: e.offsetX, y: e.offsetY }, zoom);
         syncBackground();
@@ -2240,12 +2255,37 @@ window.addEventListener('load', function() {
         saveHistory();
     });
 
+
+    // Límite prácticamente ilimitado de pasos (#undo/redo)
+    const MAX_HISTORY = 1000;
+
     function saveHistory() {
         if (isHistoryAction) return;
+        var snap = JSON.stringify(canvas.toJSON(['isEraserMask']));
+        // Anti-duplicados: un estado idéntico al último no ocupa un índice
+        // nuevo (evita que un doble guardado haga que un undo "no haga nada")
+        if (historyStack.length && historyStack[historyStack.length - 1] === snap) return;
         redoStack = [];
-        historyStack.push(JSON.stringify(canvas.toJSON(['isEraserMask'])));
-        if (historyStack.length > 50) historyStack.shift();
+        historyStack.push(snap);
+        if (historyStack.length > MAX_HISTORY) {
+            historyStack.splice(0, historyStack.length - MAX_HISTORY);
+        }
     }
+
+    // #BUGFIX texto: entrada de historial INDEPENDIENTE al terminar de editar.
+    // Así, deshacer borra SOLO el texto (con su contenido final) y no arrastra
+    // consigo el último trazo dibujado, que ya tiene su propio índice vía
+    // path:created.
+    canvas.on('text:editing:exited', function(opt) {
+        var t = opt && opt.target;
+        if (t && (t.text === '' || t.text == null)) {
+            // Caja vacía: se elimina sin ensuciar la cadena de undo
+            canvas.remove(t);
+            canvas.requestRenderAll();
+            return; // object:removed disparará saveHistory (dedupe lo filtra)
+        }
+        saveHistory();
+    });
 
     function loadState(jsonStr) {
         isHistoryAction = true;

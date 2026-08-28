@@ -2,9 +2,10 @@
 // MathPad - Service Worker
 // ============================================
 
-// Versión de caché v10: favicon físico (favicon.svg) y plano cartesiano
-// completo con ejes cruzando en el origen y ticks ±X/±Y en el graficador.
-const CACHE_NAME = 'mathpad-v10';
+// Versión de caché v11: atajos de rueda (Ctrl=pan vertical, Shift=pan
+// horizontal) e historial prácticamente ilimitado con eventos de texto
+// separados (bugfix undo texto+línea).
+const CACHE_NAME = 'mathpad-v11';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
