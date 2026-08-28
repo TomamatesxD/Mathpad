@@ -1583,10 +1583,14 @@ window.addEventListener('load', function() {
         // Activar el tracker universal de arrastre antes de cualquier early return
         isPointerDown = true;
 
-        if (currentTool === 'eraser-stroke') { 
-            evt.preventDefault(); 
-            return; 
-        } // El borrado por trazo se maneja en mouse:move sin activar isErasing
+        
+        if (currentTool === 'eraser-stroke') {
+            // Instant Erase: sin pincel fantasma; borra al contacto (también
+            // en el primer tap) y el historial se guarda UNA vez en mouse:up.
+            evt.preventDefault();
+            instantEraseAt(opt);
+            return;
+        }
 
         // --- INICIO HERRAMIENTA DE RELLENO HÍBRIDO ---
         if (currentTool === 'fill') {
@@ -1928,6 +1932,64 @@ window.addEventListener('load', function() {
         return null;
     }
 
+    // ── Instant Erase: hit-test económico + borrado inmediato, sin trazo
+    //    fantasma y sin findTarget por píxel (que causaba el lag). ──
+    var hasErasedObjects = false;      // ¿se borró algo en este trazo?
+    var suppressRemoveHistory = false; // silencia object:removed durante el barrido
+
+    function instantEraseAt(opt) {
+        var pointer = canvas.getPointer(opt.e);
+        // Radio de colisión basado en el grosor del borrador actual
+        var radius = (parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6;
+        var objects = canvas.getObjects();
+        var removed = false;
+
+        suppressRemoveHistory = true; // el historial se guarda UNA vez en mouse:up
+        try {
+            // Orden inverso: los objetos de arriba se procesan primero
+            for (var i = objects.length - 1; i >= 0; i--) {
+                var obj = objects[i];
+                if (obj.isBackground || obj.isEraserMask === true) continue;
+
+                // Filtro barato por bounding box (con el radio como tolerancia)
+                var b = obj.getBoundingRect();
+                if (pointer.x < b.left - radius || pointer.x > b.left + b.width + radius ||
+                    pointer.y < b.top - radius || pointer.y > b.top + b.height + radius) continue;
+
+                // Prueba fina: ¿el punto cae dentro del objeto?
+                var hit = false;
+                try { hit = obj.containsPoint(pointer); } catch (err) { hit = false; }
+
+                // Fallback para trazos finos: cercanía al contorno/segmentos
+                if (!hit && obj.type === 'path' && obj.path) {
+                    var localPt = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
+                    var px = localPt.x + (obj.pathOffset ? obj.pathOffset.x : 0);
+                    var py = localPt.y + (obj.pathOffset ? obj.pathOffset.y : 0);
+                    for (var ci = 0; ci < obj.path.length && !hit; ci++) {
+                        var cmd = obj.path[ci];
+                        for (var j = 1; j < cmd.length - 2 && !hit; j += 2) {
+                            if (distToSegment({ x: px, y: py }, { x: cmd[j], y: cmd[j + 1] }, { x: cmd[j + 2], y: cmd[j + 3] }) < radius) hit = true;
+                        }
+                    }
+                } else if (!hit) {
+                    var segs = getShapeSegmentsInCanvasSpace(obj);
+                    for (var s = 0; s < segs.length && !hit; s++) {
+                        if (distToSegment(pointer, segs[s].a, segs[s].b) < radius) hit = true;
+                    }
+                }
+
+                if (!hit) continue;
+                canvas.remove(obj);   // ← borrado INSTANTÁNEO al contacto
+                removed = true;
+            }
+        } finally {
+            suppressRemoveHistory = false;
+        }
+        if (removed) {
+            hasErasedObjects = true;
+            canvas.requestRenderAll(); // se ve desaparecer al instante
+        }
+    }
     canvas.on('mouse:move', function(opt) {
         var e = opt.e;
 
@@ -1971,19 +2033,12 @@ window.addEventListener('load', function() {
         // (más confiable que e.buttons/touches que Fabric.js puede no propagar correctamente)
         var isDragging = isPointerDown;
 
-        // Borrador por trazo: eliminar objetos mientras se mueve el mouse
+
+        // Instant Erase: borrado por contacto con hit-test económico
+        // (bounding box + containsPoint/distancia), sin findTarget por píxel
+        // y SIN guardar historial por objeto (se guarda 1 vez en mouse:up).
         if (currentTool === 'eraser-stroke' && isDragging) {
-            // Usar el método nativo findTarget de Fabric.js que respeta:
-            // - perPixelTargetFind = true
-            // - targetFindTolerance = 8
-            // - evented/selectable flags
-            // - Funciona correctamente con mouse y touch
-            const target = canvas.findTarget(opt.e, false);
-            if (target && !target.isBackground && target.isEraserMask !== true) {
-                canvas.remove(target);
-                canvas.requestRenderAll();
-                saveHistory();
-            }
+            instantEraseAt(opt);
             return;
         }
 
@@ -2055,8 +2110,15 @@ window.addEventListener('load', function() {
         }
     });
 
+
     canvas.on('mouse:up', function(opt) {
         isPointerDown = false; // Liberar el tracker universal
+
+        // Instant Erase: UNA sola entrada de historial por trazo de borrado
+        if (currentTool === 'eraser-stroke' && hasErasedObjects) {
+            saveHistory();
+            hasErasedObjects = false;
+        }
         if (isPanning) {
             canvas.setViewportTransform(canvas.viewportTransform);
             isPanning = false; canvasWrapper.classList.remove('cursor-panning');
@@ -2249,9 +2311,12 @@ window.addEventListener('load', function() {
 
     canvas.on('object:added',    scheduleAutoSave);
     canvas.on('object:modified', scheduleAutoSave);
+
     canvas.on('object:removed', function() {
         scheduleAutoSave();
-        // Guardar historial (el borrador de trazo lo hace aquí)
+        // Instant Erase: durante el barrido NO se guarda por objeto
+        // (hasErasedObjects + mouse:up generan UNA entrada por trazo)
+        if (suppressRemoveHistory) return;
         saveHistory();
     });
 
