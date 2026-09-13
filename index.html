@@ -1095,11 +1095,9 @@
         
         <div class="tool-separator"></div>
         
-        <button id="btnEraserStroke" title="Borrar Trazo [E]">
+
+        <button id="btnEraserStroke" title="Borrador [E]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-        </button>
-        <button id="btnEraserNormal" title="Borrado Normal [Shift+E]">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
         </button>
         <button id="btnRuler" title="Regla/Compás [R]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="10" y1="8" x2="10" y2="12"/><line x1="14" y1="8" x2="14" y2="12"/><line x1="18" y1="8" x2="18" y2="12"/></svg>
@@ -1350,50 +1348,85 @@
 
     <!-- Service Worker (inline via Blob, unificado) -->
     <script id="sw-src" type="text/plain">
-const CACHE_NAME = 'mathpad-v5';
-const ASSETS = [
+
+// ============================================
+// MathPad - Service Worker (inline, sincroniza con sw.js)
+// =============================================
+
+
+// Versión de caché v12: borrador único unificado (instant erase al contacto,
+// sin pincel transparente ni goma raster por máscaras).
+const CACHE_NAME = 'mathpad-v12';
+const urlsToCache = [
   './index.html',
+  './favicon.svg',
   './fabric.min.js',
   './math.min.js',
   './jspdf.umd.min.js',
-  './tex-svg.js',
   './dexie.min.js',
+  './tex-svg.js',
   './manifest.json',
   './icono-192.png',
   './icono-512.png',
   './icono-512-maskable.png'
 ];
 
+// Instalación: precarga la caché con los recursos del proyecto
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
+      .then(cache => {
+        // Usamos addAll con tolerancia a fallos individuales (iconos pueden faltar)
+        return Promise.allSettled(
+          urlsToCache.map(url =>
+            cache.add(url).catch(err => console.warn('No se pudo cachear:', url, err))
+          )
+        );
+      })
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
+// Activación: limpia cachés antiguas
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Fetch: estrategia cache-first con fallback a red
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      const fetchPromise = fetch(event.request).then(networkResponse => {
+    caches.match(event.request).then(cached => {
+      if (cached) {
+        // Actualiza en segundo plano (stale-while-revalidate suave)
+        fetch(event.request).then(response => {
+          if (response && response.status === 200) {
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, response.clone());
+            });
+          }
+        }).catch(() => {});
+        return cached;
+      }
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+        const responseToCache = response.clone();
         caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, networkResponse.clone());
+          cache.put(event.request, responseToCache);
         });
-        return networkResponse;
-      }).catch(() => {}); // Falla silenciosamente si no hay red (Offline real)
-      return cachedResponse || fetchPromise;
+        return response;
+      }).catch(() => caches.match('./index.html'));
     })
   );
 });
@@ -1569,7 +1602,8 @@ window.addEventListener('load', function() {
         // Botón 1 (izquierdo) o touch
         var isPrimaryAction = evt.button === 0 || evt.pointerType === 'touch' || evt.pointerType === 'pen';
         
-        if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser-normal')) {
+
+        if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser')) {
             isPanning = true;
             var clientX = evt.touches && evt.touches.length > 0 ? evt.touches[0].clientX : evt.clientX;
             var clientY = evt.touches && evt.touches.length > 0 ? evt.touches[0].clientY : evt.clientY;
@@ -1584,13 +1618,15 @@ window.addEventListener('load', function() {
         isPointerDown = true;
 
         
-        if (currentTool === 'eraser-stroke') {
-            // Instant Erase: sin pincel fantasma; borra al contacto (también
-            // en el primer tap) y el historial se guarda UNA vez en mouse:up.
+
+        if (currentTool === 'eraser') {
+            // Borrador unificado: SIN pincel fantasma; borra al contacto
+            // (incluso en el primer tap) y el historial se guarda en mouse:up.
             evt.preventDefault();
             instantEraseAt(opt);
             return;
         }
+
 
         // --- INICIO HERRAMIENTA DE RELLENO HÍBRIDO ---
         if (currentTool === 'fill') {
@@ -2034,13 +2070,13 @@ window.addEventListener('load', function() {
         var isDragging = isPointerDown;
 
 
-        // Instant Erase: borrado por contacto con hit-test económico
-        // (bounding box + containsPoint/distancia), sin findTarget por píxel
-        // y SIN guardar historial por objeto (se guarda 1 vez en mouse:up).
-        if (currentTool === 'eraser-stroke' && isDragging) {
+
+        // Borrador unificado: borrado por contacto con hit-test económico
+        if (currentTool === 'eraser' && isDragging) {
             instantEraseAt(opt);
             return;
         }
+
 
         if (currentTool === 'select') return;
 
@@ -2114,11 +2150,13 @@ window.addEventListener('load', function() {
     canvas.on('mouse:up', function(opt) {
         isPointerDown = false; // Liberar el tracker universal
 
-        // Instant Erase: UNA sola entrada de historial por trazo de borrado
-        if (currentTool === 'eraser-stroke' && hasErasedObjects) {
+
+        // Borrador unificado: UNA sola entrada de historial por trazo
+        if (currentTool === 'eraser' && hasErasedObjects) {
             saveHistory();
             hasErasedObjects = false;
         }
+
         if (isPanning) {
             canvas.setViewportTransform(canvas.viewportTransform);
             isPanning = false; canvasWrapper.classList.remove('cursor-panning');
@@ -2264,49 +2302,11 @@ window.addEventListener('load', function() {
 /* ═══════════════════════════════════════════════════════════════
    MÁSCARAS E HISTORIAL
 ═══════════════════════════════════════════════════════════════ */
+
     canvas.on('path:created', function(opt) {
-        if (currentTool === 'eraser-normal') {
-            var eraserPath = opt.path;
-            canvas.remove(eraserPath); // Quitar trazo temporal del lienzo global
-
-            // Buscar qué objetos cruzó la goma
-            var targets = canvas.getObjects().filter(function(obj) {
-                return obj !== eraserPath && !obj.isBackground && obj.intersectsWithObject(eraserPath);
-            });
-
-            if (targets.length > 0) {
-                targets.forEach(function(obj) {
-                    eraserPath.clone(function(clone) {
-                        clone.set({
-                            globalCompositeOperation: 'destination-out',
-                            stroke: '#000000',
-                            fill: 'transparent',
-                            opacity: 1
-                        });
-
-                        if (obj.type === 'group' && obj.isEraserGroup) {
-                            obj.addWithUpdate(clone);
-                            obj.set('dirty', true);
-                        } else {
-                            var newGroup = new fabric.Group([obj, clone], {
-                                isEraserGroup: true,
-                                objectCaching: true
-                            });
-                            canvas.remove(obj);
-                            canvas.add(newGroup);
-                        }
-                        canvas.requestRenderAll();
-                    });
-                });
-            }
-            saveHistory();
-            return; // Prevenir guardado duplicado
-        }
-        
-        // Mantener comportamiento para otras herramientas (lápiz, resaltador)
-        if (currentTool !== 'eraser-normal') {
-            saveHistory();
-        }
+        // Borrador unificado: ya no genera paths (borrado instantáneo en
+        // mouse:move); aquí solo lápiz/resaltador guardan su historial.
+        saveHistory();
     });
 
     canvas.on('object:added',    scheduleAutoSave);
@@ -2468,7 +2468,8 @@ window.addEventListener('load', function() {
         });
         // (Nota: Si la herramienta es 'fill', su propia rama sobreescribirá evented=true más abajo)
 
-        let btnMap = { 'pen':'btnPen', 'highlight':'btnHighlight', 'fill':'btnFill', 'text':'btnText', 'eraser-stroke':'btnEraserStroke', 'eraser-normal':'btnEraserNormal', 'select':'btnSelect', 'pan':'btnPan', 'line':'menuBtnLine', 'rect':'menuBtnRect', 'circle':'menuBtnCircle', 'triangle':'menuBtnTriangle', 'ruler':'btnRuler' };
+
+        let btnMap = { 'pen':'btnPen', 'highlight':'btnHighlight', 'fill':'btnFill', 'text':'btnText', 'eraser':'btnEraserStroke', 'select':'btnSelect', 'pan':'btnPan', 'line':'menuBtnLine', 'rect':'menuBtnRect', 'circle':'menuBtnCircle', 'triangle':'menuBtnTriangle', 'ruler':'btnRuler' };
         
         let targetBtnId = btnMap[tool];
         if (targetBtnId) {
@@ -2502,20 +2503,12 @@ window.addEventListener('load', function() {
                 } 
             });
         }
-        else if (tool === 'eraser-normal') {
-            canvas.isDrawingMode = true;
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-            canvas.freeDrawingBrush.color = 'rgba(255, 255, 255, 0.6)'; // Feedback visual suave
-            canvas.freeDrawingBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
-            canvasWrapper.classList.add('cursor-eraser');
-            canvas.renderAll();
-        }
+
         else if (tool === 'text') { canvasWrapper.classList.add('cursor-text'); }
-        else if (tool === 'eraser-stroke') { 
-            canvas.isDrawingMode = false; // Asegurar que no dibuje
+        else if (tool === 'eraser') {
+            canvas.isDrawingMode = false; // NUNCA dibuja pincel fantasma
             canvasWrapper.classList.add('cursor-eraser');
-            // Hacer que los objetos (excepto las máscaras de borrador normal) sean detectables
-            // para findTarget() pero no seleccionables manualmente
+            // Objetos detectables para el hit-test instantáneo pero no seleccionables
             canvas.forEachObject(o => {
                 if (o.isEraserMask !== true) {
                     o.evented = true;
@@ -2544,8 +2537,8 @@ window.addEventListener('load', function() {
     document.getElementById('btnHighlight').onclick = () => setTool('highlight');
     document.getElementById('btnFill').onclick = () => setTool('fill');
     document.getElementById('btnText').onclick = () => setTool('text');
-    document.getElementById('btnEraserStroke').onclick = () => setTool('eraser-stroke');
-    document.getElementById('btnEraserNormal').onclick = () => setTool('eraser-normal');
+
+    document.getElementById('btnEraserStroke').onclick = () => setTool('eraser');
     document.getElementById('btnSelect').onclick = () => setTool('select');
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
@@ -3650,7 +3643,8 @@ window.addEventListener('load', function() {
         if (e.code === 'Space' && !isSpaceDown) { isSpaceDown = true; if (currentTool !== 'pan') canvasWrapper.classList.add('cursor-pan'); e.preventDefault(); }
         if (e.code === 'KeyP' && !e.ctrlKey) setTool('pen');
         if (e.code === 'KeyF' && !e.ctrlKey) setTool('fill');
-        if (e.code === 'KeyE' && !e.ctrlKey) { if (e.shiftKey) setTool('eraser-normal'); else setTool('eraser-stroke'); }
+
+        if (e.code === 'KeyE' && !e.ctrlKey) setTool('eraser');
         if (e.code === 'KeyV' && !e.ctrlKey) setTool('select');
         if (e.code === 'KeyH' && !e.ctrlKey) setTool('pan');
         if (e.code === 'KeyI' && !e.ctrlKey) document.getElementById('btnInsertImage').click();
