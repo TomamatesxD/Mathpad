@@ -1346,99 +1346,14 @@
     
 
 
-    <!-- Service Worker (inline via Blob, unificado) -->
-    <script id="sw-src" type="text/plain">
-
-// ============================================
-// MathPad - Service Worker (inline, sincroniza con sw.js)
-// =============================================
-
-
-// Versión de caché v12: borrador único unificado (instant erase al contacto,
-// sin pincel transparente ni goma raster por máscaras).
-const CACHE_NAME = 'mathpad-v12';
-const urlsToCache = [
-  './index.html',
-  './favicon.svg',
-  './fabric.min.js',
-  './math.min.js',
-  './jspdf.umd.min.js',
-  './dexie.min.js',
-  './tex-svg.js',
-  './manifest.json',
-  './icono-192.png',
-  './icono-512.png',
-  './icono-512-maskable.png'
-];
-
-// Instalación: precarga la caché con los recursos del proyecto
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        // Usamos addAll con tolerancia a fallos individuales (iconos pueden faltar)
-        return Promise.allSettled(
-          urlsToCache.map(url =>
-            cache.add(url).catch(err => console.warn('No se pudo cachear:', url, err))
-          )
-        );
-      })
-      .then(() => self.skipWaiting())
-  );
-});
-
-// Activación: limpia cachés antiguas
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-// Fetch: estrategia cache-first con fallback a red
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) {
-        // Actualiza en segundo plano (stale-while-revalidate suave)
-        fetch(event.request).then(response => {
-          if (response && response.status === 200) {
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, response.clone());
-            });
-          }
-        }).catch(() => {});
-        return cached;
-      }
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-        return response;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
-});
-    </script>
+    <!-- Service Worker físico: registro de ./sw.js en la raíz del sitio.
+         (Registro vía Blob/URL.createObjectURL eliminado: los navegadores
+         modernos lo bloquean por seguridad.) -->
     <script>
     (function(){
       if('serviceWorker' in navigator && ['http:','https:'].includes(location.protocol)){
         window.addEventListener('load', function(){
-          var code = document.getElementById('sw-src').textContent;
-          var blob = new Blob([code], {type: 'text/javascript'});
-          var url = URL.createObjectURL(blob);
-          navigator.serviceWorker.register(url)
+          navigator.serviceWorker.register('./sw.js')
             .then(function(r){ console.log('Service Worker registrado con éxito:', r.scope); })
             .catch(function(err){ console.error('Error al registrar Service Worker', err); });
         });
@@ -1741,7 +1656,10 @@ window.addEventListener('load', function() {
                 if (cy < minY) minY = cy;
                 if (cy > maxY) maxY = cy;
 
-                if (cx === 0 || cx === w - 1 || cy === 0 || cy === h - 1) touchesBorder = true;
+                if (cx === 0 || cx === w - 1 || cy === 0 || cy === h - 1) {
+                    touchesBorder = true;
+                    break;
+                }
 
                 var neighbors = [curr - 1, curr + 1, curr - w, curr + w];
                 var neighborCoordsOk = [cx > 0, cx < w - 1, cy > 0, cy < h - 1];
@@ -1891,14 +1809,14 @@ window.addEventListener('load', function() {
             segments.push({ a, b });
         } else if (['rect', 'triangle', 'image', 'i-text', 'text'].includes(obj.type)) {
             // getCoords() nos da las 4 esquinas reales y exactas sin importar el originX/Y
-            const coords = obj.getCoords(); 
+            const coords = obj.getCoords(true); 
             segments.push({ a: coords[0], b: coords[1] });
             segments.push({ a: coords[1], b: coords[2] });
             segments.push({ a: coords[2], b: coords[3] });
             segments.push({ a: coords[3], b: coords[0] });
         } else if (obj.type === 'ellipse' || obj.type === 'circle') {
-            const rx = (obj.rx || obj.width/2) * (obj.scaleX || 1);
-            const ry = (obj.ry || obj.height/2) * (obj.scaleY || 1);
+            const rx = obj.rx || obj.width / 2;
+            const ry = obj.ry || obj.height / 2;
             const steps = 32;
             let prev = toCanvas(rx * Math.cos(0), ry * Math.sin(0));
             for (let i = 1; i <= steps; i++) {
@@ -1918,56 +1836,6 @@ window.addEventListener('load', function() {
         return segments;
     }
 
-    // Función helper para encontrar el objeto bajo el puntero
-    function findObjectAtPointer(canvas, pointer) {
-        const objects = canvas.getObjects();
-        const tolerance = 15;
-
-        // Recorrer en orden inverso (objetos de arriba primero)
-        for (let i = objects.length - 1; i >= 0; i--) {
-            const obj = objects[i];
-            if (obj.isEraserMask === true || obj.isBackground) continue;
-
-            // Filtro rápido: bounding box (con tolerancia)
-            const bounds = obj.getBoundingRect();
-            if (pointer.x < bounds.left - tolerance || pointer.x > bounds.left + bounds.width + tolerance ||
-                pointer.y < bounds.top - tolerance || pointer.y > bounds.top + bounds.height + tolerance) {
-                continue;
-            }
-
-            // Para paths de lápiz: distancia punto-a-segmento contra el trazo
-            if (obj.type === 'path' && obj.path) {
-                const localPt = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
-                const px = localPt.x + (obj.pathOffset ? obj.pathOffset.x : 0);
-                const py = localPt.y + (obj.pathOffset ? obj.pathOffset.y : 0);
-
-                const pathData = obj.path;
-                const points = [];
-                for (const cmd of pathData) {
-                    for (let j = 1; j < cmd.length - 1; j += 2) {
-                        points.push({ x: cmd[j], y: cmd[j + 1] });
-                    }
-                }
-
-                let minDist = Infinity;
-                for (let j = 0; j < points.length - 1; j++) {
-                    minDist = Math.min(minDist, distToSegment({ x: px, y: py }, points[j], points[j + 1]));
-                }
-
-                if (minDist < tolerance) return obj;
-            } else {
-                // Para otros objetos: detección de colisión estricta contra el contorno
-                const segments = getShapeSegmentsInCanvasSpace(obj);
-                for (const seg of segments) {
-                    if (distToSegment(pointer, seg.a, seg.b) < tolerance) {
-                        return obj;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     // ── Instant Erase: hit-test económico + borrado inmediato, sin trazo
     //    fantasma y sin findTarget por píxel (que causaba el lag). ──
     var hasErasedObjects = false;      // ¿se borró algo en este trazo?
@@ -1975,8 +1843,10 @@ window.addEventListener('load', function() {
 
     function instantEraseAt(opt) {
         var pointer = canvas.getPointer(opt.e);
-        // Radio de colisión basado en el grosor del borrador actual
-        var radius = (parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6;
+        var zoom = canvas.getZoom() || 1;
+        // Radio de colisión adaptado a la escala visual actual del lienzo
+        var baseRadius = (parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6;
+        var radius = baseRadius / zoom;
         var objects = canvas.getObjects();
         var removed = false;
 
@@ -1987,35 +1857,64 @@ window.addEventListener('load', function() {
                 var obj = objects[i];
                 if (obj.isBackground || obj.isEraserMask === true) continue;
 
-                // Filtro barato por bounding box (con el radio como tolerancia)
-                var b = obj.getBoundingRect();
-                if (pointer.x < b.left - radius || pointer.x > b.left + b.width + radius ||
-                    pointer.y < b.top - radius || pointer.y > b.top + b.height + radius) continue;
+                var strokePad = ((obj.strokeWidth || 0) / 2);
+                var hitRadius = radius + strokePad;
 
-                // Prueba fina: ¿el punto cae dentro del objeto?
+                // 1. Filtro rápido en coordenadas de lienzo (absolute = true)
+                var b = obj.getBoundingRect(true);
+                if (pointer.x < b.left - hitRadius || pointer.x > b.left + b.width + hitRadius ||
+                    pointer.y < b.top - hitRadius || pointer.y > b.top + b.height + hitRadius) {
+                    continue;
+                }
+
                 var hit = false;
-                try { hit = obj.containsPoint(pointer); } catch (err) { hit = false; }
 
-                // Fallback para trazos finos: cercanía al contorno/segmentos
+                // 2. Objetos de área sólida (texto, imágenes, parches de relleno o figuras con relleno activo)
+                var hasSolidArea = obj.isFillPatch ||
+                    ['i-text', 'text', 'image', 'group'].includes(obj.type) ||
+                    (obj.fill && obj.fill !== 'transparent' && obj.fill !== 'none' && obj.type !== 'path');
+
+                if (hasSolidArea) {
+                    try { hit = obj.containsPoint(pointer, null, true); } catch (err) { hit = false; }
+                }
+
+                // 3. Trazos de lápiz/resaltador (path): distancia continua punto-a-segmento en espacio local
                 if (!hit && obj.type === 'path' && obj.path) {
                     var localPt = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
-                    var px = localPt.x + (obj.pathOffset ? obj.pathOffset.x : 0);
-                    var py = localPt.y + (obj.pathOffset ? obj.pathOffset.y : 0);
-                    for (var ci = 0; ci < obj.path.length && !hit; ci++) {
+                    var scaleX = obj.scaleX || 1;
+                    var scaleY = obj.scaleY || 1;
+                    var px = (localPt.x / scaleX) + (obj.pathOffset ? obj.pathOffset.x : 0);
+                    var py = (localPt.y / scaleY) + (obj.pathOffset ? obj.pathOffset.y : 0);
+                    var localRadius = hitRadius / Math.min(scaleX, scaleY);
+
+                    var pts = [];
+                    for (var ci = 0; ci < obj.path.length; ci++) {
                         var cmd = obj.path[ci];
-                        for (var j = 1; j < cmd.length - 2 && !hit; j += 2) {
-                            if (distToSegment({ x: px, y: py }, { x: cmd[j], y: cmd[j + 1] }, { x: cmd[j + 2], y: cmd[j + 3] }) < radius) hit = true;
+                        for (var j = 1; j < cmd.length - 1; j += 2) {
+                            pts.push({ x: cmd[j], y: cmd[j + 1] });
+                        }
+                    }
+                    if (pts.length === 1) {
+                        if (Math.hypot(px - pts[0].x, py - pts[0].y) <= localRadius) hit = true;
+                    } else {
+                        for (var pi = 0; pi < pts.length - 1 && !hit; pi++) {
+                            if (distToSegment({ x: px, y: py }, pts[pi], pts[pi + 1]) <= localRadius) {
+                                hit = true;
+                            }
                         }
                     }
                 } else if (!hit) {
+                    // 4. Figuras geométricas huecas, líneas y grupos (contorno en espacio de lienzo)
                     var segs = getShapeSegmentsInCanvasSpace(obj);
                     for (var s = 0; s < segs.length && !hit; s++) {
-                        if (distToSegment(pointer, segs[s].a, segs[s].b) < radius) hit = true;
+                        if (distToSegment(pointer, segs[s].a, segs[s].b) <= hitRadius) {
+                            hit = true;
+                        }
                     }
                 }
 
                 if (!hit) continue;
-                canvas.remove(obj);   // ← borrado INSTANTÁNEO al contacto
+                canvas.remove(obj);
                 removed = true;
             }
         } finally {
@@ -2023,7 +1922,7 @@ window.addEventListener('load', function() {
         }
         if (removed) {
             hasErasedObjects = true;
-            canvas.requestRenderAll(); // se ve desaparecer al instante
+            canvas.requestRenderAll();
         }
     }
     canvas.on('mouse:move', function(opt) {
@@ -2310,7 +2209,10 @@ window.addEventListener('load', function() {
     });
 
     canvas.on('object:added',    scheduleAutoSave);
-    canvas.on('object:modified', scheduleAutoSave);
+    canvas.on('object:modified', function() {
+        scheduleAutoSave();
+        saveHistory();
+    });
 
     canvas.on('object:removed', function() {
         scheduleAutoSave();
@@ -2560,9 +2462,20 @@ window.addEventListener('load', function() {
     };
 
     document.getElementById('colorPicker').addEventListener('change', function(e) {
-        canvas.freeDrawingBrush.color = e.target.value;
-        if (currentTool !== 'pen' && currentTool !== 'highlight' && currentTool !== 'fill') setTool('pen');
-        else setTool(currentTool);
+        var newColor = e.target.value;
+        if (canvas.freeDrawingBrush) canvas.freeDrawingBrush.color = newColor;
+        var activeObj = canvas.getActiveObject();
+        if (currentTool === 'select' && activeObj) {
+            if (['i-text', 'text'].includes(activeObj.type)) {
+                activeObj.set('fill', newColor);
+            } else if (activeObj.stroke) {
+                activeObj.set('stroke', newColor);
+            }
+            canvas.requestRenderAll();
+            saveHistory();
+        } else {
+            setTool(currentTool);
+        }
     });
 
     document.getElementById('widthPicker').addEventListener('input', function(e) {
@@ -2823,14 +2736,19 @@ window.addEventListener('load', function() {
         } catch { pts.push(null); }
       }
 
-      if (pts.filter(Boolean).length < 2) throw new Error('Sin puntos válidos en el rango');
-
-      // Rango Y (ignorar outliers extremos)
+      // Rango Y protegido: lanza error sin puntos, evita la división por cero
+      // (funciones constantes con yMin === yMax) y añade 10% de margen.
       const yVals = pts.filter(Boolean).map(p => p.y);
-      const yMean = yVals.reduce((a,b) => a+b) / yVals.length;
-      const yStd  = Math.sqrt(yVals.reduce((a,b) => a + (b-yMean)**2, 0) / yVals.length);
-      const yMin  = Math.max(Math.min(...yVals), yMean - 4*yStd);
-      const yMax  = Math.min(Math.max(...yVals), yMean + 4*yStd);
+      if (yVals.length < 2) throw new Error('Sin puntos válidos en el rango');
+      let yMin = Math.min(...yVals);
+      let yMax = Math.max(...yVals);
+      if (yMin === yMax) {
+          yMin -= 1;
+          yMax += 1;
+      }
+      const yRange = yMax - yMin;
+      yMin -= yRange * 0.1;
+      yMax += yRange * 0.1;
 
       const margin = 50;
       const plotW  = canvas.getWidth()  - margin * 2;
@@ -3754,10 +3672,16 @@ window.addEventListener('load', function() {
     }
     
     // Escuchar cambios en el Service Worker (nueva versión disponible)
+    // Solo se muestra el banner si YA existía un controlador antes de cargar
+    // la página: así la primera instalación de la PWA no da un falso positivo.
     if ('serviceWorker' in navigator) {
+        let hadController = !!navigator.serviceWorker.controller;
         navigator.serviceWorker.addEventListener('controllerchange', function() {
-            // El SW cambió, mostrar banner de actualización
-            showSWUpdateBanner();
+            if (hadController) {
+                showSWUpdateBanner();
+            } else {
+                hadController = true;
+            }
         });
     }
 
