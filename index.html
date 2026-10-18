@@ -1780,7 +1780,7 @@ window.addEventListener('load', function() {
             var pointer = canvas.getPointer(evt);
             var itext = new fabric.IText('', {
                 left: pointer.x, top: pointer.y,
-                fontSize: parseInt(document.getElementById('fontSizePicker').value, 10), fill: document.getElementById('colorPicker').value,
+                fontSize: (parseInt(document.getElementById('fontSizePicker').value, 10) || 16) / (canvas.getZoom() || 1), fill: document.getElementById('colorPicker').value,
                 fontFamily: 'Segoe UI', selectable: true, evented: true, editable: true, padding: 4
             });
             canvas.add(itext); canvas.setActiveObject(itext);
@@ -1871,6 +1871,8 @@ window.addEventListener('load', function() {
 
         suppressRemoveHistory = true; // el historial se guarda UNA vez en mouse:up
         try {
+            // Dos pasadas: primero trazos finos (path/line/contornos), luego áreas sólidas; un solo borrado por llamada
+            for (var pass = 0; pass < 2 && !removed; pass++) {
             // Orden inverso: los objetos de arriba se procesan primero
             for (var i = objects.length - 1; i >= 0; i--) {
                 var obj = objects[i];
@@ -1889,9 +1891,13 @@ window.addEventListener('load', function() {
                 var hit = false;
 
                 // 2. Objetos de área sólida (texto, imágenes, parches de relleno o figuras con relleno activo)
+                var solidTypes = ['rect', 'triangle', 'ellipse', 'circle', 'polygon'];
                 var hasSolidArea = obj.isFillPatch ||
                     ['i-text', 'text', 'image', 'group'].includes(obj.type) ||
-                    (obj.fill && obj.fill !== 'transparent' && obj.fill !== 'none' && obj.type !== 'path');
+                    (solidTypes.includes(obj.type) && obj.fill && obj.fill !== 'transparent' && obj.fill !== 'none');
+
+                // En la pasada 0 solo se prueban trazos finos; las áreas sólidas esperan a la pasada 1
+                if (pass === 0 && hasSolidArea) continue;
 
                 if (hasSolidArea) {
                     try { hit = obj.containsPoint(pointer, null, true); } catch (err) { hit = false; }
@@ -1935,6 +1941,8 @@ window.addEventListener('load', function() {
                 if (!hit) continue;
                 canvas.remove(obj);
                 removed = true;
+                break;
+            }
             }
         } finally {
             suppressRemoveHistory = false;
@@ -2083,6 +2091,30 @@ window.addEventListener('load', function() {
 
         if (activeShape) {
             activeShape.setCoords();
+            var tinyW = 0, tinyH = 0;
+            if (activeShape.type === 'line') {
+                tinyW = Math.abs((activeShape.x2 || 0) - (activeShape.x1 || 0));
+                tinyH = Math.abs((activeShape.y2 || 0) - (activeShape.y1 || 0));
+                if (Math.hypot(tinyW, tinyH) < 3) {
+                    canvas.remove(activeShape);
+                    activeShape = null;
+                }
+            } else if (activeShape.type === 'ellipse' || activeShape.type === 'circle') {
+                tinyW = (activeShape.rx || 0) * 2;
+                tinyH = (activeShape.ry || 0) * 2;
+                if (tinyW < 3 && tinyH < 3) {
+                    canvas.remove(activeShape);
+                    activeShape = null;
+                }
+            } else {
+                tinyW = activeShape.width || 0;
+                tinyH = activeShape.height || 0;
+                if (tinyW < 3 && tinyH < 3) {
+                    canvas.remove(activeShape);
+                    activeShape = null;
+                }
+            }
+            if (!activeShape) return;
             var isSelect = (currentTool === 'select');
             activeShape.selectable = isSelect;
             activeShape.evented = isSelect;
@@ -2091,6 +2123,14 @@ window.addEventListener('load', function() {
 
         // Finalizar herramienta regla: convertir línea en objeto permanente
         if (currentTool === 'ruler' && rulerCurrentLine) {
+            var dx = Math.abs((rulerCurrentLine.x2 || 0) - (rulerCurrentLine.x1 || 0));
+            var dy = Math.abs((rulerCurrentLine.y2 || 0) - (rulerCurrentLine.y1 || 0));
+            if (Math.hypot(dx, dy) < 3) {
+                canvas.remove(rulerCurrentLine);
+                rulerStartPoint = null;
+                rulerCurrentLine = null;
+                return;
+            }
             rulerCurrentLine.setCoords();
             var isSelect = (currentTool === 'select');
             rulerCurrentLine.selectable = isSelect;
@@ -2488,7 +2528,13 @@ window.addEventListener('load', function() {
             if (['i-text', 'text'].includes(activeObj.type)) {
                 activeObj.set('fill', newColor);
             } else if (activeObj.stroke) {
-                activeObj.set('stroke', newColor);
+                if (activeObj.type === 'path' && typeof activeObj.stroke === 'string' && activeObj.stroke.indexOf('rgba(') === 0) {
+                    var alphaMatch = activeObj.stroke.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([0-9.]+)\s*\)/);
+                    var origAlpha = alphaMatch ? parseFloat(alphaMatch[1]) : 0.3;
+                    activeObj.set('stroke', hexToRgba(newColor, origAlpha));
+                } else {
+                    activeObj.set('stroke', newColor);
+                }
             }
             canvas.requestRenderAll();
             saveHistory();
@@ -3183,7 +3229,7 @@ window.addEventListener('load', function() {
         var text = clipboardData.getData('text');
         if (text && text.trim() !== '') {
             e.preventDefault(); var vpt = canvas.viewportTransform;
-            var itext = new fabric.IText(text, { left: (canvas.width / 2 - vpt[4]) / vpt[0], top: (canvas.height / 2 - vpt[5]) / vpt[0], fontSize: parseInt(document.getElementById('fontSizePicker').value, 10), fill: document.getElementById('colorPicker').value, fontFamily: 'Segoe UI', selectable: true, evented: true, editable: true, padding: 4 });
+            var itext = new fabric.IText(text, { left: (canvas.width / 2 - vpt[4]) / vpt[0], top: (canvas.height / 2 - vpt[5]) / vpt[0], fontSize: (parseInt(document.getElementById('fontSizePicker').value, 10) || 16) / (canvas.getZoom() || 1), fill: document.getElementById('colorPicker').value, fontFamily: 'Segoe UI', selectable: true, evented: true, editable: true, padding: 4 });
             canvas.add(itext); canvas.setActiveObject(itext);
             setTool('select');
             saveHistory();
