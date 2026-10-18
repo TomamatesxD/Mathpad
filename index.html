@@ -64,6 +64,7 @@
         #recoverBar > div { display: flex; gap: 8px; flex-shrink: 0; }
         #btnDoRecover { background: #bb86fc; color: #000; border: none; border-radius: 6px; padding: 6px 16px; font-weight: 600; cursor: pointer; font-size: 13px; }
         #btnDiscardRecover { background: transparent; color: #fde68a; border: 1px solid #7c5c00; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+        #btnReloadSW { background: #000; color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer; font-size: 13px; }
 
         :root.light-mode #recoverBar { background: #fef3c7; border-bottom-color: #f59e0b; color: #92400e; }
         :root.light-mode #btnDoRecover { background: #7c3aed; color: #fff; }
@@ -564,7 +565,7 @@
             .brand-author {
                 display: none;
             }
-            
+
             .left-sidebar {
                 width: 52px;
                 padding: 8px 0;
@@ -623,7 +624,7 @@
         }
 
         .calculator-panel {
-            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+            transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
                         opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -864,7 +865,7 @@
         .context-menu.hidden {
             display: none !important;
         }
-    
+
         /* ═══════════════════════════════════════════════════════════════
             MODAL LATEX — variables CSS: se adapta a tema claro/oscuro
          ══════════════════════════════════════════════════════════════ */
@@ -944,6 +945,41 @@
         #latexInsertBtn { background: var(--accent); color: var(--bg-panel); border: none; }
         #latexInsertBtn:hover { background: var(--accent-hover); }
         #latexCancelBtn { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); }
+        /* ==== html-validate: estilos migrados desde atributos inline ==== */
+        .bg-color-label { display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 6px; margin-left: 4px; }
+        .bg-color-input { width: 26px; height: 26px; border: 1px solid var(--border-color); border-radius: 6px; background: transparent; padding: 0; cursor: pointer; }
+        .calc-span2 { grid-column: span 2; }
+
+        /* Modal de graficacion */
+        #plotModal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .65); z-index: 9000; align-items: center; justify-content: center; }
+        .plot-dialog { background: #1e1e1e; border: 1px solid #444; border-radius: 14px; padding: 28px 32px; width: 90%; max-width: 500px; }
+        .plot-title { color: #bb86fc; margin-bottom: 20px; font-size: 16px; }
+        .plot-label { color: #aaa; font-size: 12px; display: block; margin-bottom: 6px; }
+        .plot-label-sm { color: #aaa; font-size: 12px; display: block; margin-bottom: 4px; }
+        .plot-hint { color: #666; }
+        .plot-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .plot-input { width: 100%; background: #121212; border: 1px solid #555; border-radius: 8px; padding: 9px 12px; color: #e0e0e0; outline: none; }
+        #plotExpr { padding: 10px 12px; font-family: monospace; font-size: 15px; margin-bottom: 14px; }
+        #plotXMin, #plotXMax { font-size: 14px; }
+        .plot-colorrow { display: flex; gap: 14px; margin-bottom: 14px; align-items: center; }
+        .plot-color { width: 40px; height: 32px; background: transparent; border: 1px solid #555; border-radius: 6px; cursor: pointer; }
+        .plot-onlyline-wrap { padding-top: 16px; }
+        .plot-check { color: #e0e0e0; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .plot-checkbox { width: 16px; height: 16px; accent-color: #bb86fc; }
+        .plot-section { margin-bottom: 14px; }
+        .plot-list { background: #121212; border: 1px solid #555; border-radius: 8px; padding: 8px; min-height: 40px; max-height: 120px; overflow-y: auto; font-size: 13px; color: #888; }
+        .plot-empty { font-style: italic; }
+        .plot-actions { display: flex; gap: 10px; }
+        .plot-btn-primary { flex: 1; background: #bb86fc; color: #000; border: none; border-radius: 8px; padding: 11px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .plot-btn-danger { background: transparent; color: #cf6679; border: 1px solid #cf6679; border-radius: 8px; padding: 11px 14px; cursor: pointer; font-size: 13px; }
+        .plot-btn-ghost { background: transparent; color: #999; border: 1px solid #444; border-radius: 8px; padding: 11px 18px; cursor: pointer; font-size: 14px; }
+        .plot-error { color: #f87171; font-size: 12px; margin-top: 10px; display: none; }
+
+        /* Modal LaTeX */
+        .latex-title-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* Entradas y botones auxiliares ocultos */
+        .hidden-file-input, .hidden-helper { display: none; }
 </style>
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
@@ -961,11 +997,11 @@
 
 <div id="recoverBar">
   <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
-  <div style="display:flex;gap:8px;flex-shrink:0">
-    <button id="btnDoRecover">
+  <div>
+    <button type="button" id="btnDoRecover">
       Recuperar
     </button>
-    <button id="btnDiscardRecover">
+    <button type="button" id="btnDiscardRecover">
       Descartar
     </button>
   </div>
@@ -975,26 +1011,26 @@
     <div class="top-bar" role="toolbar" aria-label="Barra de sistema">
         <!-- Archivo -->
         <div class="tool-group">
-            <button id="btnSaveProj" title="Guardar Sesión en PC">
+            <button type="button" id="btnSaveProj" title="Guardar Sesión en PC" aria-label="Guardar Sesión en PC">
                 <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h10"/></svg>
             </button>
-            <button id="btnLoadProj" title="Cargar Sesión desde PC">
+            <button type="button" id="btnLoadProj" title="Cargar Sesión desde PC" aria-label="Cargar Sesión desde PC">
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </button>
-            <button id="btnExportPDF" title="Exportar PDF">
+            <button type="button" id="btnExportPDF" title="Exportar PDF" aria-label="Exportar PDF">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><text text-anchor="middle" x="12.5" y="16.5" font-family="Arial, sans-serif" font-weight="bold" font-size="5.5" fill="currentColor" stroke="none">PDF</text></svg>
             </button>
-            <button id="btnExport" title="Exportar PNG">
+            <button type="button" id="btnExport" title="Exportar PNG" aria-label="Exportar PNG">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
             </button>
         </div>
 
         <!-- Historial -->
         <div class="tool-group">
-            <button id="btnUndo" title="Deshacer [Ctrl+Z]">
+            <button type="button" id="btnUndo" title="Deshacer [Ctrl+Z]" aria-label="Deshacer [Ctrl+Z]">
                 <svg viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 015 5v2M3 10l5-5M3 10l5 5"/></svg>
             </button>
-            <button id="btnRedo" title="Rehacer [Ctrl+Y]">
+            <button type="button" id="btnRedo" title="Rehacer [Ctrl+Y]" aria-label="Rehacer [Ctrl+Y]">
                 <svg viewBox="0 0 24 24"><path d="M21 10H11a5 5 0 00-5 5v2M21 10l-5-5M21 10l-5 5"/></svg>
             </button>
         </div>
@@ -1007,16 +1043,16 @@
                 <option value="bg-plain">⬜ Liso</option>
             </select>
             <!-- NUEVO: Selector de color de fondo -->
-            <label title="Color de la hoja" style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:6px; margin-left:4px;">
-                <input type="color" id="bgColorPicker" value="#1a1a1a" style="width:26px; height:26px; border:1px solid var(--border-color); border-radius:6px; background:transparent; padding:0; cursor:pointer;">
+            <label class="bg-color-label" title="Color de la hoja">
+                <input type="color" id="bgColorPicker" class="bg-color-input" value="#1a1a1a">
             </label>
-            <button id="themeToggle" class="theme-toggle" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema">
+            <button type="button" id="themeToggle" class="theme-toggle" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             </button>
-            <button id="btnCalcToggle" title="Mostrar/Ocultar Calculadora" aria-label="Toggle calculadora">
+            <button type="button" id="btnCalcToggle" title="Mostrar/Ocultar Calculadora" aria-label="Mostrar/Ocultar Calculadora">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><rect x="7" y="5" width="10" height="3" rx="0.5" fill="currentColor" fill-opacity="0.1"/><rect x="7" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="7" y="14" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="14" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="14" width="2.5" height="2" rx="0.5"/><rect x="7" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="17.5" width="2.5" height="2" rx="0.5"/></svg>
             </button>
-            <button id="btnClear" class="btn-danger" title="Limpiar todo">
+            <button type="button" id="btnClear" class="btn-danger" title="Limpiar todo" aria-label="Limpiar todo">
                 <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
             </button>
         </div>
@@ -1072,65 +1108,65 @@
 
     <!-- LEFT SIDEBAR - Herramientas de dibujo -->
     <div class="left-sidebar" role="toolbar" aria-label="Herramientas de dibujo">
-        <button id="btnSelect" class="active" title="Seleccionar [V]">
+        <button type="button" id="btnSelect" class="active" title="Seleccionar [V]" aria-label="Seleccionar [V]">
             <svg viewBox="0 0 24 24"><path d="M4 4l7 18 2.5-7.5L21 12z"/></svg>
         </button>
-        <button id="btnPan" title="Mover lienzo [H]">
+        <button type="button" id="btnPan" title="Mover lienzo [H]" aria-label="Mover lienzo [H]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 11V4a2 2 0 0 0-4 0v6"/><path d="M10 11V5a2 2 0 0 0-4 0v9l-3-3a2 2 0 0 0-3 3l5 7h9a5 5 0 0 0 5-5v-6Z"/>
             </svg>
         </button>
-        <button id="btnPen" title="Lápiz [P]">
+        <button type="button" id="btnPen" title="Lápiz [P]" aria-label="Lápiz [P]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
-        <button id="btnHighlight" title="Resaltador">
+        <button type="button" id="btnHighlight" title="Resaltador" aria-label="Resaltador">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 6.5 14C5.5 15 5 16 5 17.5 5 19 6.5 20 8 20c1.5 0 2.5-.5 3.5-1.5L14 16"/><path d="m14 7-3 3"/><path d="M17 3l4 4L11 17l-4-4z"/></svg>
         </button>
-        <button id="btnFill" title="Relleno de Color [F]">
+        <button type="button" id="btnFill" title="Relleno de Color [F]" aria-label="Relleno de Color [F]">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11L11 3 2.4 11.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L19 11z"/><path d="M5 2l5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 2-5 2-5s2 3.4 2 5z" fill="currentColor" stroke="none"/></svg>
         </button>
-        <button id="btnText" title="Texto [T]">
+        <button type="button" id="btnText" title="Texto [T]" aria-label="Texto [T]">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
         </button>
-        
-        <div class="tool-separator"></div>
-        
 
-        <button id="btnEraserStroke" title="Borrador [E]">
+        <div class="tool-separator"></div>
+
+
+        <button type="button" id="btnEraserStroke" title="Borrador [E]" aria-label="Borrador [E]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         </button>
-        <button id="btnRuler" title="Regla/Compás [R]">
+        <button type="button" id="btnRuler" title="Regla/Compás [R]" aria-label="Regla/Compás [R]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="10" y1="8" x2="10" y2="12"/><line x1="14" y1="8" x2="14" y2="12"/><line x1="18" y1="8" x2="18" y2="12"/></svg>
         </button>
-        <button id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]">
+        <button type="button" id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]" aria-label="Mostrar/Ocultar Ejes [A]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 22 4 4 22 4"/><path d="M8 4v4"/><path d="M12 4v4"/><path d="M16 4v4"/><path d="M4 8h4"/><path d="M4 12h4"/><path d="M4 16h4"/></svg>
         </button>
-        
+
         <div class="tool-separator"></div>
-        
+
         <!-- Formas e Inserción (acceso directo) -->
-        <button id="menuBtnLine" title="Línea">
+        <button type="button" id="menuBtnLine" title="Línea" aria-label="Línea">
             <svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg>
         </button>
-        <button id="menuBtnRect" title="Rectángulo">
+        <button type="button" id="menuBtnRect" title="Rectángulo" aria-label="Rectángulo">
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/></svg>
         </button>
-        <button id="menuBtnCircle" title="Círculo">
+        <button type="button" id="menuBtnCircle" title="Círculo" aria-label="Círculo">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
         </button>
-        <button id="menuBtnTriangle" title="Triángulo">
+        <button type="button" id="menuBtnTriangle" title="Triángulo" aria-label="Triángulo">
             <svg viewBox="0 0 24 24"><path d="M12 4L20 20H4z"/></svg>
         </button>
-        
+
         <div class="tool-separator"></div>
-        
-        <button id="menuBtnLatex" title="Fórmula LaTeX">
+
+        <button type="button" id="menuBtnLatex" title="Fórmula LaTeX" aria-label="Fórmula LaTeX">
             <svg viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>
         </button>
-        <button id="menuBtnImage" title="Insertar imagen">
+        <button type="button" id="menuBtnImage" title="Insertar imagen" aria-label="Insertar imagen">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </button>
-        <button id="menuBtnPlot" title="Graficar función">
+        <button type="button" id="menuBtnPlot" title="Graficar función" aria-label="Graficar función">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke-width="1.5"/><path d="M4 6 Q 12 24 20 6" stroke-width="2"/></svg>
         </button>
     </div>
@@ -1150,15 +1186,15 @@
     </div>
 
     <!-- BOTTOM BAR - Navegación de páginas -->
-    <div class="bottom-bar" role="navigation" aria-label="Navegación de páginas">
-        <button id="btnPrevPage" title="Página anterior">
+    <nav class="bottom-bar" aria-label="Navegación de páginas">
+        <button type="button" id="btnPrevPage" title="Página anterior" aria-label="Página anterior">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <span id="pageIndicator" title="Página actual">1 / 1</span>
-        <button id="btnNextPage" title="Página siguiente">
+        <button type="button" id="btnNextPage" title="Página siguiente" aria-label="Página siguiente">
             <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
         </button>
-        <button id="btnAddPage" title="Nueva página">
+        <button type="button" id="btnAddPage" title="Nueva página" aria-label="Nueva página">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -1166,7 +1202,7 @@
                 <line x1="9" y1="15" x2="15" y2="15"/>
             </svg>
         </button>
-    </div>
+    </nav>
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
@@ -1185,45 +1221,45 @@
             <label>
                 <input type="checkbox" id="toggleSci"> Científica
             </label>
-            <button id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)">M</button>
+            <button type="button" id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)" aria-label="Memoria (M+/M-/MR/MC)">M</button>
         </div>
         <div class="calc-keys" id="calcKeys">
             <!-- Científicas -->
-            <button class="sci-btn operator" data-val="sin(">sin</button>
-            <button class="sci-btn operator" data-val="cos(">cos</button>
-            <button class="sci-btn operator" data-val="tan(">tan</button>
-            <button class="sci-btn operator" data-val="sqrt(">√x</button>
-            <button class="sci-btn operator" data-val="^">xʸ</button>
-            <button class="sci-btn operator" data-val="log(">log</button>
-            <button class="sci-btn operator" data-val="(">(</button>
-            <button class="sci-btn operator" data-val=")">)</button>
-            <button class="sci-btn operator" data-val="pi">π</button>
-            <button class="sci-btn operator" data-val="e">e</button>
+            <button type="button" class="sci-btn operator" data-val="sin(">sin</button>
+            <button type="button" class="sci-btn operator" data-val="cos(">cos</button>
+            <button type="button" class="sci-btn operator" data-val="tan(">tan</button>
+            <button type="button" class="sci-btn operator" data-val="sqrt(">√x</button>
+            <button type="button" class="sci-btn operator" data-val="^">xʸ</button>
+            <button type="button" class="sci-btn operator" data-val="log(">log</button>
+            <button type="button" class="sci-btn operator" data-val="(">(</button>
+            <button type="button" class="sci-btn operator" data-val=")">)</button>
+            <button type="button" class="sci-btn operator" data-val="pi">π</button>
+            <button type="button" class="sci-btn operator" data-val="e">e</button>
 
             <!-- Básicas -->
-            <button class="action" id="calcClear">C</button>
-            <button class="action" id="calcDel">⌫</button>
-            <button class="operator" data-val="%">%</button>
-            <button class="operator" data-val="/">÷</button>
+            <button type="button" class="action" id="calcClear">C</button>
+            <button type="button" class="action" id="calcDel">⌫</button>
+            <button type="button" class="operator" data-val="%">%</button>
+            <button type="button" class="operator" data-val="/">÷</button>
 
-            <button data-val="7">7</button>
-            <button data-val="8">8</button>
-            <button data-val="9">9</button>
-            <button class="operator" data-val="*">×</button>
+            <button type="button" data-val="7">7</button>
+            <button type="button" data-val="8">8</button>
+            <button type="button" data-val="9">9</button>
+            <button type="button" class="operator" data-val="*">×</button>
 
-            <button data-val="4">4</button>
-            <button data-val="5">5</button>
-            <button data-val="6">6</button>
-            <button class="operator" data-val="-">−</button>
+            <button type="button" data-val="4">4</button>
+            <button type="button" data-val="5">5</button>
+            <button type="button" data-val="6">6</button>
+            <button type="button" class="operator" data-val="-">−</button>
 
-            <button data-val="1">1</button>
-            <button data-val="2">2</button>
-            <button data-val="3">3</button>
-            <button class="operator" data-val="+">+</button>
+            <button type="button" data-val="1">1</button>
+            <button type="button" data-val="2">2</button>
+            <button type="button" data-val="3">3</button>
+            <button type="button" class="operator" data-val="+">+</button>
 
-            <button data-val="0" style="grid-column: span 2;">0</button>
-            <button data-val=".">.</button>
-            <button class="equals" id="calcEquals">=</button>
+            <button type="button" data-val="0" class="calc-span2">0</button>
+            <button type="button" data-val=".">.</button>
+            <button type="button" class="equals" id="calcEquals">=</button>
         </div>
         <!-- Historial de operaciones -->
         <div class="calc-history" id="calcHistory">
@@ -1234,85 +1270,68 @@
     </div>
 
     <!-- Function Plotter Modal -->
-    <div id="plotModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.65);
-      z-index:9000; align-items:center; justify-content:center;">
-      <div style="background:#1e1e1e; border:1px solid #444; border-radius:14px;
-        padding:28px 32px; width:90%; max-width:500px;">
-        <h3 style="color:#bb86fc; margin-bottom:20px; font-size:16px">📈 Graficar función</h3>
+    <div id="plotModal">
+      <div class="plot-dialog">
+        <h3 class="plot-title">📈 Graficar función</h3>
 
-        <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">
-          f(x) = <small style="color:#666">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
+        <label class="plot-label">
+          f(x) = <small class="plot-hint">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
         </label>
-        <input id="plotExpr" type="text" value="x^2"
-          style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
-            padding:10px 12px; color:#e0e0e0; font-family:monospace; font-size:15px;
-            margin-bottom:14px; outline:none;">
+        <input id="plotExpr" class="plot-input" type="text" value="x^2">
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px">
+        <div class="plot-grid2">
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x mínimo</label>
-            <input id="plotXMin" type="number" value="-5"
-              style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
-                padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
+            <label class="plot-label-sm">x mínimo</label>
+            <input id="plotXMin" class="plot-input" type="number" value="-5">
           </div>
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">x máximo</label>
-            <input id="plotXMax" type="number" value="5"
-              style="width:100%; background:#121212; border:1px solid #555; border-radius:8px;
-                padding:9px 12px; color:#e0e0e0; font-size:14px; outline:none;">
+            <label class="plot-label-sm">x máximo</label>
+            <input id="plotXMax" class="plot-input" type="number" value="5">
           </div>
         </div>
 
-        <div style="display:flex; gap:14px; margin-bottom:14px; align-items:center;">
+        <div class="plot-colorrow">
           <div>
-            <label style="color:#aaa; font-size:12px; display:block; margin-bottom:4px">Color</label>
-            <input id="plotColorPicker" type="color" value="#bb86fc"
-              style="width:40px; height:32px; background:transparent; border:1px solid #555; border-radius:6px; cursor:pointer;">
+            <label class="plot-label-sm">Color</label>
+            <input id="plotColorPicker" class="plot-color" type="color" value="#bb86fc">
           </div>
-          <div style="padding-top: 16px;">
-            <label style="color:#e0e0e0; font-size:13px; display:flex; align-items:center; gap:6px; cursor:pointer;">
-              <input id="plotOnlyLine" type="checkbox" style="width:16px; height:16px; accent-color:#bb86fc;">
+          <div class="plot-onlyline-wrap">
+            <label class="plot-check">
+              <input id="plotOnlyLine" class="plot-checkbox" type="checkbox">
               Fondo transparente (Solo línea)
             </label>
           </div>
         </div>
 
-        <div style="margin-bottom:14px">
-          <label style="color:#aaa; font-size:12px; display:block; margin-bottom:6px">Funciones graficadas:</label>
-          <div id="plotFunctionsList" style="background:#121212; border:1px solid #555; border-radius:8px;
-            padding:8px; min-height:40px; max-height:120px; overflow-y:auto; font-size:13px; color:#888;">
-            <span style="font-style:italic">Ninguna función graficada aún</span>
+        <div class="plot-section">
+          <label class="plot-label">Funciones graficadas:</label>
+          <div id="plotFunctionsList" class="plot-list">
+            <span class="plot-empty">Ninguna función graficada aún</span>
           </div>
         </div>
 
-        <div style="display:flex; gap:10px">
-          <button id="plotBtnAdd"
-            style="flex:1; background:#bb86fc; color:#000; border:none; border-radius:8px;
-              padding:11px; font-weight:700; cursor:pointer; font-size:14px">
+        <div class="plot-actions">
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary">
             + Agregar
           </button>
-          <button id="plotBtnClear"
-            style="background:transparent; color:#cf6679; border:1px solid #cf6679;
-              border-radius:8px; padding:11px 14px; cursor:pointer; font-size:13px">
+          <button type="button" id="plotBtnClear" class="plot-btn-danger">
             Limpiar
           </button>
-          <button id="plotBtnClose"
-            style="background:transparent; color:#999; border:1px solid #444;
-              border-radius:8px; padding:11px 18px; cursor:pointer; font-size:14px">
+          <button type="button" id="plotBtnClose" class="plot-btn-ghost">
             Cerrar
           </button>
         </div>
-        <p id="plotError" style="color:#f87171; font-size:12px; margin-top:10px; display:none"></p>
+        <p id="plotError" class="plot-error"></p>
       </div>
     </div>
 
 <!-- Formula LaTeX Modal -->
     <div id="latexModal">
       <div class="latex-box">
-        <h3 class="latex-title"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>Fórmula LaTeX</h3>
+        <h3 class="latex-title"><svg class="latex-title-icon" viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>Fórmula LaTeX</h3>
 
         <input id="latexInput" class="latex-input" type="text"
-          placeholder='Ejemplo: \frac{a}{b}  ·  x^2 + y^2 = r^2'
+          placeholder="Ejemplo: \frac{a}{b}  ·  x^2 + y^2 = r^2"
           autocomplete="off" spellcheck="false">
 
         <div class="latex-chips" id="latexChips"></div>
@@ -1335,15 +1354,15 @@
     </div>
 
     <!-- Inputs ocultos -->
-    <input type="file" id="fileInput" accept=".json" style="display: none;">
-    <input type="file" id="imgFileInput" accept="image/*" style="display: none;">
-    
-    <!-- Botones ocultos para funciones -->
-    <button id="btnLatex" style="display: none;"></button>
-    <button id="btnInsertImage" style="display: none;"></button>
-    <button id="btnPlot" style="display: none;"></button>
+    <input type="file" id="fileInput" class="hidden-file-input" accept=".json">
+    <input type="file" id="imgFileInput" class="hidden-file-input" accept="image/*">
 
-    
+    <!-- Botones ocultos para funciones -->
+    <button type="button" id="btnLatex" class="hidden-helper" aria-label="Fórmula LaTeX"></button>
+    <button type="button" id="btnInsertImage" class="hidden-helper" aria-label="Insertar imagen"></button>
+    <button type="button" id="btnPlot" class="hidden-helper" aria-label="Graficar función"></button>
+
+
 
 
     <!-- Service Worker físico: registro de ./sw.js en la raíz del sitio.
@@ -1369,7 +1388,7 @@ window.addEventListener('load', function() {
     if (navigator.storage && navigator.storage.persist) {
         navigator.storage.persist();
     }
-    
+
     const canvasWrapper = document.getElementById('canvasWrapper');
     const calcPanel     = document.getElementById('calcPanel');
 
@@ -1425,7 +1444,7 @@ window.addEventListener('load', function() {
     let rulerSnapLength = 50; // Pixeles para snapping de longitud
 
     /* VARIABLES PAGINACIÓN Y RESALTADOR */
-    let pages = [null]; 
+    let pages = [null];
     let currentPage = 0;
 
     function hexToRgba(hex, alpha) {
@@ -1516,7 +1535,7 @@ window.addEventListener('load', function() {
 
         // Botón 1 (izquierdo) o touch
         var isPrimaryAction = evt.button === 0 || evt.pointerType === 'touch' || evt.pointerType === 'pen';
-        
+
 
         if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser')) {
             isPanning = true;
@@ -1532,7 +1551,7 @@ window.addEventListener('load', function() {
         // Activar el tracker universal de arrastre antes de cualquier early return
         isPointerDown = true;
 
-        
+
 
         if (currentTool === 'eraser') {
             // Borrador unificado: SIN pincel fantasma; borra al contacto
@@ -1547,7 +1566,7 @@ window.addEventListener('load', function() {
         if (currentTool === 'fill') {
             const target = canvas.findTarget(opt.e, false);
             const color = document.getElementById('colorPicker').value;
-            
+
             // 1. RELLENO VECTORIAL INTELIGENTE (Solo figuras cerradas perfectas)
             if (target && !target.isBackground && !target.isEraserMask) {
                 // Solo pintar fill directamente en polígonos cerrados nativos
@@ -1579,7 +1598,7 @@ window.addEventListener('load', function() {
             // Mapeo exacto de píxeles físicos
             var px = Math.round((clientX - rectEl.left) * scaleX);
             var py = Math.round((clientY - rectEl.top) * scaleY);
-            
+
             var w = canvas.lowerCanvasEl.width;
             var h = canvas.lowerCanvasEl.height;
             if (px < 0 || px >= w || py < 0 || py >= h) return;
@@ -1674,10 +1693,10 @@ window.addEventListener('load', function() {
             }
 
             if (touchesBorder) {
-                // FIX: El bote de pintura NUNCA debe alterar el fondo automáticamente. 
+                // FIX: El bote de pintura NUNCA debe alterar el fondo automáticamente.
                 // El fondo solo se cambia con la herramienta específica de color de hoja.
                 showToast('⚠️ Área abierta. Cierra la línea o usa el selector de fondo arriba.', 'warn', 4000);
-                return; 
+                return;
             }
 
             if (painted) {
@@ -1685,7 +1704,7 @@ window.addEventListener('load', function() {
                 var pW = maxX - minX + 1;
                 var pH = maxY - minY + 1;
                 var patchCanvas = document.createElement('canvas');
-                patchCanvas.width = pW; 
+                patchCanvas.width = pW;
                 patchCanvas.height = pH;
                 var pCtx = patchCanvas.getContext('2d');
                 var pImgData = pCtx.createImageData(pW, pH);
@@ -1719,7 +1738,7 @@ window.addEventListener('load', function() {
                         evented: true,
                         isFillPatch: true // Etiqueta identificadora
                     });
-                    
+
                     canvas.add(img);
                     if (target) {
                         var targetIdx = canvas.getObjects().indexOf(target);
@@ -1809,7 +1828,7 @@ window.addEventListener('load', function() {
             segments.push({ a, b });
         } else if (['rect', 'triangle', 'image', 'i-text', 'text'].includes(obj.type)) {
             // getCoords() nos da las 4 esquinas reales y exactas sin importar el originX/Y
-            const coords = obj.getCoords(true); 
+            const coords = obj.getCoords(true);
             segments.push({ a: coords[0], b: coords[1] });
             segments.push({ a: coords[1], b: coords[2] });
             segments.push({ a: coords[2], b: coords[3] });
@@ -2025,20 +2044,20 @@ window.addEventListener('load', function() {
             var dy = pointer.y - rulerStartPoint.y;
             var length = Math.sqrt(dx * dx + dy * dy);
             var angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            
+
             // Snapping a ángulos
             var snappedAngle = Math.round(angle / rulerSnapAngle) * rulerSnapAngle;
             var angleRad = snappedAngle * Math.PI / 180;
-            
+
             // Snapping a longitud (paso compensado por zoom: salto constante en pantalla)
             var rulZm = canvas.getZoom() || 1;
             var snapLen = rulerSnapLength / rulZm;
             var snappedLength = Math.round(length / snapLen) * snapLen;
-            
+
             // Calcular punto final con snapping
             var endX = rulerStartPoint.x + Math.cos(angleRad) * snappedLength;
             var endY = rulerStartPoint.y + Math.sin(angleRad) * snappedLength;
-            
+
             // Actualizar línea
             rulerCurrentLine.set({ x2: endX, y2: endY });
             canvas.requestRenderAll();
@@ -2065,7 +2084,7 @@ window.addEventListener('load', function() {
         if (activeShape) {
             activeShape.setCoords();
             var isSelect = (currentTool === 'select');
-            activeShape.selectable = isSelect; 
+            activeShape.selectable = isSelect;
             activeShape.evented = isSelect;
             activeShape = null; saveHistory();
         }
@@ -2088,7 +2107,7 @@ window.addEventListener('load', function() {
     canvas.on('after:render', function(opt) {
         if (!showAxes) return;
         if (!opt || !opt.ctx) return;
-        
+
         var ctx = opt.ctx;
         var vpt = canvas.viewportTransform;
         var zoom = vpt[0];
@@ -2106,7 +2125,7 @@ window.addEventListener('load', function() {
         var isMobile = window.innerWidth < 768;
 
         // Diseño: Proporciones legibles. Más grueso y con mejor tipografía en móviles.
-        var RULER_SIZE = isMobile ? 28 : 24; 
+        var RULER_SIZE = isMobile ? 28 : 24;
         var fontSize = isMobile ? 12 : 10;
         var bg = isLight ? '#f8fafc' : '#1e293b';
         var fg = isLight ? '#475569' : '#94a3b8';
@@ -2153,14 +2172,14 @@ window.addEventListener('load', function() {
 
         for (var x = firstX; x * zoom + panX < w; x += step) {
             var sx = x * zoom + panX;
-            if (sx < RULER_SIZE) continue; 
-            
+            if (sx < RULER_SIZE) continue;
+
             // Marca principal
             ctx.beginPath();
             ctx.moveTo(sx, RULER_SIZE - (isMobile ? 4 : 6));
             ctx.lineTo(sx, RULER_SIZE);
             ctx.stroke();
-            
+
             // Texto
             ctx.fillText(parseFloat((x / GRID_BASE).toPrecision(12)).toString(), sx, 2);
         }
@@ -2173,13 +2192,13 @@ window.addEventListener('load', function() {
         for (var y = firstY; y * zoom + panY < h; y += step) {
             var sy = y * zoom + panY;
             if (sy < RULER_SIZE) continue;
-            
+
             // Marca principal
             ctx.beginPath();
             ctx.moveTo(RULER_SIZE - (isMobile ? 4 : 6), sy);
             ctx.lineTo(RULER_SIZE, sy);
             ctx.stroke();
-            
+
             // Texto rotado
             ctx.save();
             ctx.translate(RULER_SIZE - (isMobile ? 6 : 8), sy);
@@ -2326,12 +2345,12 @@ window.addEventListener('load', function() {
             padding:24px 28px;max-width:340px;width:90%;text-align:center;">
             <p id="mpConfirmMsg" style="color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5"></p>
             <div style="display:flex;gap:10px;justify-content:center">
-              <button id="mpConfirmOk"
+              <button type="button" id="mpConfirmOk"
                 style="background:#bb86fc;color:#000;border:none;border-radius:8px;
                   padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px">
                 Confirmar
               </button>
-              <button id="mpConfirmCancel"
+              <button type="button" id="mpConfirmCancel"
                 style="background:transparent;color:#999;border:1px solid #444;
                   border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px">
                 Cancelar
@@ -2372,7 +2391,7 @@ window.addEventListener('load', function() {
 
 
         let btnMap = { 'pen':'btnPen', 'highlight':'btnHighlight', 'fill':'btnFill', 'text':'btnText', 'eraser':'btnEraserStroke', 'select':'btnSelect', 'pan':'btnPan', 'line':'menuBtnLine', 'rect':'menuBtnRect', 'circle':'menuBtnCircle', 'triangle':'menuBtnTriangle', 'ruler':'btnRuler' };
-        
+
         let targetBtnId = btnMap[tool];
         if (targetBtnId) {
             let btn = document.getElementById(targetBtnId);
@@ -2397,12 +2416,12 @@ window.addEventListener('load', function() {
         else if (tool === 'fill') {
             canvas.isDrawingMode = false;
             canvasWrapper.classList.add('cursor-fill');
-            canvas.forEachObject(o => { 
-                if (o.isEraserMask !== true && !o.isBackground) { 
-                    o.evented = true; 
-                    o.selectable = false; 
-                    o.hoverCursor = 'pointer'; 
-                } 
+            canvas.forEachObject(o => {
+                if (o.isEraserMask !== true && !o.isBackground) {
+                    o.evented = true;
+                    o.selectable = false;
+                    o.hoverCursor = 'pointer';
+                }
             });
         }
 
@@ -2501,14 +2520,14 @@ window.addEventListener('load', function() {
         document.documentElement.classList.toggle('light-mode');
         const isLight = document.documentElement.classList.contains('light-mode');
         localStorage.setItem('mathpad_theme', isLight ? 'light' : 'dark');
-        
+
         // Restaurar color de hoja predeterminado según el tema
         var newBg = isLight ? '#ffffff' : '#1a1a1a';
         document.documentElement.style.setProperty('--paper-bg', newBg);
         if (bgColorPicker) bgColorPicker.value = newBg;
-        
+
         showToast(isLight ? '☀️ Modo claro' : '🌙 Modo oscuro', 'info', 1500);
-        
+
                 // Sincronizar el lápiz si estaba usando un color neutro (reutiliza función unificada)
         syncDefaultInkColor();
 
@@ -2676,7 +2695,7 @@ window.addEventListener('load', function() {
     cw.addEventListener('drop', async function(e) {
       e.preventDefault();
       cw.style.outline = '';
-      
+
       // 1. Intentar obtener texto arrastrado (ej. de la calculadora)
       const textData = e.dataTransfer.getData('text/plain');
       if (textData && textData.trim() !== '') {
@@ -2685,20 +2704,20 @@ window.addEventListener('load', function() {
           // Calcular coordenadas exactas donde se soltó el mouse
           var canvasX = (e.clientX - rect.left - vpt[4]) / vpt[0];
           var canvasY = (e.clientY - rect.top - vpt[5]) / vpt[3];
-          
-          var itext = new fabric.IText(textData, { 
-              left: canvasX, 
-              top: canvasY, 
-              fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1), 
-              fill: document.getElementById('colorPicker').value, 
-              fontFamily: 'Segoe UI', 
-              selectable: true, 
-              evented: true, 
-              editable: true, 
-              padding: 4 
+
+          var itext = new fabric.IText(textData, {
+              left: canvasX,
+              top: canvasY,
+              fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1),
+              fill: document.getElementById('colorPicker').value,
+              fontFamily: 'Segoe UI',
+              selectable: true,
+              evented: true,
+              editable: true,
+              padding: 4
           });
-          canvas.add(itext); 
-          canvas.setActiveObject(itext); 
+          canvas.add(itext);
+          canvas.setActiveObject(itext);
           setTool('select');
           saveHistory();
           return;
@@ -2905,27 +2924,27 @@ window.addEventListener('load', function() {
       canvas.setActiveObject(grp);
       canvas.requestRenderAll();
 
-      
+
       // Guardar referencia
       const funcData = { expr: exprStr, xMin, xMax, color, group: grp };
       plottedFunctions.push(funcData);
       updatePlottedFunctionsList();
-      
+
       saveHistory();
       showToast('📈 f(x) = ' + exprStr + ' graficada', 'ok');
-      
+
       return funcData;
     }
 
     function updatePlottedFunctionsList() {
       const listEl = document.getElementById('plotFunctionsList');
       if (!listEl) return;
-      
+
       if (plottedFunctions.length === 0) {
         listEl.innerHTML = '<span style="font-style:italic">Ninguna función graficada aún</span>';
         return;
       }
-      
+
       listEl.innerHTML = plottedFunctions.map((func, index) => {
         const colorDot = '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + func.color + ';margin-right:6px;vertical-align:middle;"></span>';
         return '<div style="padding:4px 0;border-bottom:1px solid #333;">' + colorDot + 'f(x) = ' + func.expr + '</div>';
@@ -2944,7 +2963,7 @@ window.addEventListener('load', function() {
       saveHistory();
       showToast('🗑️ Funciones limpiadas', 'info');
     }
-    
+
     // Abrir modal
     document.getElementById('btnPlot').onclick = () => {
       document.getElementById('plotModal').style.display = 'flex';
@@ -3165,7 +3184,7 @@ window.addEventListener('load', function() {
         if (text && text.trim() !== '') {
             e.preventDefault(); var vpt = canvas.viewportTransform;
             var itext = new fabric.IText(text, { left: (canvas.width / 2 - vpt[4]) / vpt[0], top: (canvas.height / 2 - vpt[5]) / vpt[0], fontSize: parseInt(document.getElementById('fontSizePicker').value, 10), fill: document.getElementById('colorPicker').value, fontFamily: 'Segoe UI', selectable: true, evented: true, editable: true, padding: 4 });
-            canvas.add(itext); canvas.setActiveObject(itext); 
+            canvas.add(itext); canvas.setActiveObject(itext);
             setTool('select');
             saveHistory();
         }
@@ -3207,12 +3226,12 @@ window.addEventListener('load', function() {
     function updateCalcHistoryUI() {
         const historyList = document.getElementById('calcHistoryList');
         if (!historyList) return;
-        
+
         if (calcHistory.length === 0) {
             historyList.innerHTML = '<div style="color:#666;font-style:italic;padding:8px 0;">Sin historial</div>';
             return;
         }
-        
+
         // Mostrar las últimas 10 entradas en orden inverso
         const recentHistory = calcHistory.slice(-10).reverse();
         historyList.innerHTML = recentHistory.map((item, index) => {
@@ -3223,7 +3242,7 @@ window.addEventListener('load', function() {
                    '<div class="history-result">= ' + item.result + '</div>' +
                    '</div>';
         }).join('');
-        
+
         // Agregar evento click para reutilizar resultados
         historyList.querySelectorAll('.calc-history-item').forEach(item => {
             item.addEventListener('click', function() {
@@ -3277,17 +3296,17 @@ window.addEventListener('load', function() {
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
             var res = math.evaluate(evalExpr, {}); // {} purifica la ejecución: evita fugas de variables globales
-            if (res !== undefined) { 
-                var formatted = math.format(res, { precision: 14 }); 
-                resDisplay.textContent = formatted; 
-                calcExpression = formatted; 
+            if (res !== undefined) {
+                var formatted = math.format(res, { precision: 14 });
+                resDisplay.textContent = formatted;
+                calcExpression = formatted;
                 exprDisplay.textContent = evalExpr;
                 addToHistory(evalExpr, formatted);
             }
         } catch(ex) { resDisplay.textContent = 'Error'; }
     };
     document.getElementById('toggleSci').addEventListener('change', e => document.getElementById('calcKeys').parentElement.classList.toggle('sci-mode', e.target.checked));
-    
+
     // Botón de memoria - mostrar menú
     document.getElementById('calcMemory').onclick = function(e) {
         e.stopPropagation();
@@ -3304,7 +3323,7 @@ window.addEventListener('load', function() {
                 <div class="calc-memory-option" data-action="MC" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">MC (Borrar)</div>
             `;
             document.body.appendChild(menu);
-            
+
             // Event listeners para las opciones
             menu.querySelectorAll('.calc-memory-option').forEach(opt => {
                 opt.addEventListener('click', function(e) {
@@ -3318,7 +3337,7 @@ window.addEventListener('load', function() {
                 });
             });
         }
-        
+
         // Posicionar menú
         const btnRect = this.getBoundingClientRect();
         menu.style.right = (window.innerWidth - btnRect.right) + 'px';
@@ -3326,7 +3345,7 @@ window.addEventListener('load', function() {
         menu.style.top = (btnRect.bottom + 4) + 'px';
         menu.style.display = 'block';
     };
-    
+
     // Cerrar menú de memoria al hacer clic fuera
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('calcMemoryMenu');
@@ -3403,19 +3422,19 @@ window.addEventListener('load', function() {
         const canvasY = (touch.clientY - rect.top - vpt[5]) / vpt[3];
 
         // Crear el objeto de texto en las coordenadas exactas
-        var itext = new fabric.IText(touchDragData, { 
-            left: canvasX, 
-            top: canvasY, 
-            fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1), 
-            fill: document.getElementById('colorPicker').value, 
-            fontFamily: 'Segoe UI', 
-            selectable: true, 
-            evented: true, 
-            editable: true, 
-            padding: 4 
+        var itext = new fabric.IText(touchDragData, {
+            left: canvasX,
+            top: canvasY,
+            fontSize: ((parseInt(document.getElementById('fontSizePicker').value, 10)) || 16) / (canvas.getZoom() || 1),
+            fill: document.getElementById('colorPicker').value,
+            fontFamily: 'Segoe UI',
+            selectable: true,
+            evented: true,
+            editable: true,
+            padding: 4
         });
-        canvas.add(itext); 
-        canvas.setActiveObject(itext); 
+        canvas.add(itext);
+        canvas.setActiveObject(itext);
         setTool('select');
         saveHistory();
         showToast('📝 Texto insertado desde calculadora', 'ok');
@@ -3531,12 +3550,12 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { redoStack.push(historyStack.pop()); loadState(historyStack[historyStack.length - 1]); } };
     document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
-    document.getElementById('btnClear').onclick = function() { 
-        showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => { 
-            canvas.clear(); 
-            canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); 
-            saveHistory(); 
-        }); 
+    document.getElementById('btnClear').onclick = function() {
+        showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => {
+            canvas.clear();
+            canvas.setBackgroundColor('', canvas.renderAll.bind(canvas));
+            saveHistory();
+        });
     };
 
     window.addEventListener('keydown', function(e) {
@@ -3627,11 +3646,11 @@ window.addEventListener('load', function() {
 
     /* ACTUALIZACIÓN DE SERVICE WORKER */
     let swUpdateAvailable = false;
-    
+
     function showSWUpdateBanner() {
         if (swUpdateAvailable) return;
         swUpdateAvailable = true;
-        
+
         const banner = document.createElement('div');
         banner.id = 'swUpdateBanner';
         banner.style.cssText = `
@@ -3653,24 +3672,15 @@ window.addEventListener('load', function() {
         `;
         banner.innerHTML = `
             <span>📦 Hay una actualización disponible</span>
-            <button id="btnReloadSW" style="
-                background: #000;
-                color: #fff;
-                border: none;
-                border-radius: 6px;
-                padding: 8px 16px;
-                font-weight: 600;
-                cursor: pointer;
-                font-size: 13px;
-            ">Recargar</button>
+            <button type="button" id="btnReloadSW">Recargar</button>
         `;
         document.body.appendChild(banner);
-        
+
         document.getElementById('btnReloadSW').onclick = function() {
             window.location.reload();
         };
     }
-    
+
     // Escuchar cambios en el Service Worker (nueva versión disponible)
     // Solo se muestra el banner si YA existía un controlador antes de cargar
     // la página: así la primera instalación de la PWA no da un falso positivo.
@@ -3725,7 +3735,7 @@ window.addEventListener('load', function() {
         if (json.length > 4_000_000) {
           showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return;
         }
-        
+
         // Guardar en IndexedDB
         await db.autosave.put({
           key: AS_KEY,
@@ -3737,7 +3747,7 @@ window.addEventListener('load', function() {
           value: Date.now().toString(),
           timestamp: Date.now()
         });
-        
+
         showToast('💾 Guardado automáticamente', 'info', 1800);
         checkStorageQuota(); // Verificar espacio de dispositivo tras guardar
       } catch(e) {
@@ -3751,17 +3761,17 @@ window.addEventListener('load', function() {
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(doAutoSave, AS_DELAY);
     }
-    
+
     // Esperar a que el canvas esté completamente inicializado
     async function setupRecoveryBar() {
       try {
         // Obtener datos de IndexedDB
         const savedRecord = await db.autosave.get(AS_KEY);
         const tsRecord = await db.autosave.get(AS_TS);
-        
+
         const saved = savedRecord ? savedRecord.value : null;
         const ts = tsRecord ? tsRecord.value : null;
-        
+
         if (!saved || !ts) return;
 
         // Verificar que el canvas esté listo
@@ -3774,10 +3784,10 @@ window.addEventListener('load', function() {
           day:'2-digit', month:'2-digit', year:'numeric',
           hour:'2-digit', minute:'2-digit'
         });
-        
+
         const recoverBar = document.getElementById('recoverBar');
         const recoverDate = document.getElementById('recoverDate');
-        
+
         if (!recoverBar || !recoverDate) {
           console.error('Elementos de recuperación no encontrados');
           return;
@@ -3819,13 +3829,13 @@ window.addEventListener('load', function() {
             }
           };
         }
-        
+
         console.log('Barra de recuperación configurada correctamente');
     } catch (e) {
       console.error("Error setting up recovery bar:", e);
     }
   }
-  
+
   // Iniciar recuperación después de 500ms
   setTimeout(setupRecoveryBar, 500);
 });
