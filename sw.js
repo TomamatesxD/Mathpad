@@ -5,7 +5,7 @@
 
 // Versión de caché v12: borrador único unificado (instant erase al contacto,
 // sin pincel transparente ni goma raster por máscaras).
-const CACHE_NAME = 'mathpad-v12';
+const CACHE_NAME = 'mathpad-v13';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
@@ -75,7 +75,10 @@ self.addEventListener('fetch', event => {
           cache.put(event.request, responseToCache);
         });
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => {
+        if (event.request.mode === 'navigate') return caches.match('./index.html');
+        return Response.error();
+      });
     })
   );
 });

@@ -2284,6 +2284,9 @@ window.addEventListener('load', function() {
 
     // Límite prácticamente ilimitado de pasos (#undo/redo)
     const MAX_HISTORY = 1000;
+    const MAX_HISTORY_CHARS = 60000000;
+
+    function withoutHistory(fn) { var prev = isHistoryAction; isHistoryAction = true; try { fn(); } finally { isHistoryAction = prev; } }
 
     function saveHistory() {
         if (isHistoryAction) return;
@@ -2295,6 +2298,12 @@ window.addEventListener('load', function() {
         historyStack.push(snap);
         if (historyStack.length > MAX_HISTORY) {
             historyStack.splice(0, historyStack.length - MAX_HISTORY);
+        }
+        var totalChars = 0, k;
+        for (k = 0; k < historyStack.length; k++) totalChars += historyStack[k].length;
+        while (historyStack.length > 2 && totalChars > MAX_HISTORY_CHARS) {
+            totalChars -= historyStack[0].length;
+            historyStack.shift();
         }
     }
 
@@ -2313,10 +2322,11 @@ window.addEventListener('load', function() {
         saveHistory();
     });
 
-    function loadState(jsonStr) {
+    function loadState(jsonStr, onDone) {
         isHistoryAction = true;
         canvas.loadFromJSON(jsonStr, function() {
             canvas.renderAll(); isHistoryAction = false; setTool(currentTool);
+            if (typeof onDone === 'function') onDone();
         });
     }
 
@@ -2325,6 +2335,21 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     function saveCurrentPage() { pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask'])); }
     function renderPageInfo() { document.getElementById('pageIndicator').innerText = (currentPage + 1) + ' / ' + pages.length; }
+    function serializeProject() { saveCurrentPage(); return JSON.stringify({version: 2, currentPage: currentPage, pages: pages}); }
+    function loadProject(str, onDone) {
+        try {
+            var parsed = JSON.parse(str);
+            if (parsed && Array.isArray(parsed.pages)) {
+                pages = parsed.pages;
+                currentPage = Math.min(Math.max(parseInt(parsed.currentPage, 10) || 0, 0), pages.length - 1);
+            } else {
+                pages = [str]; currentPage = 0;
+            }
+        } catch (e) { pages = [str]; currentPage = 0; }
+        renderPageInfo();
+        historyStack = [pages[currentPage]]; redoStack = [];
+        loadState(pages[currentPage], onDone);
+    }
 
     document.getElementById('btnAddPage').onclick = () => {
         saveCurrentPage();
@@ -2337,11 +2362,11 @@ window.addEventListener('load', function() {
     };
 
     document.getElementById('btnPrevPage').onclick = () => {
-        if (currentPage > 0) { saveCurrentPage(); currentPage--; loadState(pages[currentPage]); renderPageInfo(); }
+        if (currentPage > 0) { saveCurrentPage(); currentPage--; loadState(pages[currentPage]); renderPageInfo(); historyStack = [pages[currentPage]]; redoStack = []; }
     };
 
     document.getElementById('btnNextPage').onclick = () => {
-        if (currentPage < pages.length - 1) { saveCurrentPage(); currentPage++; loadState(pages[currentPage]); renderPageInfo(); }
+        if (currentPage < pages.length - 1) { saveCurrentPage(); currentPage++; loadState(pages[currentPage]); renderPageInfo(); historyStack = [pages[currentPage]]; redoStack = []; }
     };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2638,6 +2663,8 @@ window.addEventListener('load', function() {
         var pdf = null;
         var firstPage = true;
         var exportBg = getExportBgColor();
+        isHistoryAction = true;
+        try {
         for (let i = 0; i < pages.length; i++) {
             await new Promise(resolve => canvas.loadFromJSON(pages[i], resolve));
             canvas.setViewportTransform([1,0,0,1,0,0]);
@@ -2657,7 +2684,9 @@ window.addEventListener('load', function() {
             }
             pdf.addImage(imgData, 'PNG', 0, 0, bounds.width, bounds.height);
         }
-        canvas.loadFromJSON(pages[currentPage], function() { canvas.setViewportTransform(vpt); canvas.renderAll(); });
+        } finally {
+        canvas.loadFromJSON(pages[currentPage], function() { isHistoryAction = false; canvas.setViewportTransform(vpt); canvas.renderAll(); });
+        }
         pdf.save("Cuaderno_Matematico.pdf");
     }
 
@@ -2679,7 +2708,7 @@ window.addEventListener('load', function() {
     };
 
     document.getElementById('btnSaveProj').onclick = function() {
-        var json = JSON.stringify(canvas.toJSON(['isEraserMask']));
+        var json = serializeProject();
         var link = document.createElement('a'); link.download = 'sesion_mate.json';
         link.href = URL.createObjectURL(new Blob([json], {type: "application/json"})); link.click();
     };
@@ -2691,7 +2720,7 @@ window.addEventListener('load', function() {
     fileInput.addEventListener('change', function(e) {
         var file = e.target.files[0]; if (!file) return;
         var reader = new FileReader();
-        reader.onload = function(f) { loadState(f.target.result); historyStack = [f.target.result]; redoStack = []; };
+        reader.onload = function(f) { loadProject(f.target.result); };
         reader.readAsText(file); fileInput.value = "";
     });
 
@@ -3598,7 +3627,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
     document.getElementById('btnClear').onclick = function() {
         showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => {
-            canvas.clear();
+            withoutHistory(function() { canvas.clear(); });
             canvas.setBackgroundColor('', canvas.renderAll.bind(canvas));
             saveHistory();
         });
@@ -3637,7 +3666,7 @@ window.addEventListener('load', function() {
 
         if ((e.code === 'Delete' || e.code === 'Backspace') && currentTool === 'select') {
             var objs = canvas.getActiveObjects();
-            if (objs.length) { canvas.discardActiveObject(); objs.forEach(o => canvas.remove(o)); saveHistory(); }
+            if (objs.length) { canvas.discardActiveObject(); withoutHistory(function() { objs.forEach(o => canvas.remove(o)); }); saveHistory(); }
         }
 
         // NUEVO: Z-Index (Capas)
@@ -3753,6 +3782,9 @@ window.addEventListener('load', function() {
     db.version(1).stores({
       autosave: 'key, value, timestamp'
     });
+    db.version(2).stores({
+      autosave: 'key'
+    });
 
     // Monitor de Cuota de Almacenamiento Seguro
     async function checkStorageQuota() {
@@ -3774,12 +3806,12 @@ window.addEventListener('load', function() {
         }
     }
 
-    async function doAutoSave() {
+    async function doAutoSave(silent) {
       try {
-        const json = JSON.stringify(canvas.toJSON(['isEraserMask']));
+        const json = serializeProject();
         // Comprimir si es grande (solo base64 de imágenes puede ser enorme)
         if (json.length > 4_000_000) {
-          showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return;
+          if (!silent) showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return;
         }
 
         // Guardar en IndexedDB
@@ -3794,11 +3826,11 @@ window.addEventListener('load', function() {
           timestamp: Date.now()
         });
 
-        showToast('💾 Guardado automáticamente', 'info', 1800);
+        if (!silent) showToast('💾 Guardado automáticamente', 'info', 1800);
         checkStorageQuota(); // Verificar espacio de dispositivo tras guardar
       } catch(e) {
         console.error('Error en autoguardado:', e);
-        showToast('Autoguardado falló (almacenamiento lleno?)', 'warn');
+        if (!silent) showToast('Autoguardado falló (almacenamiento lleno?)', 'warn');
       }
     }
 
@@ -3807,6 +3839,12 @@ window.addEventListener('load', function() {
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(doAutoSave, AS_DELAY);
     }
+
+    // Autoguardado inmediato al ocultar/salir, sin toast
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'hidden') { clearTimeout(autoSaveTimer); doAutoSave(true); }
+    });
+    window.addEventListener('pagehide', function() { clearTimeout(autoSaveTimer); doAutoSave(true); });
 
     // Esperar a que el canvas esté completamente inicializado
     async function setupRecoveryBar() {
@@ -3851,10 +3889,7 @@ window.addEventListener('load', function() {
           btnRecover.onclick = async function() {
             try {
               recoverBar.style.display = 'none';
-              await canvas.loadFromJSON(saved);
-              canvas.requestRenderAll();
-              saveHistory();
-              showToast('✅ Sesión recuperada', 'ok');
+              loadProject(saved, function() { showToast('✅ Sesión recuperada', 'ok'); });
             } catch (e) {
               showToast('❌ Error al recuperar la sesión.', 'err');
               console.error(e);
