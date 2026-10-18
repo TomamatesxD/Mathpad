@@ -33,10 +33,16 @@
             user-select: none;
         }
 
+        input, textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -537,6 +543,7 @@
            RESPONSIVE LAYOUT
         ════════════════════════════════════════════════════════════════ */
         @media (max-width: 768px) {
+            :root { --sidebar-w: 52px; }
             .top-bar {
                 justify-content: flex-start;
                 overflow-x: auto;
@@ -579,6 +586,7 @@
 
             .main-content {
                 flex-direction: column;
+                margin-bottom: 0;
             }
 
             .calculator-panel {
@@ -1429,10 +1437,8 @@ window.addEventListener('load', function() {
     let currentTool     = 'pen';
     let isPanning       = false;
     let isPointerDown   = false; // Flag universal de arrastre (mouse/touch/pen)
-    let isErasing       = false;
     let isSpaceDown     = false;
     let lastPosX = 0, lastPosY = 0;
-    let clipboard = null;
     let isHistoryAction = false, historyStack = [], redoStack = [];
     let calcVisible = false;
     let showAxes = false; // Control de las reglas de medición
@@ -1504,6 +1510,7 @@ window.addEventListener('load', function() {
     let lastTouchDistance = 0;
     let lastTouchCenter = null;
     let isTouchPanning = false;
+    let twoFingerGesture = false;
 
     function resetTouchGesture() {
         lastTouchDistance = 0;
@@ -1515,11 +1522,15 @@ window.addEventListener('load', function() {
    EVENTOS UNIFICADOS DE PUNTERO (mouse/touch/pen)
 ═══════════════════════════════════════════════════════════════ */
     canvas.on('mouse:down', function(opt) {
-        if (currentTool === 'select') return;
         var evt = opt.e;
 
-        // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan
+        // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
         if (evt.touches && evt.touches.length === 2) {
+            twoFingerGesture = true;
+            canvas.discardActiveObject();
+            canvas.clearContext(canvas.contextTop);
+            if (activeShape) { canvas.remove(activeShape); activeShape = null; }
+            if (rulerCurrentLine) { canvas.remove(rulerCurrentLine); rulerCurrentLine = null; }
             isTouchPanning = true;
             lastTouchDistance = Math.hypot(
                 evt.touches[1].clientX - evt.touches[0].clientX,
@@ -1533,9 +1544,9 @@ window.addEventListener('load', function() {
             return;
         }
 
-        // Botón 1 (izquierdo) o touch
-        var isPrimaryAction = evt.button === 0 || evt.pointerType === 'touch' || evt.pointerType === 'pen';
+        if (currentTool === 'select') return;
 
+        // Botón 1 (izquierdo) o touch
 
         if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser')) {
             isPanning = true;
@@ -2074,6 +2085,8 @@ window.addEventListener('load', function() {
 
 
     canvas.on('mouse:up', function(opt) {
+        var evUp = (opt && opt.e) || {};
+        if (!evUp.touches || evUp.touches.length === 0) { twoFingerGesture = false; resetTouchGesture(); }
         isPointerDown = false; // Liberar el tracker universal
 
 
@@ -2262,6 +2275,7 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
 
     canvas.on('path:created', function(opt) {
+        if (twoFingerGesture) { canvas.remove(opt.path); return; }
         // Borrador unificado: ya no genera paths (borrado instantáneo en
         // mouse:move); aquí solo lápiz/resaltador guardan su historial.
         saveHistory();
@@ -2810,7 +2824,6 @@ window.addEventListener('load', function() {
 
     // Variables para múltiples funciones
     let plottedFunctions = []; // Array de {expr, xMin, xMax, color, group}
-    const plotColors = ['#bb86fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#f472b6'];
 
     function plotFunction(exprStr, xMin, xMax, color, onlyLine) {
       // Reemplazar ^ por ** para Math.js si es necesario (Math.js acepta ^, ok)
@@ -3433,10 +3446,11 @@ window.addEventListener('load', function() {
     document.getElementById('calcPanel').addEventListener('dragstart', function(e) {
         if (e.target.id === 'calcResult' || e.target.id === 'calcExpr') {
             e.dataTransfer.setData('text/plain', e.target.innerText);
-        } else if (e.target.classList.contains('calc-history-item')) {
+        } else if (e.target.closest('.calc-history-item')) {
             // Si arrastra el historial, tomamos la expresión y el resultado (ej: "2+2 = 4")
-            const expr = e.target.querySelector('.history-expr').innerText.split('—')[1].trim();
-            const res = e.target.querySelector('.history-result').innerText.replace('= ', '');
+            const item = e.target.closest('.calc-history-item');
+            const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
+            const res = item.querySelector('.history-result').innerText.replace('= ', '');
             e.dataTransfer.setData('text/plain', expr + ' = ' + res);
         }
     });
@@ -3451,12 +3465,13 @@ window.addEventListener('load', function() {
     // touchstart: capturar el texto del elemento arrastrado
     document.getElementById('calcPanel').addEventListener('touchstart', function(e) {
         const target = e.target;
+        const item = target.closest('.calc-history-item');
         // Solo capturar si es un elemento arrastrable (resultado, expresión o historial)
         if (target.id === 'calcResult' || target.id === 'calcExpr') {
             touchDragData = target.innerText;
-        } else if (target.classList.contains('calc-history-item')) {
-            const expr = target.querySelector('.history-expr').innerText.split('—')[1].trim();
-            const res = target.querySelector('.history-result').innerText.replace('= ', '');
+        } else if (item) {
+            const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
+            const res = item.querySelector('.history-result').innerText.replace('= ', '');
             touchDragData = expr + ' = ' + res;
         } else {
             // Si no es un elemento arrastrable, limpiar y salir
