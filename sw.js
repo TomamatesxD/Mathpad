@@ -2,10 +2,10 @@
 // MathPad - Service Worker
 // ============================================
 
-// Versión de caché v11: atajos de rueda (Ctrl=pan vertical, Shift=pan
-// horizontal) e historial prácticamente ilimitado con eventos de texto
-// separados (bugfix undo texto+línea).
-const CACHE_NAME = 'mathpad-v11';
+
+// Versión de caché v12: borrador único unificado (instant erase al contacto,
+// sin pincel transparente ni goma raster por máscaras).
+const CACHE_NAME = 'mathpad-v12';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
