@@ -1518,6 +1518,30 @@ window.addEventListener('load', function() {
         isTouchPanning = false;
     }
 
+    function beginTwoFingerGesture(evt) {
+        twoFingerGesture = true;
+        canvas.discardActiveObject();
+        canvas.clearContext(canvas.contextTop);
+        if (activeShape) { canvas.remove(activeShape); activeShape = null; }
+        if (rulerCurrentLine) { canvas.remove(rulerCurrentLine); rulerCurrentLine = null; }
+        isTouchPanning = true;
+        lastTouchDistance = Math.hypot(
+            evt.touches[1].clientX - evt.touches[0].clientX,
+            evt.touches[1].clientY - evt.touches[0].clientY
+        );
+        lastTouchCenter = {
+            x: (evt.touches[0].clientX + evt.touches[1].clientX) / 2,
+            y: (evt.touches[0].clientY + evt.touches[1].clientY) / 2
+        };
+        if (evt.preventDefault) evt.preventDefault();
+    }
+
+    // Pinch a nivel DOM: Fabric 5.3 no dispara 'mouse:down' para el 2.º dedo
+    // fuera del modo dibujo, así que se detecta aquí para toda herramienta.
+    canvasWrapper.addEventListener('touchstart', function(e) {
+        if (e.touches && e.touches.length === 2) { beginTwoFingerGesture(e); e.preventDefault(); }
+    }, { passive: false, capture: true });
+
 /* ═══════════════════════════════════════════════════════════════
    EVENTOS UNIFICADOS DE PUNTERO (mouse/touch/pen)
 ═══════════════════════════════════════════════════════════════ */
@@ -1526,21 +1550,7 @@ window.addEventListener('load', function() {
 
         // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
         if (evt.touches && evt.touches.length === 2) {
-            twoFingerGesture = true;
-            canvas.discardActiveObject();
-            canvas.clearContext(canvas.contextTop);
-            if (activeShape) { canvas.remove(activeShape); activeShape = null; }
-            if (rulerCurrentLine) { canvas.remove(rulerCurrentLine); rulerCurrentLine = null; }
-            isTouchPanning = true;
-            lastTouchDistance = Math.hypot(
-                evt.touches[1].clientX - evt.touches[0].clientX,
-                evt.touches[1].clientY - evt.touches[0].clientY
-            );
-            lastTouchCenter = {
-                x: (evt.touches[0].clientX + evt.touches[1].clientX) / 2,
-                y: (evt.touches[0].clientY + evt.touches[1].clientY) / 2
-            };
-            if (evt.preventDefault) evt.preventDefault();
+            beginTwoFingerGesture(evt);
             return;
         }
 
@@ -1965,6 +1975,12 @@ window.addEventListener('load', function() {
     }
     canvas.on('mouse:move', function(opt) {
         var e = opt.e;
+
+        // Si el 2.º dedo llegó sin 'mouse:down' (fuera del modo dibujo),
+        // se inicia el gesto aquí antes de la lógica de zoom.
+        if (e.touches && e.touches.length === 2 && !isTouchPanning) {
+            beginTwoFingerGesture(e);
+        }
 
         // Gesto táctil nativo: pinch-to-zoom y pan con dos dedos
         if (isTouchPanning && e.touches && e.touches.length === 2) {
