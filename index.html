@@ -1588,12 +1588,21 @@ window.addEventListener('load', function() {
    RESIZE Y FONDO
 ═══════════════════════════════════════════════════════════════ */
     function resizeCanvas() {
+        if (!canvas || !canvasWrapper) return;
         canvas.setWidth(canvasWrapper.clientWidth);
         canvas.setHeight(canvasWrapper.clientHeight);
         syncBackground();
+        canvas.setDimensions({
+            width: canvasWrapper.clientWidth,
+            height: canvasWrapper.clientHeight
+        });
+        canvas.calcOffset();
         canvas.requestRenderAll();
     }
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', function() {
+        setTimeout(resizeCanvas, 200);
+    });
     resizeCanvas();
 
     // Alinear el fondo del canvas con el valor del menú al iniciar
