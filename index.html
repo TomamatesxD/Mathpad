@@ -15,8 +15,8 @@
             --accent: #bb86fc;
             --accent-hover: #9965f4;
             --danger: #cf6679;
-            --toolbar-h: 56px;
-            --sidebar-w: 60px;
+            --toolbar-h: 48px;
+            --sidebar-w: 52px;
             --bottom-bar-h: 48px;
             --calc-w: 320px;
             --paper-bg: #1a1a1a;
@@ -269,20 +269,39 @@
         ════════════════════════════════════════════════════════════════ */
         .bottom-bar {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: var(--bottom-bar-h);
-            background-color: var(--bg-panel);
+            right: 12px;
+            bottom: 12px;
+            left: auto;
+            transform: none;
+            height: 36px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
-            padding: 0 16px;
+            padding: 0 8px;
             padding-bottom: env(safe-area-inset-bottom, 0px);
-            gap: 12px;
+            gap: 4px;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            transition: right 0.25s ease, opacity 0.2s ease;
+        }
+        :root.light-mode .bottom-bar {
+            background: rgba(255, 255, 255, 0.88);
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.1);
+        }
+        body.calc-open .bottom-bar {
+            right: calc(var(--calc-w) + 12px);
+        }
+        @media (max-width: 768px) {
+            body.calc-open .bottom-bar {
+                right: 12px;
+                opacity: 0;
+                pointer-events: none;
+            }
         }
 
         .bottom-bar button {
@@ -329,7 +348,7 @@
             overflow: hidden;
             min-height: 0;
             margin-left: var(--sidebar-w);
-            margin-bottom: var(--bottom-bar-h);
+            margin-bottom: 0;
         }
 
         /* ═══════════════════════════════════════════════════════════════
@@ -619,6 +638,33 @@
             }
         }
 
+        /* Celular en horizontal (p. ej. 874x402): barras más delgadas */
+        @media (max-height: 500px) {
+            :root {
+                --toolbar-h: 42px;
+                --sidebar-w: 46px;
+            }
+            .top-bar {
+                padding: 4px 10px;
+                gap: 6px;
+            }
+            .top-bar button,
+            .top-bar select {
+                min-width: 36px;
+                min-height: 36px;
+                padding: 4px 8px;
+            }
+            .left-sidebar {
+                padding: 4px 0;
+                gap: 2px;
+            }
+            .left-sidebar button {
+                width: 36px;
+                height: 36px;
+                padding: 6px;
+            }
+        }
+
         /* ═══════════════════════════════════════════════════════════════
            TRANSICIONES GLOBALES
         ════════════════════════════════════════════════════════════════ */
@@ -808,6 +854,8 @@
             gap: 6px;
         }
 
+        .context-menu-group.hidden { display: none !important; }
+
         .context-menu-group label {
             display: flex;
             align-items: center;
@@ -815,6 +863,71 @@
             color: var(--text-main);
             font-size: 13px;
             cursor: pointer;
+        }
+
+        .context-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            opacity: 0.7;
+        }
+        .context-close-btn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+
+        :root.light-mode .context-menu {
+            background: rgba(255, 255, 255, 0.94);
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.12);
+            color: #1e293b;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+            FOCUS MODE — modo concentración (pantalla completa de dibujo)
+         ════════════════════════════════════════════════════════════════ */
+        .focus-exit-btn { display: none; }
+        body.focus-mode .top-bar { display: none !important; }
+        body.focus-mode .main-content { margin-left: 0 !important; }
+        body.focus-mode .left-sidebar {
+            top: 8px; left: 8px; bottom: auto; height: auto;
+            max-height: calc(100dvh - 16px);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            opacity: 0.25;
+            transition: opacity 0.2s;
+        }
+        body.focus-mode .left-sidebar:hover,
+        body.focus-mode .left-sidebar:focus-within { opacity: 1; }
+        body.focus-mode .bottom-bar { opacity: 0.35; }
+        body.focus-mode .bottom-bar:hover { opacity: 1; }
+        body.focus-mode .context-menu { top: 12px; left: 64px; }
+        body.focus-mode .focus-exit-btn {
+            display: flex;
+            position: fixed;
+            top: 10px; right: 12px;
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 120;
+            opacity: 0.65;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+        body.focus-mode .focus-exit-btn:hover {
+            opacity: 1;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .focus-exit-btn svg {
+            width: 18px; height: 18px;
+            stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
 
         /* ═══════════════════════════════════════════════════════════════
@@ -1003,6 +1116,10 @@
 </head>
 <body>
 
+    <button type="button" id="btnExitFocus" class="focus-exit-btn" title="Salir de modo concentración [Esc]" aria-label="Salir de modo concentración">
+        <svg viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+    </button>
+
 <div id="recoverBar">
   <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
   <div>
@@ -1059,6 +1176,12 @@
             </button>
             <button type="button" id="btnCalcToggle" title="Mostrar/Ocultar Calculadora" aria-label="Mostrar/Ocultar Calculadora">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><rect x="7" y="5" width="10" height="3" rx="0.5" fill="currentColor" fill-opacity="0.1"/><rect x="7" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="7" y="14" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="14" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="14" width="2.5" height="2" rx="0.5"/><rect x="7" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="17.5" width="2.5" height="2" rx="0.5"/></svg>
+            </button>
+            <button type="button" id="btnToolSettings" title="Ajustes de trazo y color" aria-label="Ajustes de trazo y color">
+                <svg viewBox="0 0 24 24"><path d="M12 2s5 4.5 5 9.5c0 1.5-.5 3-1.5 4L12 19l-3.5-3.5C7.5 14.5 7 13 7 11.5 7 6.5 12 2 12 2z"/><circle cx="12" cy="11" r="2"/></svg>
+            </button>
+            <button type="button" id="btnFocusMode" title="Modo concentración [Z]" aria-label="Modo concentración">
+                <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
             </button>
             <button type="button" id="btnClear" class="btn-danger" title="Limpiar todo" aria-label="Limpiar todo">
                 <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
@@ -1181,16 +1304,17 @@
 
     <!-- CONTEXT-MENU PANEL - Controles contextuales (color, grosor, fuente) -->
     <div id="contextMenu" class="context-menu hidden">
-        <div class="context-menu-group">
+        <div class="context-menu-group" id="ctxGroupColor">
             <label title="Color del trazo">🎨 <input type="color" id="colorPicker" value="#000000"></label>
         </div>
-        <div class="context-menu-group">
+        <div class="context-menu-group" id="ctxGroupWidth">
             <label title="Grosor del trazo">📏 <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
             <span id="widthValue">3</span>
         </div>
-        <div class="context-menu-group">
+        <div class="context-menu-group" id="ctxGroupFont">
             <label title="Tamaño de fuente">🔤 <input type="number" id="fontSizePicker" min="8" max="120" value="16"></label>
         </div>
+        <button type="button" id="btnCloseContext" class="context-close-btn" title="Cerrar ajustes" aria-label="Cerrar ajustes">✕</button>
     </div>
 
     <!-- BOTTOM BAR - Navegación de páginas -->
@@ -1441,6 +1565,8 @@ window.addEventListener('load', function() {
     let lastPosX = 0, lastPosY = 0;
     let isHistoryAction = false, historyStack = [], redoStack = [];
     let calcVisible = false;
+    let focusMode = false;
+    let focusResizeTimer = null;
     let showAxes = false; // Control de las reglas de medición
     let activeShape = null, startX = 0, startY = 0;
     // Variables para herramienta de regla/compás
@@ -1539,6 +1665,7 @@ window.addEventListener('load', function() {
     // Pinch a nivel DOM: Fabric 5.3 no dispara 'mouse:down' para el 2.º dedo
     // fuera del modo dibujo, así que se detecta aquí para toda herramienta.
     canvasWrapper.addEventListener('touchstart', function(e) {
+        closeContextMenu();
         if (e.touches && e.touches.length === 2) { beginTwoFingerGesture(e); e.preventDefault(); }
     }, { passive: false, capture: true });
 
@@ -1547,6 +1674,7 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     canvas.on('mouse:down', function(opt) {
         var evt = opt.e;
+        closeContextMenu();
 
         // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
         if (evt.touches && evt.touches.length === 2) {
@@ -2464,9 +2592,13 @@ window.addEventListener('load', function() {
       };
     }
 
+    // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
+    let contextMenuOpen = false;
+
     function setTool(tool) {
+        var prevTool = currentTool;
         currentTool = tool;
-        document.querySelectorAll('.left-sidebar button:not(#btnToggleAxes), .top-bar button:not(#btnCalcToggle)').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.left-sidebar button:not(#btnToggleAxes), .top-bar button:not(#btnCalcToggle):not(#btnToolSettings):not(#btnFocusMode)').forEach(b => b.classList.remove('active'));
 
         canvas.isDrawingMode = false; canvas.selection = false;
         canvas.discardActiveObject && canvas.discardActiveObject();
@@ -2539,15 +2671,55 @@ window.addEventListener('load', function() {
         else if (tool === 'pan') { canvasWrapper.classList.add('cursor-pan'); }
         else if (['line', 'rect', 'circle', 'triangle'].includes(tool)) { canvasWrapper.classList.add('cursor-cross'); }
 
-        // Mostrar/ocultar menú contextual según la herramienta
-        const contextMenu = document.getElementById('contextMenu');
-        const showColorControls = ['pen', 'highlight', 'fill', 'text', 'line', 'rect', 'circle', 'triangle', 'ruler'].includes(tool);
+        // Menú contextual inteligente: cerrado por defecto, se alterna al
+        // re-clicar la herramienta activa o con el botón de ajustes.
+        var contextMenu = document.getElementById('contextMenu');
+        var ctxColor = document.getElementById('ctxGroupColor');
+        var ctxWidth = document.getElementById('ctxGroupWidth');
+        var ctxFont = document.getElementById('ctxGroupFont');
+        var hasSettings = ['pen', 'highlight', 'line', 'rect', 'circle', 'triangle', 'ruler', 'text', 'fill', 'eraser'].includes(tool);
+        if (tool !== prevTool) {
+            contextMenuOpen = false;
+        } else if (hasSettings) {
+            contextMenuOpen = !contextMenuOpen;
+        }
+        if (ctxColor) ctxColor.classList.toggle('hidden', !(['pen', 'highlight', 'line', 'rect', 'circle', 'triangle', 'ruler', 'text', 'fill'].includes(tool)));
+        if (ctxWidth) ctxWidth.classList.toggle('hidden', !(['pen', 'highlight', 'line', 'rect', 'circle', 'triangle', 'ruler', 'eraser'].includes(tool)));
+        if (ctxFont) ctxFont.classList.toggle('hidden', !(tool === 'text'));
         if (contextMenu) {
-            contextMenu.classList.toggle('hidden', !showColorControls);
+            contextMenu.classList.toggle('hidden', !(hasSettings && contextMenuOpen));
         }
 
         canvas.requestRenderAll();
     }
+
+    // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
+    let contextMenuOpen = false;
+
+    function closeContextMenu() {
+        contextMenuOpen = false;
+        var cm = document.getElementById('contextMenu');
+        if (cm) cm.classList.add('hidden');
+    }
+
+    document.getElementById('btnCloseContext').onclick = closeContextMenu;
+    document.getElementById('btnToolSettings').onclick = function() {
+        var adjustable = ['pen', 'highlight', 'line', 'rect', 'circle', 'triangle', 'ruler', 'text', 'fill', 'eraser'];
+        if (!adjustable.includes(currentTool)) {
+            setTool('pen');
+            contextMenuOpen = true;
+            var contextMenu = document.getElementById('contextMenu');
+            var ctxColor = document.getElementById('ctxGroupColor');
+            var ctxWidth = document.getElementById('ctxGroupWidth');
+            var ctxFont = document.getElementById('ctxGroupFont');
+            if (ctxColor) ctxColor.classList.remove('hidden');
+            if (ctxWidth) ctxWidth.classList.remove('hidden');
+            if (ctxFont) ctxFont.classList.add('hidden');
+            if (contextMenu) contextMenu.classList.remove('hidden');
+            return;
+        }
+        setTool(currentTool);
+    };
 
     document.getElementById('btnPen').onclick = () => setTool('pen');
     document.getElementById('btnHighlight').onclick = () => setTool('highlight');
@@ -3301,10 +3473,29 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     var btnCalcToggle = document.getElementById('btnCalcToggle');
     function toggleCalc() {
-        calcVisible = !calcVisible; calcPanel.classList.toggle('hidden', !calcVisible);
-        btnCalcToggle.classList.toggle('active', calcVisible); setTimeout(resizeCanvas, 270);
+        calcVisible = !calcVisible;
+        document.body.classList.toggle('calc-open', calcVisible);
+        calcPanel.classList.toggle('hidden', !calcVisible);
+        btnCalcToggle.classList.toggle('active', calcVisible);
+        setTimeout(resizeCanvas, 270);
     }
     btnCalcToggle.onclick = toggleCalc;
+
+    var btnFocusMode = document.getElementById('btnFocusMode');
+    var btnExitFocus = document.getElementById('btnExitFocus');
+    function toggleFocusMode(force) {
+        var next = force !== undefined ? force : !focusMode;
+        focusMode = next;
+        document.body.classList.toggle('focus-mode', focusMode);
+        if (btnFocusMode) {
+            btnFocusMode.classList.toggle('active', focusMode);
+            btnFocusMode.setAttribute('aria-pressed', focusMode);
+        }
+        if (focusResizeTimer) clearTimeout(focusResizeTimer);
+        focusResizeTimer = setTimeout(resizeCanvas, 250);
+    }
+    if (btnFocusMode) btnFocusMode.onclick = function() { toggleFocusMode(); };
+    if (btnExitFocus) btnExitFocus.onclick = function() { toggleFocusMode(false); };
 
     var calcExpression = '', exprDisplay = document.getElementById('calcExpr'), resDisplay = document.getElementById('calcResult');
     let calcMemory = 0; // Memoria de la calculadora
@@ -3683,6 +3874,15 @@ window.addEventListener('load', function() {
             if (key === 'Enter' || key === '=') { document.getElementById('calcEquals').click(); return; }
             if (key === 'Backspace') { document.getElementById('calcDel').click(); return; }
             if (key === 'Escape') { document.getElementById('calcClear').click(); return; }
+        }
+
+        if (e.key === 'Escape') {
+            closeContextMenu();
+            if (focusMode) toggleFocusMode(false);
+        }
+
+        if (e.code === 'KeyZ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            toggleFocusMode();
         }
 
         if (e.code === 'Space' && !isSpaceDown) { isSpaceDown = true; if (currentTool !== 'pan') canvasWrapper.classList.add('cursor-pan'); e.preventDefault(); }
