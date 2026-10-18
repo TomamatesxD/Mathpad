@@ -2700,10 +2700,12 @@ window.addEventListener('load', function() {
             canvas.setViewportTransform([1,0,0,1,0,0]);
             await new Promise(resolve => canvas.setBackgroundColor(exportBg, resolve));
             var bounds = getCanvasBounds(canvas);
+            var maxSide = Math.max(bounds.width, bounds.height, 1);
+            var multiplier = Math.max(1, Math.min(2, 4000 / maxSide));
             var imgData = canvas.toDataURL({
                 format: 'png', quality: 1,
                 left: bounds.left, top: bounds.top,
-                width: bounds.width, height: bounds.height
+                width: bounds.width, height: bounds.height, multiplier: multiplier
             });
             await new Promise(resolve => canvas.setBackgroundColor('', resolve));
             if (firstPage) {

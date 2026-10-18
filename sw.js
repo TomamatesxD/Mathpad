@@ -3,9 +3,9 @@
 // ============================================
 
 
-// Versión de caché v12: borrador único unificado (instant erase al contacto,
-// sin pincel transparente ni goma raster por máscaras).
-const CACHE_NAME = 'mathpad-v13';
+// Versión de caché v12: limpieza de duplicados modulares (solo index.html),
+// iconos PWA reales y exportPDF en alta resolución.
+const CACHE_NAME = 'mathpad-v14';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
