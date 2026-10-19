@@ -1756,6 +1756,13 @@ window.addEventListener('load', function() {
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
 
+    // Gestos táctiles: declaradas antes de resizeCanvas() para evitar TDZ
+    // (resizeCanvas() las asigna y ResizeObserver puede invocarla de inmediato)
+    let lastTouchDistance = 0;
+    let lastTouchCenter = null;
+    let isTouchPanning = false;
+    let twoFingerGesture = false;
+
 /* ═══════════════════════════════════════════════════════════════
    RESIZE Y FONDO
 ═══════════════════════════════════════════════════════════════ */
@@ -1829,11 +1836,7 @@ window.addEventListener('load', function() {
     });
 
     // Gestos táctiles: pinch-to-zoom y pan con dos dedos (detección nativa, sin Event.js)
-    let lastTouchDistance = 0;
-    let lastTouchCenter = null;
-    let isTouchPanning = false;
-    let twoFingerGesture = false;
-
+    // (variables declaradas arriba, antes de resizeCanvas(), para evitar TDZ)
     function resetTouchGesture() {
         lastTouchDistance = 0;
         lastTouchCenter = null;
