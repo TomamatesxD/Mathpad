@@ -1556,8 +1556,8 @@
             <button type="button" data-val="7">7</button>
             <button type="button" data-val="8">8</button>
             <button type="button" data-val="9">9</button>
-            <button type="button" class="orange" id="calcDel" data-val="⌫" aria-label="Borrar último carácter">DEL</button>
-            <button type="button" class="orange" id="calcClear" data-val="AC" aria-label="Limpiar todo">AC</button>
+            <button type="button" class="orange" id="calcDel" aria-label="Borrar último carácter">DEL</button>
+            <button type="button" class="orange" id="calcClear" aria-label="Limpiar todo">AC</button>
             <button type="button" data-val="4">4</button>
             <button type="button" data-val="5">5</button>
             <button type="button" data-val="6">6</button>
@@ -1572,7 +1572,7 @@
             <button type="button" data-val=".">.</button>
             <button type="button" data-val="Ans" aria-label="Último resultado">Ans</button>
             <button type="button" data-val="+/−" aria-label="Cambiar signo">±</button>
-            <button type="button" class="equals" id="calcEquals" data-val="=" aria-label="Igual">=</button>
+            <button type="button" class="equals" id="calcEquals" aria-label="Igual">=</button>
         </div>
         <!-- Historial de operaciones -->
         <div class="calc-history" id="calcHistory">
@@ -3837,6 +3837,7 @@ window.addEventListener('load', function() {
     };
 
     function handleCalcKey(btn) {
+        if (btn.id === 'calcClear' || btn.id === 'calcDel' || btn.id === 'calcEquals') return;
         var val = btn.getAttribute('data-val');
         if (val === null) return;
         if (val === 'Ans') { calcUpdate('Ans'); return; }
