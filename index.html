@@ -380,18 +380,17 @@
         ════════════════════════════════════════════════════════════════ */
         .calculator-panel {
             width: var(--calc-w);
-            background-color: var(--bg-panel);
-            border-left: 1px solid var(--border-color);
+            background: #23262b;
+            border-left: 2px solid #141619;
             display: flex;
             flex-direction: column;
             z-index: 10;
             flex-shrink: 0;
             overflow-y: auto; overscroll-behavior: contain;
             transition: width 0.25s ease, opacity 0.25s ease;
-            /* Anti-desbordamiento: jamás más grande que el viewport actual */
             max-width: 95vw;
             max-height: 90vh;
-            overflow-y: auto;   /* scroll interno si el contenido se aplasta con zoom */
+            overflow-y: auto;
         }
 
         .calculator-panel.hidden {
@@ -402,32 +401,82 @@
         }
 
         .calc-display {
-            padding: 16px 18px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: rgba(0,0,0,0.25);
+            background: #c8d6bf;
+            color: #111a14;
+            border: 3px solid #16181c;
+            border-radius: 6px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.35);
+            font-family: 'Courier New', monospace;
+            margin: 6px 10px;
+            padding: 8px 10px;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
+            gap: 4px;
+            draggable: true;
         }
-
+        .calc-status-bar {
+            font-size: 11px;
+            color: #4a5a4f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .calc-angle-badge, .calc-mem-badge {
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background: #a8b4a8;
+            color: #111a14;
+        }
+        .calc-mem-badge { background: #d9a85a; }
         .calc-expr {
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            color: #2c3a30;
             min-height: 18px;
             text-align: right;
             word-break: break-all;
             width: 100%;
         }
-
         .calc-result {
-            font-size: 30px;
+            font-size: 26px;
             font-weight: 700;
-            min-height: 38px;
+            color: #0b120d;
+            min-height: 34px;
             text-align: right;
             word-break: break-all;
             width: 100%;
         }
+
+        .calc-header {
+            background: #1a1c20;
+            color: #e8edf1;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #141619;
+        }
+        .calc-mode-bar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .calc-mode-btn {
+            background: #2f343d;
+            color: #f1f5f9;
+            border: 1px solid #171a1f;
+            border-radius: 4px;
+            font-size: 11px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .calc-mode-btn:hover { background: #3a414d; }
+        .calc-mode-btn.active { background: #4a5360; border-color: #7c3aed; }
+        .hidden { display: none !important; }
 
         .calc-controls {
             padding: 8px 14px;
@@ -446,22 +495,21 @@
             user-select: none;
         }
 
-        .calc-keys {
+        .calc-sci-keys {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            padding: 12px;
-            flex: 1;
-            align-content: start;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            padding: 6px 8px;
+            flex: 0;
         }
-
-        .calc-keys button {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            font-size: 17px;
-            height: 48px;
+        .calc-sci-keys button {
+            background: #2f343d;
+            color: #f1f5f9;
+            border: none;
+            border-bottom: 2px solid #171a1f;
             border-radius: 5px;
+            font-size: 12px;
+            padding: 7px 4px;
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -470,18 +518,48 @@
             -webkit-user-select: none;
             user-select: none;
         }
+        .calc-sci-keys button:hover { background: #3a414d; }
+        .calc-sci-keys button:active { background: #4a5360; }
 
-        .calc-keys button:hover  { background: rgba(255,255,255,0.12); }
-        .calc-keys button:active { background: rgba(255,255,255,0.2); }
+        .calc-num-keys {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            padding: 6px 8px;
+            flex: 1;
+            align-content: start;
+        }
+        .calc-num-keys button {
+            background: #4b5260;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            border-bottom: 2px solid #262a32;
+            border-radius: 6px;
+            padding: 10px 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.1s;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .calc-num-keys button:hover { background: #5a6372; }
+        .calc-num-keys button:active { background: #6a7382; }
+        .calc-num-keys button.orange {
+            background: #d96b27;
+            border-bottom-color: #a34d15;
+        }
+        .calc-num-keys button.orange:hover { background: #e67a3d; }
 
         .calc-keys button.operator { color: var(--accent); }
-
         .calc-keys button.action {
             background: rgba(207,102,121,0.15);
             color: var(--danger);
         }
         .calc-keys button.action:hover { background: rgba(207,102,121,0.3); }
-
         .calc-keys button.equals {
             background: var(--accent);
             color: var(--bg-dark);
@@ -673,13 +751,21 @@
             .calc-result {
                 font-size: 20px;
             }
-            .calc-keys {
-                padding: 6px 10px;
-                gap: 4px;
+            .calc-sci-keys {
+                padding: 4px 2px;
+                gap: 3px;
             }
-            .calc-keys button {
-                padding: 7px 4px;
-                font-size: 14px;
+            .calc-sci-keys button {
+                padding: 4px 2px;
+                font-size: 11px;
+            }
+            .calc-num-keys {
+                padding: 4px 2px;
+                gap: 3px;
+            }
+            .calc-num-keys button {
+                padding: 6px 2px;
+                font-size: 13px;
             }
             .calc-history {
                 min-height: 95px;
@@ -700,7 +786,8 @@
         .top-bar select,
         .left-sidebar button,
         .bottom-bar button,
-        .calc-keys button,
+        .calc-sci-keys button,
+        .calc-num-keys button,
         .calc-memory-btn {
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -1417,8 +1504,20 @@
 
         <!-- CALCULADORA (oculta por defecto) -->
         <div class="calculator-panel hidden" id="calcPanel">
-            <div class="calc-display">
-                <div class="calc-expr"   id="calcExpr" draggable="true"></div>
+            <!-- Cabecera Casio -->
+            <div class="calc-header">
+                <span>CASIO · fx-82 MathPad</span>
+                <div class="calc-mode-bar">
+                    <button type="button" id="btnAngleMode" class="calc-mode-btn" title="Grados/Radianes" aria-label="Cambiar entre grados y radianes">DEG</button>
+                    <button type="button" id="btnSD" class="calc-mode-btn" title="Fracción/Decimal" aria-label="Alternar fracción y decimal">S⇔D</button>
+                </div>
+            </div>
+            <div class="calc-display" draggable="true">
+                <div class="calc-status-bar">
+                    <span id="calcAngleBadge" class="calc-angle-badge">DEG</span>
+                    <span id="calcMemBadge" class="calc-mem-badge hidden">M</span>
+                </div>
+                <div class="calc-expr" id="calcExpr" draggable="true"></div>
                 <div class="calc-result" id="calcResult" draggable="true">0</div>
             </div>
         <div class="calc-controls">
@@ -1427,43 +1526,44 @@
             </label>
             <button type="button" id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)" aria-label="Memoria (M+/M-/MR/MC)">M</button>
         </div>
-        <div class="calc-keys" id="calcKeys">
-            <!-- Científicas -->
-            <button type="button" class="sci-btn operator" data-val="sin(">sin</button>
-            <button type="button" class="sci-btn operator" data-val="cos(">cos</button>
-            <button type="button" class="sci-btn operator" data-val="tan(">tan</button>
-            <button type="button" class="sci-btn operator" data-val="sqrt(">√x</button>
-            <button type="button" class="sci-btn operator" data-val="^">xʸ</button>
-            <button type="button" class="sci-btn operator" data-val="log(">log</button>
-            <button type="button" class="sci-btn operator" data-val="(">(</button>
-            <button type="button" class="sci-btn operator" data-val=")">)</button>
-            <button type="button" class="sci-btn operator" data-val="pi">π</button>
-            <button type="button" class="sci-btn operator" data-val="e">e</button>
-
-            <!-- Básicas -->
-            <button type="button" class="action" id="calcClear">C</button>
-            <button type="button" class="action" id="calcDel">⌫</button>
-            <button type="button" class="operator" data-val="%">%</button>
-            <button type="button" class="operator" data-val="/">÷</button>
-
+        <div class="calc-sci-keys" id="calcSciKeys">
+            <button type="button" class="sci-btn operator" data-val="x²" aria-label="x al cuadrado">x²</button>
+            <button type="button" class="sci-btn operator" data-val="xʸ" aria-label="x a la y">xʸ</button>
+            <button type="button" class="sci-btn operator" data-val="sqrt(" aria-label="Raíz cuadrada">√</button>
+            <button type="button" class="sci-btn operator" data-val="pi" aria-label="Pi">π</button>
+            <button type="button" class="sci-btn operator" data-val="e" aria-label="Número e">e</button>
+            <button type="button" class="sci-btn operator" data-val="sin(" aria-label="Seno">sin</button>
+            <button type="button" class="sci-btn operator" data-val="cos(" aria-label="Coseno">cos</button>
+            <button type="button" class="sci-btn operator" data-val="tan(" aria-label="Tangente">tan</button>
+            <button type="button" class="sci-btn operator" data-val="log10(" aria-label="Logaritmo base 10">log</button>
+            <button type="button" class="sci-btn operator" data-val="ln(" aria-label="Logaritmo natural">ln</button>
+            <button type="button" class="sci-btn operator" data-val="(" aria-label="Paréntesis abierto">(</button>
+            <button type="button" class="sci-btn operator" data-val=")" aria-label="Paréntesis cerrado">)</button>
+            <button type="button" class="sci-btn operator" data-val="1/x" aria-label="Uno sobre x">1/x</button>
+            <button type="button" class="sci-btn operator" data-val="%" aria-label="Porcentaje">%</button>
+            <button type="button" class="sci-btn operator" id="btnSDKey" aria-label="Alternar fracción y decimal">S⇔D</button>
+        </div>
+        <div class="calc-num-keys" id="calcNumKeys">
             <button type="button" data-val="7">7</button>
             <button type="button" data-val="8">8</button>
             <button type="button" data-val="9">9</button>
-            <button type="button" class="operator" data-val="*">×</button>
-
+            <button type="button" class="orange" id="calcDel" data-val="⌫" aria-label="Borrar último carácter">DEL</button>
+            <button type="button" class="orange" id="calcClear" data-val="AC" aria-label="Limpiar todo">AC</button>
             <button type="button" data-val="4">4</button>
             <button type="button" data-val="5">5</button>
             <button type="button" data-val="6">6</button>
-            <button type="button" class="operator" data-val="-">−</button>
-
+            <button type="button" class="operator" data-val="×" aria-label="Multiplicar">×</button>
+            <button type="button" class="operator" data-val="÷" aria-label="Dividir">÷</button>
             <button type="button" data-val="1">1</button>
             <button type="button" data-val="2">2</button>
             <button type="button" data-val="3">3</button>
-            <button type="button" class="operator" data-val="+">+</button>
-
-            <button type="button" data-val="0" class="calc-span2">0</button>
+            <button type="button" class="operator" data-val="+" aria-label="Sumar">+</button>
+            <button type="button" class="operator" data-val="−" aria-label="Restar">−</button>
+            <button type="button" data-val="0">0</button>
             <button type="button" data-val=".">.</button>
-            <button type="button" class="equals" id="calcEquals">=</button>
+            <button type="button" data-val="Ans" aria-label="Último resultado">Ans</button>
+            <button type="button" data-val="+/−" aria-label="Cambiar signo">±</button>
+            <button type="button" class="equals" id="calcEquals" data-val="=" aria-label="Igual">=</button>
         </div>
         <!-- Historial de operaciones -->
         <div class="calc-history" id="calcHistory">
@@ -3612,16 +3712,48 @@ window.addEventListener('load', function() {
     var calcExpression = '', exprDisplay = document.getElementById('calcExpr'), resDisplay = document.getElementById('calcResult');
     let calcMemory = 0; // Memoria de la calculadora
     let calcHistory = []; // Historial de operaciones
+    let angleMode = 'DEG'; // Modo angular: 'DEG' o 'RAD'
+    let lastAns = null;    // Último resultado numérico válido
 
     function calcUpdate(append) {
         if (append !== undefined) calcExpression += append;
         exprDisplay.textContent = calcExpression;
         if (!calcExpression) { resDisplay.textContent = '0'; return; }
         try {
-            var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
+            var evalExpr = calcExpression
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/')
+                .replace(/−/g, '-')
+                .replace(/x²/g, '^2')
+                .replace(/xʸ/g, '^')
+                .replace(/1\/x/g, '^(-1)')
+                .replace(/Ans/g, 'Ans')
+                .replace(/π/g, 'pi');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecución: evita fugas de variables globales
+            // Scope personalizado: trig en DEG/RAD, log10, ln, Ans, pi, e
+            var scope = {
+                pi: Math.PI,
+                e: Math.E,
+                Ans: lastAns !== null ? lastAns : 0,
+                sin: function(x) {
+                    var v = (angleMode === 'DEG') ? Math.sin(x * Math.PI / 180) : Math.sin(x);
+                    return Math.abs(v) < 1e-12 ? 0 : v;
+                },
+                cos: function(x) {
+                    var v = (angleMode === 'DEG') ? Math.cos(x * Math.PI / 180) : Math.cos(x);
+                    return Math.abs(v) < 1e-12 ? 0 : v;
+                },
+                tan: function(x) {
+                    var v = (angleMode === 'DEG') ? Math.tan(x * Math.PI / 180) : Math.tan(x);
+                    return Math.abs(v) < 1e-12 ? 0 : v;
+                },
+                log10: function(x) { return Math.log10(x); },
+                log: function(x) { return Math.log(x); },
+                ln: function(x) { return Math.log(x); },
+                sqrt: Math.sqrt
+            };
+            var res = math.evaluate(evalExpr, scope);
             if (res !== undefined && typeof res !== 'function') resDisplay.textContent = math.format(res, { precision: 14 });
         } catch (ex) {}
     }
@@ -3692,29 +3824,133 @@ window.addEventListener('load', function() {
         showToast('MC (memoria borrada)', 'info', 1500);
     };
 
-    document.getElementById('calcKeys').addEventListener('click', function(e) {
+    function handleCalcKey(btn) {
+        var val = btn.getAttribute('data-val');
+        if (val === null) return;
+        if (val === 'Ans') { calcUpdate('Ans'); return; }
+        if (val === '+/−') {
+            if (calcExpression) {
+                if (calcExpression.charAt(0) === '−') calcExpression = calcExpression.slice(1);
+                else calcExpression = '−' + calcExpression;
+                calcUpdate();
+            }
+            return;
+        }
+        calcUpdate(val);
+    }
+    document.getElementById('calcSciKeys').addEventListener('click', function(e) {
         var btn = e.target.closest('button');
-        if (!btn) return; var val = btn.getAttribute('data-val'); if (val !== null) calcUpdate(val);
+        if (!btn) return; handleCalcKey(btn);
+    });
+    document.getElementById('calcNumKeys').addEventListener('click', function(e) {
+        var btn = e.target.closest('button');
+        if (!btn) return; handleCalcKey(btn);
     });
 
     document.getElementById('calcClear').onclick = () => { calcExpression = ''; calcUpdate(); };
     document.getElementById('calcDel').onclick   = () => { calcExpression = calcExpression.slice(0, -1); calcUpdate(); };
     document.getElementById('calcEquals').onclick = function() {
         try {
-            var evalExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
+            var evalExpr = calcExpression
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/')
+                .replace(/−/g, '-')
+                .replace(/x²/g, '^2')
+                .replace(/xʸ/g, '^')
+                .replace(/1\/x/g, '^(-1)')
+                .replace(/Ans/g, 'Ans')
+                .replace(/π/g, 'pi');
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
             for(var i = 0; i < openP - closeP; i++) evalExpr += ')';
-            var res = math.evaluate(evalExpr, {}); // {} purifica la ejecución: evita fugas de variables globales
+            var scope = {
+                pi: Math.PI, e: Math.E,
+                Ans: lastAns !== null ? lastAns : 0,
+                sin: function(x) { var v = (angleMode === 'DEG') ? Math.sin(x * Math.PI / 180) : Math.sin(x); return Math.abs(v) < 1e-12 ? 0 : v; },
+                cos: function(x) { var v = (angleMode === 'DEG') ? Math.cos(x * Math.PI / 180) : Math.cos(x); return Math.abs(v) < 1e-12 ? 0 : v; },
+                tan: function(x) { var v = (angleMode === 'DEG') ? Math.tan(x * Math.PI / 180) : Math.tan(x); return Math.abs(v) < 1e-12 ? 0 : v; },
+                log10: function(x) { return Math.log10(x); },
+                log: function(x) { return Math.log(x); },
+                ln: function(x) { return Math.log(x); },
+                sqrt: Math.sqrt
+            };
+            var res = math.evaluate(evalExpr, scope);
             if (res !== undefined) {
                 var formatted = math.format(res, { precision: 14 });
                 resDisplay.textContent = formatted;
+                lastAns = res;
                 calcExpression = formatted;
                 exprDisplay.textContent = evalExpr;
                 addToHistory(evalExpr, formatted);
             }
         } catch(ex) { resDisplay.textContent = 'Error'; }
     };
-    document.getElementById('toggleSci').addEventListener('change', e => document.getElementById('calcKeys').parentElement.classList.toggle('sci-mode', e.target.checked));
+    document.getElementById('toggleSci').addEventListener('change', e => document.getElementById('calcPanel').classList.toggle('sci-mode', e.target.checked));
+
+    // Botón DEG/RAD
+    var btnAngleMode = document.getElementById('btnAngleMode');
+    var calcAngleBadge = document.getElementById('calcAngleBadge');
+    if (btnAngleMode) {
+        btnAngleMode.onclick = function() {
+            angleMode = (angleMode === 'DEG') ? 'RAD' : 'DEG';
+            btnAngleMode.textContent = angleMode;
+            if (calcAngleBadge) calcAngleBadge.textContent = angleMode;
+            btnAngleMode.classList.toggle('active', angleMode === 'RAD');
+            calcUpdate();
+        };
+    }
+    // Botón S⇔D (header y teclado)
+    function toggleSD() {
+        var current = resDisplay.textContent;
+        if (!current || current === 'Error' || current === '0') return;
+        var num = parseFloat(current);
+        if (isNaN(num)) return;
+        if (current.includes('/')) {
+            var parts = current.split('/');
+            var dec = parseFloat(parts[0]) / parseFloat(parts[1]);
+            resDisplay.textContent = math.format(dec, { precision: 14 });
+            calcExpression = resDisplay.textContent;
+        } else {
+            var val = Math.abs(num);
+            var sign = num < 0 ? '-' : '';
+            var maxDen = 100000;
+            var tolerance = 1e-9;
+            var n = Math.floor(val);
+            var remainder = val - n;
+            if (remainder < tolerance) {
+                resDisplay.textContent = sign + n;
+            } else {
+                var h1 = 1, h2 = n;
+                var k1 = 0, k2 = 1;
+                var b = 1 / remainder;
+                var iter = 0;
+                while (iter < 100) {
+                    var an = Math.floor(b);
+                    var h = an * h2 + h1;
+                    var k = an * k2 + k1;
+                    if (k > maxDen) break;
+                    var approx = h / k;
+                    if (Math.abs(approx - val) < tolerance) break;
+                    h1 = h2; h2 = h;
+                    k1 = k2; k2 = k;
+                    var frac = b - an;
+                    if (frac < 1e-15) break;
+                    b = 1 / frac;
+                    iter++;
+                }
+                resDisplay.textContent = sign + h2 + '/' + k2;
+            }
+            calcExpression = resDisplay.textContent;
+        }
+        exprDisplay.textContent = calcExpression;
+    }
+    var btnSD = document.getElementById('btnSD');
+    if (btnSD) {
+        btnSD.onclick = function() { toggleSD(); };
+    }
+    var btnSDKey = document.getElementById('btnSDKey');
+    if (btnSDKey) {
+        btnSDKey.onclick = function() { toggleSD(); };
+    }
 
     // Botón de memoria - mostrar menú
     document.getElementById('calcMemory').onclick = function(e) {
@@ -3765,8 +4001,8 @@ window.addEventListener('load', function() {
 
     // Capturar el arrastre desde la calculadora (PC: HTML5 Drag & Drop nativo)
     document.getElementById('calcPanel').addEventListener('dragstart', function(e) {
-        if (e.target.id === 'calcResult' || e.target.id === 'calcExpr') {
-            e.dataTransfer.setData('text/plain', e.target.innerText);
+        if (e.target.id === 'calcResult' || e.target.id === 'calcExpr' || e.target.closest('.calc-display')) {
+            e.dataTransfer.setData('text/plain', resDisplay.textContent);
         } else if (e.target.closest('.calc-history-item')) {
             // Si arrastra el historial, tomamos la expresión y el resultado (ej: "2+2 = 4")
             const item = e.target.closest('.calc-history-item');
@@ -3788,8 +4024,8 @@ window.addEventListener('load', function() {
         const target = e.target;
         const item = target.closest('.calc-history-item');
         // Solo capturar si es un elemento arrastrable (resultado, expresión o historial)
-        if (target.id === 'calcResult' || target.id === 'calcExpr') {
-            touchDragData = target.innerText;
+        if (target.id === 'calcResult' || target.id === 'calcExpr' || target.closest('.calc-display')) {
+            touchDragData = resDisplay.textContent;
         } else if (item) {
             const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
             const res = item.querySelector('.history-result').innerText.replace('= ', '');
