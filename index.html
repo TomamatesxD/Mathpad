@@ -386,7 +386,7 @@
             flex-direction: column;
             z-index: 10;
             flex-shrink: 0;
-            overflow: hidden;
+            overflow-y: auto; overscroll-behavior: contain;
             transition: width 0.25s ease, opacity 0.25s ease;
             /* Anti-desbordamiento: jamás más grande que el viewport actual */
             max-width: 95vw;
@@ -515,8 +515,11 @@
         .calc-history {
             border-top: 1px solid var(--border-color);
             padding: 8px;
-            max-height: 150px;
+            min-height: 110px;
+            max-height: 220px;
+            flex-shrink: 0;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .calc-history-header {
             font-size: 11px;
@@ -662,6 +665,31 @@
                 width: 36px;
                 height: 36px;
                 padding: 6px;
+            }
+            .calc-display {
+                padding: 8px 12px;
+                min-height: 58px;
+            }
+            .calc-result {
+                font-size: 20px;
+            }
+            .calc-keys {
+                padding: 6px 10px;
+                gap: 4px;
+            }
+            .calc-keys button {
+                padding: 7px 4px;
+                font-size: 14px;
+            }
+            .calc-history {
+                min-height: 95px;
+                max-height: 160px;
+                padding: 6px 12px;
+            }
+            .plot-dialog,
+            .latex-box {
+                padding: 12px 16px;
+                max-height: calc(100dvh - 16px);
             }
         }
 
@@ -891,16 +919,24 @@
         body.focus-mode .top-bar { display: none !important; }
         body.focus-mode .main-content { margin-left: 0 !important; }
         body.focus-mode .left-sidebar {
-            top: 8px; left: 8px; bottom: auto; height: auto;
-            max-height: calc(100dvh - 16px);
+            top: 54px;
+            left: 10px;
+            bottom: auto;
+            height: auto;
+            max-height: calc(100dvh - 64px);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-            opacity: 0.25;
-            transition: opacity 0.2s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-130%);
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        body.focus-mode .left-sidebar:hover,
-        body.focus-mode .left-sidebar:focus-within { opacity: 1; }
+        body.focus-mode.focus-tools-open .left-sidebar {
+            opacity: 0.96;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
         body.focus-mode .bottom-bar { opacity: 0.35; }
         body.focus-mode .bottom-bar:hover { opacity: 1; }
         body.focus-mode .context-menu { top: 12px; left: 64px; }
@@ -925,6 +961,32 @@
             color: var(--accent);
         }
         .focus-exit-btn svg {
+            width: 18px; height: 18px;
+            stroke: currentColor; fill: none;
+            stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+        }
+        .focus-tools-btn { display: none; }
+        body.focus-mode .focus-tools-btn {
+            display: flex;
+            position: fixed;
+            top: 10px; left: 12px;
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 125;
+            opacity: 0.65;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+        body.focus-mode .focus-tools-btn:hover {
+            opacity: 1;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .focus-tools-btn svg {
             width: 18px; height: 18px;
             stroke: currentColor; fill: none;
             stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
@@ -998,6 +1060,9 @@
             z-index: 9500;
             align-items: center;
             justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
         #latexModal.open { display: flex; }
         .latex-box {
@@ -1007,6 +1072,10 @@
             padding: 22px 26px;
             width: 92%;
             max-width: 520px;
+            max-height: calc(100dvh - 24px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            box-sizing: border-box;
             color: var(--text-main);
             box-shadow: 0 12px 40px rgba(0,0,0,.45);
         }
@@ -1072,8 +1141,8 @@
         .calc-span2 { grid-column: span 2; }
 
         /* Modal de graficacion */
-        #plotModal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .65); z-index: 9000; align-items: center; justify-content: center; }
-        .plot-dialog { background: #1e1e1e; border: 1px solid #444; border-radius: 14px; padding: 28px 32px; width: 90%; max-width: 500px; }
+        #plotModal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .65); z-index: 9000; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; overflow-y: auto; }
+        .plot-dialog { background: #1e1e1e; border: 1px solid #444; border-radius: 14px; padding: 28px 32px; width: 90%; max-width: 500px; max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
         .plot-title { color: #bb86fc; margin-bottom: 20px; font-size: 16px; }
         .plot-label { color: #aaa; font-size: 12px; display: block; margin-bottom: 6px; }
         .plot-label-sm { color: #aaa; font-size: 12px; display: block; margin-bottom: 4px; }
@@ -1118,6 +1187,9 @@
 
     <button type="button" id="btnExitFocus" class="focus-exit-btn" title="Salir de modo concentración [Esc]" aria-label="Salir de modo concentración">
         <svg viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+    </button>
+    <button type="button" id="btnFocusTools" class="focus-tools-btn" title="Mostrar/ocultar herramientas" aria-label="Mostrar herramientas">
+        <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
     </button>
 
 <div id="recoverBar">
@@ -1589,19 +1661,34 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     function resizeCanvas() {
         if (!canvas || !canvasWrapper) return;
-        canvas.setWidth(canvasWrapper.clientWidth);
-        canvas.setHeight(canvasWrapper.clientHeight);
-        syncBackground();
-        canvas.setDimensions({
-            width: canvasWrapper.clientWidth,
-            height: canvasWrapper.clientHeight
-        });
+        var w = canvasWrapper.clientWidth;
+        var h = canvasWrapper.clientHeight;
+        if (!w || !h) return;
+        canvas._isCurrentlyDrawing = false;
+        isTouchPanning = false;
+        twoFingerGesture = false;
+        canvas.setDimensions({ width: w, height: h });
         canvas.calcOffset();
+        canvas.getObjects().forEach(function(obj) {
+            obj.setCoords();
+        });
+        syncBackground();
         canvas.requestRenderAll();
+    }
+    if (typeof ResizeObserver !== 'undefined' && canvasWrapper) {
+        var ro = new ResizeObserver(function() {
+            resizeCanvas();
+        });
+        ro.observe(canvasWrapper);
+    }
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', resizeCanvas);
     }
     window.addEventListener('resize', resizeCanvas);
     window.addEventListener('orientationchange', function() {
-        setTimeout(resizeCanvas, 200);
+        setTimeout(resizeCanvas, 100);
+        setTimeout(resizeCanvas, 300);
+        setTimeout(resizeCanvas, 600);
     });
     resizeCanvas();
 
@@ -1675,6 +1762,12 @@ window.addEventListener('load', function() {
     // fuera del modo dibujo, así que se detecta aquí para toda herramienta.
     canvasWrapper.addEventListener('touchstart', function(e) {
         closeContextMenu();
+        if (document.body.classList.contains('focus-tools-open')) {
+            document.body.classList.remove('focus-tools-open');
+        }
+        if (document.activeElement && document.activeElement.closest && document.activeElement.closest('.left-sidebar')) {
+            document.activeElement.blur();
+        }
         if (e.touches && e.touches.length === 2) { beginTwoFingerGesture(e); e.preventDefault(); }
     }, { passive: false, capture: true });
 
@@ -1684,6 +1777,12 @@ window.addEventListener('load', function() {
     canvas.on('mouse:down', function(opt) {
         var evt = opt.e;
         closeContextMenu();
+        if (document.body.classList.contains('focus-tools-open')) {
+            document.body.classList.remove('focus-tools-open');
+        }
+        if (document.activeElement && document.activeElement.closest && document.activeElement.closest('.left-sidebar')) {
+            document.activeElement.blur();
+        }
 
         // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
         if (evt.touches && evt.touches.length === 2) {
@@ -3491,10 +3590,12 @@ window.addEventListener('load', function() {
 
     var btnFocusMode = document.getElementById('btnFocusMode');
     var btnExitFocus = document.getElementById('btnExitFocus');
+    var btnFocusTools = document.getElementById('btnFocusTools');
     function toggleFocusMode(force) {
         var next = force !== undefined ? force : !focusMode;
         focusMode = next;
         document.body.classList.toggle('focus-mode', focusMode);
+        document.body.classList.remove('focus-tools-open');
         if (btnFocusMode) {
             btnFocusMode.classList.toggle('active', focusMode);
             btnFocusMode.setAttribute('aria-pressed', focusMode);
@@ -3504,6 +3605,9 @@ window.addEventListener('load', function() {
     }
     if (btnFocusMode) btnFocusMode.onclick = function() { toggleFocusMode(); };
     if (btnExitFocus) btnExitFocus.onclick = function() { toggleFocusMode(false); };
+    if (btnFocusTools) btnFocusTools.onclick = function() {
+        document.body.classList.toggle('focus-tools-open');
+    };
 
     var calcExpression = '', exprDisplay = document.getElementById('calcExpr'), resDisplay = document.getElementById('calcResult');
     let calcMemory = 0; // Memoria de la calculadora
