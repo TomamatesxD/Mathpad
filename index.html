@@ -971,6 +971,15 @@
 
         .context-menu-group.hidden { display: none !important; }
 
+        .context-menu-group svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            flex-shrink: 0;
+            display: block;
+        }
+
         .context-menu-group label {
             display: flex;
             align-items: center;
@@ -1337,7 +1346,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><rect x="7" y="5" width="10" height="3" rx="0.5" fill="currentColor" fill-opacity="0.1"/><rect x="7" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="10.5" width="2.5" height="2" rx="0.5"/><rect x="7" y="14" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="14" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="14" width="2.5" height="2" rx="0.5"/><rect x="7" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="10.75" y="17.5" width="2.5" height="2" rx="0.5"/><rect x="14.5" y="17.5" width="2.5" height="2" rx="0.5"/></svg>
             </button>
             <button type="button" id="btnToolSettings" title="Ajustes de trazo y color" aria-label="Ajustes de trazo y color">
-                <svg viewBox="0 0 24 24"><path d="M12 2s5 4.5 5 9.5c0 1.5-.5 3-1.5 4L12 19l-3.5-3.5C7.5 14.5 7 13 7 11.5 7 6.5 12 2 12 2z"/><circle cx="12" cy="11" r="2"/></svg>
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 6.8 3 11.5c0 2.8 2 4.5 4.3 4.5h1.4c.9 0 1.6.7 1.6 1.6 0 .5-.2.9-.5 1.2-.4.4-.6.9-.6 1.5 0 1 .9 1.7 2 1.7 5 0 9.8-4.3 9.8-9.5C21 6.8 17 3 12 3Z"/><circle cx="7.3" cy="10.2" r="1.15"/><circle cx="10.6" cy="7" r="1.15"/><circle cx="14.9" cy="7" r="1.15"/><circle cx="17.7" cy="10.2" r="1.15"/></svg>
             </button>
             <button type="button" id="btnFocusMode" title="Modo concentración [Z]" aria-label="Modo concentración">
                 <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
@@ -1464,7 +1473,7 @@
     <!-- CONTEXT-MENU PANEL - Controles contextuales (color, grosor, fuente) -->
     <div id="contextMenu" class="context-menu hidden">
         <div class="context-menu-group" id="ctxGroupColor">
-            <label title="Color del trazo">🎨 <input type="color" id="colorPicker" value="#000000"></label>
+            <label title="Color del trazo"><span aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 6.8 3 11.5c0 2.8 2 4.5 4.3 4.5h1.4c.9 0 1.6.7 1.6 1.6 0 .5-.2.9-.5 1.2-.4.4-.6.9-.6 1.5 0 1 .9 1.7 2 1.7 5 0 9.8-4.3 9.8-9.5C21 6.8 17 3 12 3Z"/><circle cx="7.3" cy="10.2" r="1.15"/><circle cx="10.6" cy="7" r="1.15"/><circle cx="14.9" cy="7" r="1.15"/><circle cx="17.7" cy="10.2" r="1.15"/></svg></span> <input type="color" id="colorPicker" value="#000000"></label>
         </div>
         <div class="context-menu-group" id="ctxGroupWidth">
             <label title="Grosor del trazo">📏 <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
