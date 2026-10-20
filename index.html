@@ -4292,6 +4292,7 @@ window.addEventListener('load', function() {
     calcBindCaretRepeat('calcCaretRight', 1);
 
     if (exprDisplay) {
+        exprDisplay.addEventListener('mousedown', function(e) { e.preventDefault(); exprDisplay.focus({ preventScroll: true }); });
         exprDisplay.addEventListener('pointerdown', function(e) {
             if (e.target && e.target.classList && e.target.classList.contains('tk')) {
                 var idx = parseInt(e.target.getAttribute('data-i'), 10);

@@ -5,7 +5,7 @@
 
 // Versión de caché v12: limpieza de duplicados modulares (solo index.html),
 // iconos PWA reales y exportPDF en alta resolución.
-const CACHE_NAME = 'mathpad-v22';
+const CACHE_NAME = 'mathpad-v23';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
