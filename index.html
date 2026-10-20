@@ -4295,13 +4295,14 @@ window.addEventListener('load', function() {
         exprDisplay.addEventListener('pointerdown', function(e) {
             if (e.target && e.target.classList && e.target.classList.contains('tk')) {
                 var idx = parseInt(e.target.getAttribute('data-i'), 10);
-                if (isNaN(idx)) return;
+                if (isNaN(idx)) { exprDisplay.focus({ preventScroll: true }); return; }
                 var r = e.target.getBoundingClientRect();
                 var after = (e.clientX - r.left) > (r.width / 2);
                 calcMoveCaretTo(after ? idx + 1 : idx, true);
             } else {
                 calcMoveCaretTo(calcTokens.length, true);
             }
+            exprDisplay.focus({ preventScroll: true });
         });
     }
 
