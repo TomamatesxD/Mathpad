@@ -435,8 +435,36 @@
             color: #2c3a30;
             min-height: 18px;
             text-align: right;
-            word-break: break-all;
             width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .calc-expr::-webkit-scrollbar {
+            display: none;
+        }
+        .calc-expr .tk {
+            display: inline-block;
+            padding: 0 1px;
+            cursor: text;
+        }
+        .calc-expr .caret {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: currentColor;
+            vertical-align: middle;
+            margin: 0 1px;
+            animation: calcCaretBlink 1s steps(1) infinite;
+        }
+        @keyframes calcCaretBlink {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
         }
         .calc-result {
             font-size: 26px;
@@ -1582,13 +1610,13 @@
                     <button type="button" id="btnSD" class="calc-mode-btn" title="Fracción/Decimal" aria-label="Alternar fracción y decimal">S⇔D</button>
                 </div>
             </div>
-            <div class="calc-display" draggable="true">
+            <div class="calc-display">
                 <div class="calc-status-bar">
                     <span id="calcShiftBadge" class="calc-shift-badge" aria-hidden="true">S</span>
                     <span id="calcAngleBadge" class="calc-angle-badge">DEG</span>
                     <span id="calcMemBadge" class="calc-mem-badge hidden">M</span>
                 </div>
-                <div class="calc-expr" id="calcExpr" draggable="true"></div>
+                <div class="calc-expr" id="calcExpr" tabindex="0" role="textbox" aria-label="Expresión de la calculadora"></div>
                 <div class="calc-result" id="calcResult" draggable="true">0</div>
             </div>
         <div class="calc-shift-row">
@@ -1641,6 +1669,8 @@
         </div>
         <div class="calc-num-keys">
             <button type="button" class="equals" id="calcEquals" aria-label="Igual">=</button>
+            <button type="button" id="calcCaretLeft" aria-label="Mover cursor a la izquierda">◄</button>
+            <button type="button" id="calcCaretRight" aria-label="Mover cursor a la derecha">►</button>
         </div>
         <!-- Historial de operaciones -->
         <div class="calc-history" id="calcHistory">
@@ -3795,6 +3825,7 @@ window.addEventListener('load', function() {
     let angleMode = 'DEG'; // Modo angular: 'DEG', 'RAD' o 'GRA'
     let lastAns = null;    // Último resultado numérico válido
     let calcTokens = [];   // Expresión como array de tokens {show, js, kind}
+    let calcCaret = 0; // Posición del cursor: 0..calcTokens.length
     let calcError = null;  // null | 'Math ERROR' | 'Syntax ERROR'
     let justEvaluated = false; // true tras '=' hasta la próxima tecla
     let shiftActive = false;   // SHIFT armado para segunda función
@@ -3877,19 +3908,51 @@ window.addEventListener('load', function() {
         if (btn) btn.classList.toggle('active', shiftActive);
     }
 
+    function calcClampCaret() {
+        if (calcCaret < 0) calcCaret = 0;
+        if (calcCaret > calcTokens.length) calcCaret = calcTokens.length;
+    }
+
+    function calcEnterEditKeep() {
+        if (justEvaluated) justEvaluated = false;
+    }
+
     function calcRender() {
-        exprDisplay.textContent = calcShowText();
+        calcClampCaret();
+        exprDisplay.textContent = '';
+        for (var ri = 0; ri < calcTokens.length; ri++) {
+            if (ri === calcCaret) {
+                var cb = document.createElement('span');
+                cb.className = 'caret';
+                exprDisplay.appendChild(cb);
+            }
+            var sp = document.createElement('span');
+            sp.className = 'tk';
+            sp.setAttribute('data-i', String(ri));
+            sp.textContent = calcTokens[ri].show;
+            exprDisplay.appendChild(sp);
+        }
+        if (calcCaret === calcTokens.length) {
+            var ce = document.createElement('span');
+            ce.className = 'caret';
+            exprDisplay.appendChild(ce);
+        }
         if (!calcTokens.length && !calcError) resDisplay.textContent = '0';
         calcUpdateMemBadge();
+        var caretEl = exprDisplay.querySelector('.caret');
+        if (caretEl && caretEl.scrollIntoView) {
+            try { caretEl.scrollIntoView({ inline: 'nearest' }); } catch (e) {}
+        }
     }
 
     function calcClearErrorIfNeeded() {
         if (calcError) {
             calcTokens = [];
+            calcCaret = 0;
             calcError = null;
             justEvaluated = false;
             resDisplay.textContent = '0';
-            exprDisplay.textContent = '';
+            calcRender();
         }
     }
 
@@ -3904,13 +3967,24 @@ window.addEventListener('load', function() {
     function calcPushToken(tok) {
         if (!tok) return;
         calcClearErrorIfNeeded();
+        calcClampCaret();
         if (justEvaluated) {
-            if (calcIsStarter(tok)) calcTokens = [];
-            else if (calcIsContinuer(tok)) calcTokens = [{ show: 'Ans', js: 'Ans', kind: 'const' }];
-            else calcTokens = [];
+            if (calcIsStarter(tok)) {
+                calcTokens = [];
+                calcCaret = 0;
+                resDisplay.textContent = '0';
+            } else if (calcIsContinuer(tok)) {
+                calcTokens = [{ show: 'Ans', js: 'Ans', kind: 'const' }];
+                calcCaret = 1;
+            } else {
+                calcTokens = [];
+                calcCaret = 0;
+                resDisplay.textContent = '0';
+            }
             justEvaluated = false;
         }
-        calcTokens.push(tok);
+        calcTokens.splice(calcCaret, 0, tok);
+        calcCaret++;
         calcRender();
     }
 
@@ -3957,6 +4031,7 @@ window.addEventListener('load', function() {
                         calcTokens = htok.map(function(t) { return { show: t.show, js: t.js, kind: t.kind }; });
                         calcError = null;
                         justEvaluated = false;
+                        calcCaret = calcTokens.length;
                         resDisplay.textContent = calcHistory[index].result;
                         calcRender();
                     }
@@ -3997,8 +4072,9 @@ window.addEventListener('load', function() {
 
     function calcToggleSign() {
         calcClearErrorIfNeeded();
-        justEvaluated = false;
-        var i = calcTokens.length - 1;
+        calcEnterEditKeep();
+        calcClampCaret();
+        var i = calcCaret - 1;
         while (i >= 0 && calcTokens[i].kind !== 'num' && calcTokens[i].kind !== 'const') {
             if (calcTokens[i].kind === 'close') break;
             i--;
@@ -4023,6 +4099,10 @@ window.addEventListener('load', function() {
                 for (var k2 = 0; k2 < digits.length; k2++) arr.push({ show: digits[k2], js: digits[k2], kind: 'num' });
             }
             calcTokens = calcTokens.slice(0, j).concat(arr, calcTokens.slice(i + 1));
+            var tail = calcCaret - (i + 1);
+            if (tail < 0) tail = 0;
+            if (tail > calcTokens.length - (j + arr.length)) tail = calcTokens.length - (j + arr.length);
+            calcCaret = j + arr.length + tail;
             calcRender();
             return;
         }
@@ -4031,6 +4111,7 @@ window.addEventListener('load', function() {
     function handleCalcKey(btn) {
         if (!btn) return;
         if (btn.id === 'calcClear' || btn.id === 'calcDel' || btn.id === 'calcEquals') return;
+        if (btn.id === 'calcCaretLeft' || btn.id === 'calcCaretRight') return;
         if (btn.id === 'btnSDKey') return;
         var key = btn.getAttribute('data-tok');
         if (key === null) return;
@@ -4042,14 +4123,187 @@ window.addEventListener('load', function() {
         var tok = tokenFromKey(key);
         if (tok) calcPushToken(tok);
     }
+    function calcInsertKeyAsToken(key) {
+        if (key === '*') { calcPushToken(tokenFromKey('*')); return true; }
+        if (key === '/') { calcPushToken(tokenFromKey('/')); return true; }
+        if (key === '-') { calcPushToken(tokenFromKey('-')); return true; }
+        var tok = tokenFromKey(key);
+        if (tok) { calcPushToken(tok); return true; }
+        return false;
+    }
+
+    function calcTokenizePaste(text) {
+        var out = [];
+        var s = String(text || '');
+        var names = ['asin(', 'acos(', 'atan(', 'log10(', 'sin(', 'cos(', 'tan(', 'sqrt(', 'abs(', 'log(', 'ln(', 'Ans', 'pi', 'e'];
+        function isWordChar(c) {
+            return !!c && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_');
+        }
+        var i = 0;
+        while (i < s.length) {
+            var ch = s[i];
+            if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') { i++; continue; }
+            var low = s.slice(i).toLowerCase();
+            var matched = null;
+            for (var n = 0; n < names.length; n++) {
+                var nm = names[n];
+                if (low.indexOf(nm.toLowerCase()) === 0) {
+                    if (!matched || nm.length > matched.length) matched = nm;
+                }
+            }
+            if (matched) {
+                var key = matched;
+                if (key.toLowerCase() === 'log(') key = 'log10(';
+                if (key.toLowerCase() === 'ans') key = 'Ans';
+                if (key.toLowerCase() === 'pi') key = 'pi';
+                if (key.toLowerCase() === 'e') key = 'e';
+                var after = s[i + matched.length];
+                var isBare = (matched.toLowerCase() === 'e' || matched.toLowerCase() === 'pi' || matched.toLowerCase() === 'ans');
+                if (isBare && isWordChar(after)) {
+                    var jw0 = i;
+                    while (jw0 < s.length && isWordChar(s[jw0])) jw0++;
+                    i = jw0;
+                    continue;
+                }
+                var tok = tokenFromKey(key);
+                if (tok) out.push(tok);
+                i += matched.length;
+                continue;
+            }
+            if (ch >= '0' && ch <= '9') { out.push(tokenFromKey(ch)); i++; continue; }
+            if (ch === '.' || ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '^' || ch === '(' || ch === ')' || ch === '!' || ch === '%') {
+                if (ch === '^' && s[i + 1] === '(') { out.push(tokenFromKey('^(')); i += 2; continue; }
+                var tk2 = tokenFromKey(ch);
+                if (tk2) out.push(tk2);
+                i++;
+                continue;
+            }
+            if (ch === '×' || ch === '✕') { out.push(tokenFromKey('*')); i++; continue; }
+            if (ch === '÷') { out.push(tokenFromKey('/')); i++; continue; }
+            if (ch === '−') { out.push(tokenFromKey('-')); i++; continue; }
+            if (ch === 'π') { out.push(tokenFromKey('pi')); i++; continue; }
+            if (ch === '√') { out.push(tokenFromKey('sqrt(')); i++; continue; }
+            if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
+                var jw = i;
+                while (jw < s.length && isWordChar(s[jw])) jw++;
+                i = jw;
+                continue;
+            }
+            i++;
+        }
+        return out;
+    }
+
+    function calcPasteText(text) {
+        var toks = calcTokenizePaste(text);
+        for (var k = 0; k < toks.length; k++) calcPushToken(toks[k]);
+    }
+
+    if (exprDisplay) {
+        exprDisplay.addEventListener('paste', function(e) {
+            if (e.clipboardData) {
+                e.preventDefault();
+                calcPasteText(e.clipboardData.getData('text'));
+            }
+        });
+        exprDisplay.addEventListener('copy', function(e) {
+            try {
+                var txt = resDisplay.textContent;
+                if (!txt || txt === '0' || txt === 'Math ERROR' || txt === 'Syntax ERROR') txt = calcShowText();
+                if (e.clipboardData) {
+                    e.clipboardData.setData('text/plain', txt);
+                    e.preventDefault();
+                }
+            } catch (err) {}
+        });
+    }
+    var calcPanelEl = document.getElementById('calcPanel');
+    if (calcPanelEl) {
+        calcPanelEl.addEventListener('paste', function(e) {
+            if (e.target && exprDisplay && (e.target === exprDisplay || exprDisplay.contains(e.target))) return;
+            if (e.clipboardData) {
+                e.preventDefault();
+                calcPasteText(e.clipboardData.getData('text'));
+            }
+        });
+    }
+
     document.getElementById('calcSciKeys').addEventListener('click', function(e) {
         var btn = e.target.closest('button');
         if (!btn) return; handleCalcKey(btn);
     });
     document.getElementById('calcNumKeys').addEventListener('click', function(e) {
         var btn = e.target.closest('button');
-        if (!btn) return; handleCalcKey(btn);
+        if (!btn) return;
+        if (btn.id === 'calcCaretLeft') { if (e.detail === 0) calcMoveCaret(-1); return; }
+        if (btn.id === 'calcCaretRight') { if (e.detail === 0) calcMoveCaret(1); return; }
+        handleCalcKey(btn);
     });
+
+    function calcMoveCaret(delta) {
+        calcClearErrorIfNeeded();
+        calcClampCaret();
+        if (justEvaluated) {
+            if (delta < 0) calcCaret = calcTokens.length;
+            else calcCaret = 0;
+            justEvaluated = false;
+            calcRender();
+            return;
+        }
+        calcCaret += delta;
+        calcClampCaret();
+        calcRender();
+    }
+
+    function calcMoveCaretTo(pos, fromEdit) {
+        calcClearErrorIfNeeded();
+        if (fromEdit) calcEnterEditKeep();
+        calcCaret = pos;
+        calcClampCaret();
+        calcRender();
+    }
+
+    function calcBumpCaretRepeat(delta) {
+        calcMoveCaret(delta);
+    }
+
+    function calcBindCaretRepeat(btnId, delta) {
+        var btn = document.getElementById(btnId);
+        if (!btn) return;
+        var timer = null;
+        var interval = null;
+        function clearRep() {
+            if (timer) { clearTimeout(timer); timer = null; }
+            if (interval) { clearInterval(interval); interval = null; }
+        }
+        btn.addEventListener('pointerdown', function() {
+            calcBumpCaretRepeat(delta);
+            clearRep();
+            timer = setTimeout(function() {
+                interval = setInterval(function() { calcBumpCaretRepeat(delta); }, 80);
+            }, 400);
+        });
+        btn.addEventListener('pointerup', clearRep);
+        btn.addEventListener('pointercancel', clearRep);
+        btn.addEventListener('pointerleave', clearRep);
+        btn.addEventListener('click', function(e) { e.preventDefault(); });
+    }
+    calcBindCaretRepeat('calcCaretLeft', -1);
+    calcBindCaretRepeat('calcCaretRight', 1);
+
+    if (exprDisplay) {
+        exprDisplay.addEventListener('pointerdown', function(e) {
+            if (e.target && e.target.classList && e.target.classList.contains('tk')) {
+                var idx = parseInt(e.target.getAttribute('data-i'), 10);
+                if (isNaN(idx)) return;
+                var r = e.target.getBoundingClientRect();
+                var after = (e.clientX - r.left) > (r.width / 2);
+                calcMoveCaretTo(after ? idx + 1 : idx, true);
+            } else {
+                calcMoveCaretTo(calcTokens.length, true);
+            }
+        });
+    }
 
     function isCalcInt(n) { return typeof n === 'number' && isFinite(n) && Math.abs(n - Math.round(n)) < 1e-9; }
     function calcFact(n) {
@@ -4221,8 +4475,15 @@ window.addEventListener('load', function() {
         }
         return res2;
     }
-    document.getElementById('calcClear').onclick = function() { calcTokens = []; calcError = null; justEvaluated = false; calcSetShift(false); resDisplay.textContent = '0'; calcRender(); };
-    document.getElementById('calcDel').onclick   = function() { if (calcError) { calcClearErrorIfNeeded(); calcRender(); return; } justEvaluated = false; calcTokens.pop(); calcRender(); };
+    document.getElementById('calcClear').onclick = function() { calcTokens = []; calcCaret = 0; calcError = null; justEvaluated = false; calcSetShift(false); resDisplay.textContent = '0'; calcRender(); };
+    document.getElementById('calcDel').onclick = function() { if (calcError) { calcClearErrorIfNeeded(); return; } calcEnterEditKeep(); calcClampCaret(); if (calcCaret > 0) { calcTokens.splice(calcCaret - 1, 1); calcCaret--; } calcRender(); };
+    function calcDeleteForward() {
+        if (calcError) { calcClearErrorIfNeeded(); return; }
+        calcEnterEditKeep();
+        calcClampCaret();
+        if (calcCaret < calcTokens.length) calcTokens.splice(calcCaret, 1);
+        calcRender();
+    }
     document.getElementById('calcEquals').onclick = function() {
         calcSetShift(false);
         var showText = calcShowText();
@@ -4244,8 +4505,8 @@ window.addEventListener('load', function() {
             lastAns = res;
             calcError = null;
             justEvaluated = true;
-            exprDisplay.textContent = showText + ' =';
             addToHistory(showText, formatted);
+            calcRender();
         } catch (ex) {
             if (ex && (ex.name === 'MathError' || (ex.message && ex.message.indexOf('Math') !== -1))) { calcError = 'Math ERROR'; }
             else calcError = 'Syntax ERROR';
@@ -4284,6 +4545,7 @@ window.addEventListener('load', function() {
             var dec = parseFloat(parts[0]) / parseFloat(parts[1]);
             resDisplay.textContent = math.format(dec, { precision: 14 });
             calcTokens = [{ show: resDisplay.textContent, js: String(dec), kind: 'const' }];
+            calcCaret = 1;
             justEvaluated = true;
         } else {
             var val = Math.abs(num);
@@ -4316,6 +4578,7 @@ window.addEventListener('load', function() {
                 resDisplay.textContent = sign + h2 + '/' + k2;
             }
             calcTokens = [{ show: resDisplay.textContent, js: String(num), kind: 'const' }];
+            calcCaret = 1;
             justEvaluated = true;
         }
         calcRender();
@@ -4378,7 +4641,7 @@ window.addEventListener('load', function() {
 
     // Capturar el arrastre desde la calculadora (PC: HTML5 Drag & Drop nativo)
     document.getElementById('calcPanel').addEventListener('dragstart', function(e) {
-        if (e.target.id === 'calcResult' || e.target.id === 'calcExpr' || e.target.closest('.calc-display')) {
+        if (e.target.id === 'calcResult') {
             e.dataTransfer.setData('text/plain', resDisplay.textContent);
         } else if (e.target.closest('.calc-history-item')) {
             // Si arrastra el historial, tomamos la expresión y el resultado (ej: "2+2 = 4")
@@ -4400,8 +4663,8 @@ window.addEventListener('load', function() {
     document.getElementById('calcPanel').addEventListener('touchstart', function(e) {
         const target = e.target;
         const item = target.closest('.calc-history-item');
-        // Solo capturar si es un elemento arrastrable (resultado, expresión o historial)
-        if (target.id === 'calcResult' || target.id === 'calcExpr' || target.closest('.calc-display')) {
+        // Solo capturar si es un elemento arrastrable (resultado o historial)
+        if (target.id === 'calcResult') {
             touchDragData = resDisplay.textContent;
         } else if (item) {
             const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
@@ -4597,12 +4860,51 @@ window.addEventListener('load', function() {
             var calcPanelEl = document.getElementById('calcPanel');
             var inCalc = calcPanelEl && e.target && calcPanelEl.contains(e.target);
             if (inCalc) {
-                var key = e.key;
-                if ('0123456789'.includes(key) || ['+','-','*','/','.','%','(',')','^'].includes(key)) { calcUpdate(key); return; }
-                if (key === '^') key = '^(';
-                if (key === 'Enter' || key === '=') { document.getElementById('calcEquals').click(); return; }
-                if (key === 'Backspace') { document.getElementById('calcDel').click(); return; }
-                if (key === 'Escape') { document.getElementById('calcClear').click(); return; }
+                var ckey = e.key;
+                if ((e.ctrlKey || e.metaKey) && (ckey === 'c' || ckey === 'C')) {
+                    try {
+                        var ctxt = resDisplay.textContent;
+                        if (!ctxt || ctxt === '0') ctxt = calcShowText();
+                        if (e.clipboardData) { e.clipboardData.setData('text/plain', ctxt); }
+                        else if (navigator.clipboard) { navigator.clipboard.writeText(ctxt); }
+                    } catch (err) {}
+                    e.preventDefault();
+                    return;
+                }
+                if ((e.ctrlKey || e.metaKey) && (ckey === 'v' || ckey === 'V')) {
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        e.preventDefault();
+                        navigator.clipboard.readText().then(function(txt) { calcPasteText(txt); }).catch(function() {});
+                    }
+                    return;
+                }
+                if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+                    if (ckey && ckey.length === 1 && ckey >= '0' && ckey <= '9') { e.preventDefault(); calcInsertKeyAsToken(ckey); return; }
+                    if (ckey === '.' || ckey === '+' || ckey === '-' || ckey === '*' || ckey === '/' || ckey === '(' || ckey === ')' || ckey === '^' || ckey === '!' || ckey === '%') {
+                        e.preventDefault();
+                        if (ckey === '^') calcPushToken(tokenFromKey('^('));
+                        else calcInsertKeyAsToken(ckey);
+                        return;
+                    }
+                    if (ckey === '=' || ckey === 'Enter') { e.preventDefault(); document.getElementById('calcEquals').click(); return; }
+                    if (ckey === 'Backspace') { e.preventDefault(); document.getElementById('calcDel').click(); return; }
+                    if (ckey === 'Delete') { e.preventDefault(); calcDeleteForward(); return; }
+                    if (ckey === 'Escape') { e.preventDefault(); document.getElementById('calcClear').click(); return; }
+                    if (ckey === 'ArrowLeft') { e.preventDefault(); calcMoveCaret(-1); return; }
+                    if (ckey === 'ArrowRight') { e.preventDefault(); calcMoveCaret(1); return; }
+                    if (ckey === 'Home') { e.preventDefault(); calcMoveCaretTo(0, true); return; }
+                    if (ckey === 'End') { e.preventDefault(); calcMoveCaretTo(calcTokens.length, true); return; }
+                    var lowKey = String(ckey || '').toLowerCase();
+                    if (lowKey === 's') { e.preventDefault(); calcPushToken(tokenFromKey('sin(')); return; }
+                    if (lowKey === 'c') { e.preventDefault(); calcPushToken(tokenFromKey('cos(')); return; }
+                    if (lowKey === 't') { e.preventDefault(); calcPushToken(tokenFromKey('tan(')); return; }
+                    if (lowKey === 'l') { e.preventDefault(); calcPushToken(tokenFromKey('log10(')); return; }
+                    if (lowKey === 'n') { e.preventDefault(); calcPushToken(tokenFromKey('ln(')); return; }
+                    if (lowKey === 'r') { e.preventDefault(); calcPushToken(tokenFromKey('sqrt(')); return; }
+                    if (lowKey === 'p') { e.preventDefault(); calcPushToken(tokenFromKey('pi')); return; }
+                    if (lowKey === 'e') { e.preventDefault(); calcPushToken(tokenFromKey('e')); return; }
+                    if (lowKey === 'a') { e.preventDefault(); calcPushToken(tokenFromKey('Ans')); return; }
+                }
             }
         }
 
