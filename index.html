@@ -1380,10 +1380,10 @@
 <div id="recoverBar">
   <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
   <div>
-    <button type="button" id="btnDoRecover">
+    <button type="button" id="btnDoRecover" aria-label="Recuperar sesión guardada">
       Recuperar
     </button>
-    <button type="button" id="btnDiscardRecover">
+    <button type="button" id="btnDiscardRecover" aria-label="Descartar sesión guardada">
       Descartar
     </button>
   </div>
@@ -1722,13 +1722,13 @@
         </div>
 
         <div class="plot-actions">
-          <button type="button" id="plotBtnAdd" class="plot-btn-primary">
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">
             + Agregar
           </button>
-          <button type="button" id="plotBtnClear" class="plot-btn-danger">
+          <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas">
             Limpiar
           </button>
-          <button type="button" id="plotBtnClose" class="plot-btn-ghost">
+          <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador">
             Cerrar
           </button>
         </div>
@@ -1758,8 +1758,8 @@
         </p>
 
         <div class="latex-actions">
-          <button id="latexCancelBtn" type="button">Cancelar</button>
-          <button id="latexInsertBtn" type="button">Insertar fórmula</button>
+          <button id="latexCancelBtn" type="button" aria-label="Cancelar y cerrar el editor de LaTeX">Cancelar</button>
+          <button id="latexInsertBtn" type="button" aria-label="Insertar fórmula LaTeX en el lienzo">Insertar fórmula</button>
         </div>
       </div>
     </div>
@@ -2886,12 +2886,12 @@ window.addEventListener('load', function() {
             padding:24px 28px;max-width:340px;width:90%;text-align:center;">
             <p id="mpConfirmMsg" style="color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5"></p>
             <div style="display:flex;gap:10px;justify-content:center">
-              <button type="button" id="mpConfirmOk"
+              <button type="button" id="mpConfirmOk" aria-label="Confirmar acción"
                 style="background:#bb86fc;color:#000;border:none;border-radius:8px;
                   padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px">
                 Confirmar
               </button>
-              <button type="button" id="mpConfirmCancel"
+              <button type="button" id="mpConfirmCancel" aria-label="Cancelar acción"
                 style="background:transparent;color:#999;border:1px solid #444;
                   border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px">
                 Cancelar
@@ -5014,7 +5014,7 @@ window.addEventListener('load', function() {
         `;
         banner.innerHTML = `
             <span>📦 Hay una actualización disponible</span>
-            <button type="button" id="btnReloadSW">Recargar</button>
+            <button type="button" id="btnReloadSW" aria-label="Recargar para aplicar la actualización">Recargar</button>
         `;
         document.body.appendChild(banner);
 

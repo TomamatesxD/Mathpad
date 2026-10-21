@@ -3,9 +3,8 @@
 // ============================================
 
 
-// Versión de caché v12: limpieza de duplicados modulares (solo index.html),
-// iconos PWA reales y exportPDF en alta resolución.
-const CACHE_NAME = 'mathpad-v23';
+// Versión de caché v24: Fase 10: aria-label en botones.
+const CACHE_NAME = 'mathpad-v24';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
