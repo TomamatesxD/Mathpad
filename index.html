@@ -3900,6 +3900,129 @@ window.addEventListener('load', function() {
         if (b) b.classList.toggle('hidden', !(calcMemory !== 0));
     }
 
+    /* ═════════════════════════════════════════════════════════════
+       PERSISTENCIA DE LA CALCULADORA (localStorage, clave mathpad_calc)
+       Todos los accesos a localStorage van dentro de try/catch;
+       cualquier fallo se ignora silenciosamente.
+    ══════════════════════════════════════════════════════════════ */
+    function calcSave() {
+        try {
+            var state = {
+                calcTokens: calcTokens.map(function(t) {
+                    return { show: t.show, js: t.js, kind: t.kind };
+                }),
+                calcCaret: calcCaret,
+                lastAns: lastAns,
+                calcMemory: calcMemory,
+                angleMode: angleMode,
+                calcHistory: calcHistory.slice(0),
+                toggleSci: document.getElementById('toggleSci') ? document.getElementById('toggleSci').checked : false
+            };
+            localStorage.setItem('mathpad_calc', JSON.stringify(state));
+        } catch (e) {
+            // Ignorar fallos de persistencia silenciosamente
+        }
+    }
+
+    function calcLoad() {
+        try {
+            var raw = localStorage.getItem('mathpad_calc');
+            if (!raw) return null;
+            var parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+            return parsed;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Validar un token restaurado contra TOKEN_MAP y excepciones válidas.
+    // Devuelve el token reconstruido/aceptado o null si hay que descartarlo.
+    function calcTokenValid(t) {
+        if (!t || typeof t !== 'object') return null;
+        var show = t.show, js = t.js, kind = t.kind;
+        if (typeof show !== 'string' || typeof js !== 'string' || typeof kind !== 'string') return null;
+        if ('num op post infix func open close const exp neg'.indexOf(kind) === -1) return null;
+        // 1. Reconstrucción desde TOKEN_MAP: js y kind deben coincidir con una entrada
+        for (var key in TOKEN_MAP) {
+            var def = TOKEN_MAP[key];
+            if (def.js === js && def.kind === kind) {
+                return { show: def.show, js: def.js, kind: def.kind };
+            }
+        }
+        // 2. Excepciones válidas fuera de TOKEN_MAP (MR, S⇔D, ±)
+        if (kind === 'neg') {
+            if (show === '-' && js === '-') return { show: '-', js: '-', kind: 'neg' };
+            return null;
+        }
+        if (kind === 'const') {
+            if (/^-?[0-9.]+(?:e[+\-]?[0-9]+)?$/.test(js) && /^-?[0-9./]+(?:e[+\-]?[0-9]+)?$/.test(show)) {
+                return { show: show, js: js, kind: 'const' };
+            }
+            return null;
+        }
+        return null;
+    }
+
+    function calcRestore(state) {
+        if (!state || typeof state !== 'object') return;
+        try {
+            // Tokens de la expresión (validados uno por uno; nunca se pasan a math.evaluate)
+            if (Array.isArray(state.calcTokens)) {
+                var tokens = [];
+                for (var i = 0; i < state.calcTokens.length; i++) {
+                    var v = calcTokenValid(state.calcTokens[i]);
+                    if (v) tokens.push(v);
+                }
+                calcTokens = tokens;
+                calcCaret = Math.max(0, Math.min(typeof state.calcCaret === 'number' ? state.calcCaret : tokens.length, tokens.length));
+            }
+            // Historial (máximo 50 entradas; se descartan entradas con tokens inválidos)
+            if (Array.isArray(state.calcHistory)) {
+                var hist = [];
+                for (var j = 0; j < state.calcHistory.length; j++) {
+                    var item = state.calcHistory[j];
+                    if (!item || typeof item !== 'object') continue;
+                    var htoks = [];
+                    var ok = true;
+                    if (Array.isArray(item.tokens)) {
+                        for (var k = 0; k < item.tokens.length; k++) {
+                            var hv = calcTokenValid(item.tokens[k]);
+                            if (!hv) { ok = false; break; }
+                            htoks.push(hv);
+                        }
+                    }
+                    if (!ok) continue;
+                    hist.push({
+                        expression: String(item.expression || ''),
+                        result: String(item.result || ''),
+                        timestamp: typeof item.timestamp === 'number' ? item.timestamp : Date.now(),
+                        tokens: htoks
+                    });
+                }
+                if (hist.length > 50) hist = hist.slice(-50);
+                calcHistory = hist;
+            }
+            // Escalares
+            if (typeof state.lastAns === 'number' && isFinite(state.lastAns)) lastAns = state.lastAns;
+            if (typeof state.calcMemory === 'number' && isFinite(state.calcMemory)) calcMemory = state.calcMemory;
+            if (typeof state.angleMode === 'string' && ['DEG','RAD','GRA'].indexOf(state.angleMode) !== -1) angleMode = state.angleMode;
+            // Nunca se restaura calcError
+        } catch (e) {
+            // Estado inválido: ignorar por completo
+        }
+    }
+
+    // ── PUNTO DE PRUEBA (Playwright) — no afecta la ejecución en producción ──
+    // Solo expone funciones internas para que las pruebas puedan inyectar un
+    // estado completo (el mismo formato que escribe calcSave) y verificar
+    // restauración, renderizado e escape del historial sin depender de
+    // temporizadores de pagehide.
+    window.__mathpad = window.__mathpad || {};
+    window.__mathpad.calcRestore = calcRestore;
+    window.__mathpad.updateCalcHistoryUI = updateCalcHistoryUI;
+    window.__mathpad.calcRender = calcRender;
+
     function calcSetShift(on) {
         shiftActive = !!on;
         var badge = document.getElementById('calcShiftBadge');
@@ -4005,21 +4128,39 @@ window.addEventListener('load', function() {
         const historyList = document.getElementById('calcHistoryList');
         if (!historyList) return;
 
+        historyList.textContent = '';
+
         if (calcHistory.length === 0) {
-            historyList.innerHTML = '<div style="color:#666;font-style:italic;padding:8px 0;">Sin historial</div>';
+            var empty = document.createElement('div');
+            empty.style.cssText = 'color:#666;font-style:italic;padding:8px 0;';
+            empty.textContent = 'Sin historial';
+            historyList.appendChild(empty);
             return;
         }
 
-        // Mostrar las últimas 10 entradas en orden inverso
+        // Mostrar las últimas 10 entradas en orden inverso (texto escapado con textContent)
         const recentHistory = calcHistory.slice(-10).reverse();
-        historyList.innerHTML = recentHistory.map((item, index) => {
+        recentHistory.forEach(function(item, index) {
             const date = new Date(item.timestamp);
             const timeStr = date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-            return '<div class="calc-history-item" data-index="' + (calcHistory.length - 1 - index) + '" draggable="true">' +
-                   '<div class="history-expr">' + timeStr + ' — ' + item.expression + '</div>' +
-                   '<div class="history-result">= ' + item.result + '</div>' +
-                   '</div>';
-        }).join('');
+
+            var div = document.createElement('div');
+            div.className = 'calc-history-item';
+            div.setAttribute('data-index', String(calcHistory.length - 1 - index));
+            div.setAttribute('draggable', 'true');
+
+            var exprDiv = document.createElement('div');
+            exprDiv.className = 'history-expr';
+            exprDiv.textContent = timeStr + ' — ' + item.expression;
+
+            var resDiv = document.createElement('div');
+            resDiv.className = 'history-result';
+            resDiv.textContent = '= ' + item.result;
+
+            div.appendChild(exprDiv);
+            div.appendChild(resDiv);
+            historyList.appendChild(div);
+        });
 
         // Agregar evento click para reutilizar resultados
         historyList.querySelectorAll('.calc-history-item').forEach(item => {
@@ -4047,6 +4188,7 @@ window.addEventListener('load', function() {
             calcMemory += parseFloat(currentResult);
             calcUpdateMemBadge();
             showToast('M+ (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
+            calcSave();
         }
     };
 
@@ -4056,18 +4198,21 @@ window.addEventListener('load', function() {
             calcMemory -= parseFloat(currentResult);
             calcUpdateMemBadge();
             showToast('M- (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
+            calcSave();
         }
     };
 
     window.calcMemoryRecall = function() {
         calcPushToken({ show: math.format(calcMemory, { precision: 14 }), js: String(calcMemory), kind: 'const' });
         showToast('MR', 'info', 1500);
+        calcSave();
     };
 
     window.calcMemoryClear = function() {
         calcMemory = 0;
         calcUpdateMemBadge();
         showToast('MC (memoria borrada)', 'info', 1500);
+        calcSave();
     };
 
     function calcToggleSign() {
@@ -4107,6 +4252,7 @@ window.addEventListener('load', function() {
             return;
         }
         calcPushToken({ show: '-', js: '-', kind: 'neg' });
+        calcSave();
     }
     function handleCalcKey(btn) {
         if (!btn) return;
@@ -4508,6 +4654,7 @@ window.addEventListener('load', function() {
             calcError = null;
             justEvaluated = true;
             addToHistory(showText, formatted);
+            calcSave();
             calcRender();
         } catch (ex) {
             if (ex && (ex.name === 'MathError' || (ex.message && ex.message.indexOf('Math') !== -1))) { calcError = 'Math ERROR'; }
@@ -4530,6 +4677,7 @@ window.addEventListener('load', function() {
             if (calcAngleBadge) calcAngleBadge.textContent = angleMode;
             btnAngleMode.classList.toggle('active', angleMode !== 'DEG');
             if (!calcError) calcRender();
+            calcSave();
         };
     }
     var btnShiftEl = document.getElementById('btnShift');
@@ -4584,6 +4732,7 @@ window.addEventListener('load', function() {
             justEvaluated = true;
         }
         calcRender();
+        calcSave();
     }
     var btnSD = document.getElementById('btnSD');
     if (btnSD) {
@@ -4640,6 +4789,29 @@ window.addEventListener('load', function() {
             menu.style.display = 'none';
         }
     });
+
+    // ── Persistencia de la calculadora (localStorage) ──
+    window.addEventListener('pagehide', calcSave);
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'hidden') calcSave();
+    });
+
+    // Restaurar estado guardado al arrancar, antes del primer pintado
+    var savedCalc = calcLoad();
+    if (savedCalc) {
+        calcRestore(savedCalc);
+        calcRender();
+        updateCalcHistoryUI();
+    }
+    // Sincronizar UI con el estado (restaurado o por defecto)
+    if (btnAngleMode) {
+        btnAngleMode.textContent = angleMode;
+        if (calcAngleBadge) calcAngleBadge.textContent = angleMode;
+        btnAngleMode.classList.toggle('active', angleMode !== 'DEG');
+    }
+    calcUpdateMemBadge();
+    var sciCb = document.getElementById('toggleSci');
+    if (sciCb) sciCb.checked = Boolean(savedCalc && savedCalc.toggleSci);
 
     // Capturar el arrastre desde la calculadora (PC: HTML5 Drag & Drop nativo)
     document.getElementById('calcPanel').addEventListener('dragstart', function(e) {

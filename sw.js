@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v24: Fase 10: aria-label en botones.
-const CACHE_NAME = 'mathpad-v24';
+// Versión de caché v25: Paso 2: persistencia de la calculadora.
+const CACHE_NAME = 'mathpad-v25';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
