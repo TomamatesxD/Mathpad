@@ -3827,7 +3827,8 @@ window.addEventListener('load', function() {
     let calcTokens = [];   // Expresión como array de tokens {show, js, kind}
     let calcCaret = 0; // Posición del cursor: 0..calcTokens.length
     let calcError = null;  // null | 'Math ERROR' | 'Syntax ERROR'
-    let justEvaluated = false; // true tras '=' hasta la próxima tecla
+    let justEvaluated = false; // true tras = hasta la próxima tecla
+    let calcDirty = false; // true cuando el estado cambió // true tras '=' hasta la próxima tecla
     let shiftActive = false;   // SHIFT armado para segunda función
     const CALC_FMT = { precision: 15 };
 
@@ -3907,20 +3908,18 @@ window.addEventListener('load', function() {
     ══════════════════════════════════════════════════════════════ */
     function calcSave() {
         try {
-            var state = {
-                calcTokens: calcTokens.map(function(t) {
-                    return { show: t.show, js: t.js, kind: t.kind };
-                }),
+            calcDirty = false;
+            var data = {
+                calcTokens: calcTokens,
                 calcCaret: calcCaret,
                 lastAns: lastAns,
                 justEvaluated: justEvaluated,
                 calcMemory: calcMemory,
                 angleMode: angleMode,
-                calcHistory: calcHistory.slice(0),
-                justEvaluated: justEvaluated,
-                toggleSci: document.getElementById('toggleSci') ? document.getElementById('toggleSci').checked : false
+                calcHistory: calcHistory,
+                toggleSci: !!document.getElementById('toggleSci').checked
             };
-            localStorage.setItem('mathpad_calc', JSON.stringify(state));
+            localStorage.setItem('mathpad_calc', JSON.stringify(data));
         } catch (e) {
             // Ignorar fallos de persistencia silenciosamente
         }
@@ -4012,6 +4011,14 @@ window.addEventListener('load', function() {
             if (typeof state.justEvaluated === 'boolean') justEvaluated = state.justEvaluated;
             if (typeof state.calcMemory === 'number' && isFinite(state.calcMemory)) calcMemory = state.calcMemory;
             if (typeof state.angleMode === 'string' && ['DEG','RAD','GRA'].indexOf(state.angleMode) !== -1) angleMode = state.angleMode;
+            // Restaurar toggleSci y sincronizar UI
+            if (typeof state.toggleSci === 'boolean') {
+                var sciInput = document.getElementById('toggleSci');
+                if (sciInput) {
+                    sciInput.checked = state.toggleSci;
+                    sciInput.dispatchEvent(new Event('change'));
+                }
+            }
             // Nunca se restaura calcError
         } catch (e) {
             // Estado inválido: ignorar por completo
@@ -4800,9 +4807,12 @@ window.addEventListener('load', function() {
     });
 
     // ── Persistencia de la calculadora (localStorage) ──
-    window.addEventListener('pagehide', calcSave);
+    window.addEventListener('pagehide', function() {
+        if (calcDirty) calcSave();
+    });
+
     document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'hidden') calcSave();
+        if (document.visibilityState === 'hidden' && calcDirty) calcSave();
     });
 
     // Restaurar estado guardado al arrancar, antes del primer pintado
@@ -4818,6 +4828,7 @@ window.addEventListener('load', function() {
         if (calcAngleBadge) calcAngleBadge.textContent = angleMode;
         btnAngleMode.classList.toggle('active', angleMode !== 'DEG');
     }
+    calcUpdateMemBadge();
     calcUpdateMemBadge();
     var sciCb = document.getElementById('toggleSci');
     if (sciCb) sciCb.checked = Boolean(savedCalc && savedCalc.toggleSci);
