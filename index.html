@@ -2845,6 +2845,31 @@ window.addEventListener('load', function() {
     function saveCurrentPage() { pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask'])); }
     function renderPageInfo() { document.getElementById('pageIndicator').innerText = (currentPage + 1) + ' / ' + pages.length; }
     function serializeProject() { saveCurrentPage(); return JSON.stringify({version: 2, currentPage: currentPage, pages: pages}); }
+    function sanitizeFabricObjects(objs) {
+      if (!Array.isArray(objs)) return [];
+      return objs.filter(function(obj) {
+        if (!obj || typeof obj !== 'object') return false;
+        if (String(obj.type || '').toLowerCase() === 'image') {
+          if (typeof obj.src !== 'string' || obj.src.indexOf('data:image/') !== 0) return false;
+        }
+        if (typeof obj.scaleX === 'number') obj.scaleX = Math.max(-50, Math.min(50, isFinite(obj.scaleX) ? obj.scaleX : 1));
+        if (typeof obj.scaleY === 'number') obj.scaleY = Math.max(-50, Math.min(50, isFinite(obj.scaleY) ? obj.scaleY : 1));
+        if (typeof obj.text === 'string' && obj.text.length > 10000) obj.text = obj.text.slice(0, 10000);
+        if (Array.isArray(obj.objects)) obj.objects = sanitizeFabricObjects(obj.objects);
+        return true;
+      });
+    }
+    function sanitizePageJson(pageEntry) {
+      if (pageEntry === null || pageEntry === undefined) return '{"version":"5.3.0","objects":[]}';
+      try {
+        var data = typeof pageEntry === 'string' ? JSON.parse(pageEntry) : JSON.parse(JSON.stringify(pageEntry));
+        if (!data || typeof data !== 'object') return '{"version":"5.3.0","objects":[]}';
+        if (Array.isArray(data.objects)) data.objects = sanitizeFabricObjects(data.objects);
+        return JSON.stringify(data);
+      } catch (err) {
+        return '{"version":"5.3.0","objects":[]}';
+      }
+    }
     function loadProject(str, onDone) {
         try {
             var parsed = JSON.parse(str);
@@ -2855,6 +2880,7 @@ window.addEventListener('load', function() {
                 pages = [str]; currentPage = 0;
             }
         } catch (e) { pages = [str]; currentPage = 0; }
+        pages = pages.map(sanitizePageJson);
         renderPageInfo();
         historyStack = [pages[currentPage]]; redoStack = [];
         loadState(pages[currentPage], onDone);
@@ -3294,6 +3320,7 @@ window.addEventListener('load', function() {
     /* FUNCIONALIDAD DE IMAGEN */
     function insertImageOnCanvas(dataURL) {
       fabric.Image.fromURL(dataURL, function(img) {
+        if (!img || !img.width || !img.height) { showToast('Imagen inválida', 'err'); return; }
         const vpt = canvas.viewportTransform;
         const maxW = canvas.getWidth() * 0.55;
         if (img.width > maxW) img.scaleToWidth(maxW);
@@ -3581,6 +3608,11 @@ window.addEventListener('load', function() {
       const listEl = document.getElementById('plotFunctionsList');
       if (!listEl) return;
 
+      // Helper to escape HTML special characters
+      function escapeHtml(str) {
+        return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
+      }
+
       if (plottedFunctions.length === 0) {
         listEl.innerHTML = '<span style="font-style:italic">Ninguna función graficada aún</span>';
         return;
@@ -3588,7 +3620,7 @@ window.addEventListener('load', function() {
 
       listEl.innerHTML = plottedFunctions.map((func, index) => {
         const colorDot = '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + func.color + ';margin-right:6px;vertical-align:middle;"></span>';
-        return '<div style="padding:4px 0;border-bottom:1px solid #333;">' + colorDot + 'f(x) = ' + func.expr + '</div>';
+        return '<div style="padding:4px 0;border-bottom:1px solid #333;">' + colorDot + 'f(x) = ' + escapeHtml(func.expr) + '</div>';
       }).join('');
     }
 
@@ -3605,8 +3637,23 @@ window.addEventListener('load', function() {
       showToast('🗑️ Funciones limpiadas', 'info');
     }
 
-    // Abrir modal
-    let lastModalTrigger = null;
+    // Versión de última modal trigger (compartida por closePlotModal, openLatexModal, closeLatexModal, showConfirm, closeConfirmModal)
+let lastModalTrigger = null;
+
+function closePlotModal() {
+  document.getElementById('plotModal').style.display = 'none';
+  if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
+}
+
+function closeConfirmModal() {
+  var modalEl = document.getElementById('mpConfirm');
+  if (modalEl && modalEl.style.display === 'flex') {
+    modalEl.style.display = 'none';
+    if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
+  }
+}
+
+// Abrir modal
 document.getElementById('btnPlot').onclick = () => {
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       document.getElementById('plotModal').style.display = 'flex';
@@ -4454,6 +4501,7 @@ document.getElementById('btnPlot').onclick = () => {
     });
 
     function calcMoveCaret(delta) {
+        calcSetShift(false);
         calcClearErrorIfNeeded();
         calcClampCaret();
         if (justEvaluated) {
@@ -4469,6 +4517,7 @@ document.getElementById('btnPlot').onclick = () => {
     }
 
     function calcMoveCaretTo(pos, fromEdit) {
+        calcSetShift(false);
         calcClearErrorIfNeeded();
         if (fromEdit) calcEnterEditKeep();
         calcCaret = pos;
@@ -4523,6 +4572,7 @@ document.getElementById('btnPlot').onclick = () => {
     function isCalcInt(n) { return typeof n === 'number' && isFinite(n) && Math.abs(n - Math.round(n)) < 1e-9; }
     function calcFact(n) {
         n = Math.round(n);
+        if (!isFinite(n) || n < 0 || n > 170) throw new CalcMathError('fact');
         var r = 1;
         for (var i = 2; i <= n; i++) r *= i;
         return r;
@@ -5096,14 +5146,18 @@ document.getElementById('btnPlot').onclick = () => {
         e.preventDefault();
         return;
     }
+    if (e.key === 'Escape' && document.getElementById('mpConfirm') && document.getElementById('mpConfirm').style.display === 'flex') {
+        closeConfirmModal();
+        return;
+    }
     if (e.key === 'Escape' && document.getElementById('plotModal').style.display === 'flex') {
-            document.getElementById('plotModal').style.display = 'none';
-            return;
-        }
-        if (e.key === 'Escape' && document.getElementById('latexModal').classList.contains('open')) {
-            closeLatexModal();
-            return;
-        }
+        closePlotModal();
+        return;
+    }
+    if (e.key === 'Escape' && document.getElementById('latexModal').classList.contains('open')) {
+        closeLatexModal();
+        return;
+    }
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
         if (calcVisible) {
@@ -5204,6 +5258,34 @@ document.getElementById('btnPlot').onclick = () => {
         if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); document.getElementById('btnUndo').click(); }
         if (e.ctrlKey && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) { e.preventDefault(); document.getElementById('btnRedo').click(); }
     });
+// Focus Trap en fase de captura: Impedir que Tab/Shift+Tab salgan de los modales abiertos
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Tab') return;
+        var confirmEl = document.getElementById('mpConfirm');
+        var plotEl = document.getElementById('plotModal');
+        var latexEl = document.getElementById('latexModal');
+        var activeModal = (confirmEl && confirmEl.style.display === 'flex') ? confirmEl :
+                          (plotEl && plotEl.style.display === 'flex') ? plotEl :
+                          (latexEl && latexEl.classList.contains('open')) ? latexEl : null;
+        if (!activeModal) return;
+        var focusables = Array.from(activeModal.querySelectorAll(
+            'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(function(el) { return el.offsetParent !== null; });
+        if (!focusables.length) return;
+        var first = focusables[0];
+        var last = focusables[focusables.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first || !activeModal.contains(document.activeElement)) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last || !activeModal.contains(document.activeElement)) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    }, true);
 
     window.addEventListener('keyup', function(e) {
         if (e.code === 'Space') {

@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v30: Paso 5: PWA y manifest
-const CACHE_NAME = 'mathpad-v30';
+// Versión de caché v31: Paso 5: PWA y manifest
+const CACHE_NAME = 'mathpad-v31';
 const urlsToCache = [
   './',
   './index.html',
