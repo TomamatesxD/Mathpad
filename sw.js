@@ -3,9 +3,10 @@
 // ============================================
 
 
-// Versión de caché v28: Paso 3: menú de memoria con estilo nativo
-const CACHE_NAME = 'mathpad-v29';
+// Versión de caché v30: Paso 5: PWA y manifest
+const CACHE_NAME = 'mathpad-v30';
 const urlsToCache = [
+  './',
   './index.html',
   './favicon.svg',
   './fabric.min.js',
@@ -27,7 +28,7 @@ self.addEventListener('install', event => {
         // Usamos addAll con tolerancia a fallos individuales (iconos pueden faltar)
         return Promise.allSettled(
           urlsToCache.map(url =>
-            cache.add(url).catch(err => console.warn('No se pudo cachear:', url, err))
+            cache.add(new Request(url, { cache: 'reload' })).catch(err => console.warn('No se pudo cachear:', url, err))
           )
         );
       })
@@ -39,7 +40,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      return Promise.all(
+      return Promise.allSettled(
         cacheNames
           .filter(name => name !== CACHE_NAME)
           .map(name => caches.delete(name))
@@ -51,6 +52,7 @@ self.addEventListener('activate', event => {
 // Fetch: estrategia cache-first con fallback a red
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {

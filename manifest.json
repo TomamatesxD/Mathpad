@@ -4,8 +4,11 @@
   "description": "Pizarra matemática offline con trazos, funciones y exportación.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+   "id": "./index.html",
+   "scope": "./",
+   "lang": "es",
   "orientation": "any",
   "icons": [
     {

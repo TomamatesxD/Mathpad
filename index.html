@@ -2943,10 +2943,13 @@ window.addEventListener('load', function() {
           </div>
         `;
         document.body.appendChild(modal);
-        document.getElementById('mpConfirmCancel').onclick = () => modal.style.display = 'none';
+        document.getElementById('mpConfirmCancel').onclick = () => {
+      closeConfirmModal();
       }
       document.getElementById('mpConfirmMsg').textContent = msg;
       modal.style.display = 'flex';
+      lastModalTrigger = document.activeElement || document.getElementById('btnClear');
+      document.getElementById('mpConfirmOk').focus();
       document.getElementById('mpConfirmOk').onclick = () => {
         modal.style.display = 'none';
         onOk();
@@ -3603,7 +3606,9 @@ window.addEventListener('load', function() {
     }
 
     // Abrir modal
-    document.getElementById('btnPlot').onclick = () => {
+    let lastModalTrigger = null;
+document.getElementById('btnPlot').onclick = () => {
+      lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       document.getElementById('plotModal').style.display = 'flex';
       document.getElementById('plotExpr').focus();
       document.getElementById('plotError').style.display = 'none';
@@ -3701,11 +3706,11 @@ window.addEventListener('load', function() {
       latexInputEl.value = '';
       latexUpdatePreview();
       latexModalEl.classList.add('open');
-      setTimeout(function() { latexInputEl.focus(); }, 30);
-    }
+      latexInputEl.focus();
     function closeLatexModal() {
       latexModalEl.classList.remove('open');
       setTool('select');
+      if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
     }
 
     document.getElementById('btnLatex').onclick = openLatexModal;
@@ -3721,6 +3726,7 @@ window.addEventListener('load', function() {
     // herramientas/Esc) debe procesar estas teclas. Solo Escape cierra el modal.
     ['keydown', 'keypress', 'keyup'].forEach(function(evName) {
       latexInputEl.addEventListener(evName, function(e) {
+        if (e.key === 'Tab') return;
         if (e.key === 'Escape') { e.stopPropagation(); closeLatexModal(); return; }
         e.stopPropagation();
       });
@@ -5433,3 +5439,4 @@ window.addEventListener('load', function() {
     </script>
 </body>
 </html>
+
