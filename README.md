@@ -10,4 +10,5 @@ Validación local:
   npm install --no-save html-validate
   npx html-validate index.html
 
+MathPad es un proyecto independiente, no afiliado a Casio.
 Si deseas que el workflow apunte a otra rama o agregar linters/tests, dime qué prefieres.

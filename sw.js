@@ -4,7 +4,7 @@
 
 
 // Versión de caché v25: Paso 2: persistencia de la calculadora.
-const CACHE_NAME = 'mathpad-v25';
+const CACHE_NAME = 'mathpad-v26';
 const urlsToCache = [
   './index.html',
   './favicon.svg',
