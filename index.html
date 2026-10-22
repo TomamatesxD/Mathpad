@@ -3913,9 +3913,11 @@ window.addEventListener('load', function() {
                 }),
                 calcCaret: calcCaret,
                 lastAns: lastAns,
+                justEvaluated: justEvaluated,
                 calcMemory: calcMemory,
                 angleMode: angleMode,
                 calcHistory: calcHistory.slice(0),
+                justEvaluated: justEvaluated,
                 toggleSci: document.getElementById('toggleSci') ? document.getElementById('toggleSci').checked : false
             };
             localStorage.setItem('mathpad_calc', JSON.stringify(state));
@@ -3938,7 +3940,7 @@ window.addEventListener('load', function() {
 
     // Validar un token restaurado contra TOKEN_MAP y excepciones válidas.
     // Devuelve el token reconstruido/aceptado o null si hay que descartarlo.
-    function calcTokenValid(t) {
+    function sanitizeCalcToken(t) {
         if (!t || typeof t !== 'object') return null;
         var show = t.show, js = t.js, kind = t.kind;
         if (typeof show !== 'string' || typeof js !== 'string' || typeof kind !== 'string') return null;
@@ -3956,8 +3958,10 @@ window.addEventListener('load', function() {
             return null;
         }
         if (kind === 'const') {
-            if (/^-?[0-9.]+(?:e[+\-]?[0-9]+)?$/.test(js) && /^-?[0-9./]+(?:e[+\-]?[0-9]+)?$/.test(show)) {
-                return { show: show, js: js, kind: 'const' };
+            if (js === '-pi') return { show: '-\u03C0', js: '-pi', kind: 'const' };
+            if (js === '-e') return { show: '-e', js: '-e', kind: 'const' };
+            if (/^-?[0-9]+(?:\.[0-9]+)?(?:e[+\-]?[0-9]+)?$/i.test(js) && isFinite(Number(js)) && /^-?[0-9./]+(?:e[+\-]?[0-9]+)?$/i.test(show)) {
+                return { show: String(show).slice(0, 32), js: String(Number(js)), kind: 'const' };
             }
             return null;
         }
@@ -3971,7 +3975,7 @@ window.addEventListener('load', function() {
             if (Array.isArray(state.calcTokens)) {
                 var tokens = [];
                 for (var i = 0; i < state.calcTokens.length; i++) {
-                    var v = calcTokenValid(state.calcTokens[i]);
+                    var v = sanitizeCalcToken(state.calcTokens[i]);
                     if (v) tokens.push(v);
                 }
                 calcTokens = tokens;
@@ -3987,7 +3991,7 @@ window.addEventListener('load', function() {
                     var ok = true;
                     if (Array.isArray(item.tokens)) {
                         for (var k = 0; k < item.tokens.length; k++) {
-                            var hv = calcTokenValid(item.tokens[k]);
+                            var hv = sanitizeCalcToken(item.tokens[k]);
                             if (!hv) { ok = false; break; }
                             htoks.push(hv);
                         }
@@ -4005,6 +4009,7 @@ window.addEventListener('load', function() {
             }
             // Escalares
             if (typeof state.lastAns === 'number' && isFinite(state.lastAns)) lastAns = state.lastAns;
+            if (typeof state.justEvaluated === 'boolean') justEvaluated = state.justEvaluated;
             if (typeof state.calcMemory === 'number' && isFinite(state.calcMemory)) calcMemory = state.calcMemory;
             if (typeof state.angleMode === 'string' && ['DEG','RAD','GRA'].indexOf(state.angleMode) !== -1) angleMode = state.angleMode;
             // Nunca se restaura calcError
@@ -4623,7 +4628,7 @@ window.addEventListener('load', function() {
         }
         return res2;
     }
-    document.getElementById('calcClear').onclick = function() { calcTokens = []; calcCaret = 0; calcError = null; justEvaluated = false; calcSetShift(false); resDisplay.textContent = '0'; calcRender(); };
+    document.getElementById('calcClear').onclick = function() { calcTokens = []; calcCaret = 0; calcError = null; justEvaluated = false; calcSetShift(false); resDisplay.textContent = '0'; calcRender(); calcSave(); };
     document.getElementById('calcDel').onclick = function() { if (calcError) { calcClearErrorIfNeeded(); return; } calcEnterEditKeep(); calcClampCaret(); if (calcCaret > 0) { calcTokens.splice(calcCaret - 1, 1); calcCaret--; } calcRender(); };
     function calcDeleteForward() {
         if (calcError) { calcClearErrorIfNeeded(); return; }
@@ -4663,7 +4668,11 @@ window.addEventListener('load', function() {
             justEvaluated = false;
         }
     };
-    document.getElementById('toggleSci').addEventListener('change', e => document.getElementById('calcPanel').classList.toggle('sci-mode', e.target.checked));
+    document.getElementById('toggleSci').addEventListener('change', e => {
+        var panel = document.getElementById('calcPanel');
+        panel.classList.toggle('sci-mode', e.target.checked);
+        calcSave();
+    });
 
     // Botón DEG/RAD/GRA
     var btnAngleMode = document.getElementById('btnAngleMode');
