@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v25: Paso 2: persistencia de la calculadora.
-const CACHE_NAME = 'mathpad-v27';
+// Versión de caché v28: Paso 3: menú de memoria con estilo nativo
+const CACHE_NAME = 'mathpad-v28';
 const urlsToCache = [
   './index.html',
   './favicon.svg',

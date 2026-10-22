@@ -617,6 +617,39 @@
             background: rgba(187,134,252,0.25);
         }
 
+        /* Memory menu */
+        .calc-memory-menu {
+            position: fixed;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 0;
+            min-width: 140px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+            z-index: 9999;
+        }
+
+        .calc-memory-option {
+            display: flex;
+            align-items: center;
+            min-height: 40px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-main);
+            user-select: none;
+        }
+
+        .calc-memory-option:hover,
+        .calc-memory-option:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        :root.light-mode .calc-memory-option:hover,
+        :root.light-mode .calc-memory-option:active {
+            background: rgba(0,0,0,0.08);
+        }
+
         /* Fila SHIFT (estilo calculadora científica) */
         .calc-shift-row {
             display: flex;
@@ -3794,6 +3827,9 @@ window.addEventListener('load', function() {
         document.body.classList.toggle('calc-open', calcVisible);
         calcPanel.classList.toggle('hidden', !calcVisible);
         btnCalcToggle.classList.toggle('active', calcVisible);
+        // Cerrar menú de memoria al togglear calculadora
+        const memMenu = document.getElementById('calcMemoryMenu');
+        if (memMenu) memMenu.style.display = 'none';
         setTimeout(resizeCanvas, 270);
     }
     btnCalcToggle.onclick = toggleCalc;
@@ -4767,12 +4803,12 @@ window.addEventListener('load', function() {
         if (!menu) {
             menu = document.createElement('div');
             menu.id = 'calcMemoryMenu';
-            menu.style.cssText = 'position:absolute;background:#1e1e1e;border:1px solid #444;border-radius:8px;padding:6px 0;min-width:120px;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:9999;';
+            menu.className = 'calc-memory-menu';
             menu.innerHTML = `
-                <div class="calc-memory-option" data-action="M+" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">M+ (Sumar)</div>
-                <div class="calc-memory-option" data-action="M-" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">M- (Restar)</div>
-                <div class="calc-memory-option" data-action="MR" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">MR (Leer)</div>
-                <div class="calc-memory-option" data-action="MC" style="padding:8px 14px;cursor:pointer;font-size:13px;color:#e0e0e0;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">MC (Borrar)</div>
+                <div class="calc-memory-option" data-action="M+">M+ (Sumar)</div>
+                <div class="calc-memory-option" data-action="M-">M- (Restar)</div>
+                <div class="calc-memory-option" data-action="MR">MR (Leer)</div>
+                <div class="calc-memory-option" data-action="MC">MC (Borrar)</div>
             `;
             document.body.appendChild(menu);
 
@@ -4790,11 +4826,15 @@ window.addEventListener('load', function() {
             });
         }
 
-        // Posicionar menú
+        // Posicionar menú manteniendo 100% dentro del viewport
         const btnRect = this.getBoundingClientRect();
-        menu.style.right = (window.innerWidth - btnRect.right) + 'px';
-        menu.style.left = 'auto'; // Anula cualquier left previo
-        menu.style.top = (btnRect.bottom + 4) + 'px';
+        let menuRect = menu.getBoundingClientRect();
+        let vh = window.innerHeight;
+
+        // Calcular posición inicial a la derecha del botón
+        menu.style.right = Math.max(4, window.innerWidth - btnRect.right) + 'px';
+        menu.style.left = 'auto';
+        menu.style.top = Math.max(4, Math.min(btnRect.bottom + 4, vh - menuRect.height - 4)) + 'px';
         menu.style.display = 'block';
     };
 
@@ -5014,15 +5054,6 @@ window.addEventListener('load', function() {
       window.addEventListener('resize', clampCalcToViewport);
       window.addEventListener('orientationchange', function() { setTimeout(clampCalcToViewport, 120); });
 
-      // Ejecutar al abrir/toggle la calculadora (respeta el handler ya asignado)
-      var tbtn = document.getElementById('btnCalcToggle');
-      if (tbtn && typeof tbtn.onclick === 'function') {
-        var _prevToggleCalc = tbtn.onclick;
-        tbtn.onclick = function(ev) {
-          _prevToggleCalc.call(this, ev || window.event);
-          setTimeout(clampCalcToViewport, 300); // espera la transición del panel
-        };
-      }
       clampCalcToViewport();
     })();
 
@@ -5040,7 +5071,13 @@ window.addEventListener('load', function() {
     };
 
     window.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && document.getElementById('plotModal').style.display === 'flex') {
+    const memMenu = document.getElementById('calcMemoryMenu');
+        if (e.key === 'Escape' && memMenu && memMenu.style.display === 'block') {
+        memMenu.style.display = 'none';
+        e.preventDefault();
+        return;
+    }
+    if (e.key === 'Escape' && document.getElementById('plotModal').style.display === 'flex') {
             document.getElementById('plotModal').style.display = 'none';
             return;
         }
