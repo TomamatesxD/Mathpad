@@ -4,7 +4,7 @@
 
 
 // Versión de caché v28: Paso 3: menú de memoria con estilo nativo
-const CACHE_NAME = 'mathpad-v28';
+const CACHE_NAME = 'mathpad-v29';
 const urlsToCache = [
   './index.html',
   './favicon.svg',

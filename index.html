@@ -1645,15 +1645,15 @@
             </div>
             <div class="calc-display">
                 <div class="calc-status-bar">
-                    <span id="calcShiftBadge" class="calc-shift-badge" aria-hidden="true">S</span>
+                    <span id="calcShiftBadge" class="calc-shift-badge" aria-live="polite">S</span>
                     <span id="calcAngleBadge" class="calc-angle-badge">DEG</span>
                     <span id="calcMemBadge" class="calc-mem-badge hidden">M</span>
                 </div>
                 <div class="calc-expr" id="calcExpr" tabindex="0" role="textbox" aria-label="Expresión de la calculadora"></div>
-                <div class="calc-result" id="calcResult" draggable="true">0</div>
+                <div class="calc-result" id="calcResult" draggable="true" role="status" aria-live="polite" aria-atomic="true">0</div>
             </div>
         <div class="calc-shift-row">
-            <button type="button" id="btnShift" class="calc-shift-btn" aria-label="Activar segunda funcion">SHIFT</button>
+            <button type="button" id="btnShift" class="calc-shift-btn" aria-pressed="false" aria-label="Activar segunda funcion">SHIFT</button>
         </div>
         <div class="calc-controls">
             <label>
@@ -1714,9 +1714,9 @@
     </div>
 
     <!-- Function Plotter Modal -->
-    <div id="plotModal">
+    <div id="plotModal" role="dialog" aria-modal="true" aria-labelledby="plotModalTitle">
       <div class="plot-dialog">
-        <h3 class="plot-title">📈 Graficar función</h3>
+        <h3 class="plot-title" id="plotModalTitle">📈 Graficar función</h3>
 
         <label class="plot-label">
           f(x) = <small class="plot-hint">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
@@ -1770,9 +1770,9 @@
     </div>
 
 <!-- Formula LaTeX Modal -->
-    <div id="latexModal">
+    <div id="latexModal" role="dialog" aria-modal="true" aria-labelledby="latexModalTitle">
       <div class="latex-box">
-        <h3 class="latex-title"><svg class="latex-title-icon" viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>Fórmula LaTeX</h3>
+        <h3 class="latex-title" id="latexModalTitle"><svg class="latex-title-icon" viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>Fórmula LaTeX</h3>
 
         <input id="latexInput" class="latex-input" type="text"
           placeholder="Ejemplo: \frac{a}{b}  ·  x^2 + y^2 = r^2"
@@ -2883,7 +2883,13 @@ window.addEventListener('load', function() {
 ═══════════════════════════════════════════════════════════════ */
     function showToast(msg, type = 'info', duration = 3000) {
       let t = document.getElementById('mpToast');
-      if (!t) {
+      if (!t) { return; }
+      t.setAttribute('role', 'status');
+      t.setAttribute('aria-live', 'polite');
+      t.setAttribute('aria-atomic', 'true');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, duration);
         t = document.createElement('div');
         t.id = 'mpToast';
         t.style.cssText = `
@@ -2907,7 +2913,11 @@ window.addEventListener('load', function() {
 
     function showConfirm(msg, onOk) {
       let modal = document.getElementById('mpConfirm');
-      if (!modal) {
+      if (!modal) { return; }
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'mpConfirmMsg');
+      modal.innerHTML = \`<div class="mp-confirm-dialog" role="document">\<h2 id="mpConfirmMsg">¿Estás seguro?</h2>\<button id="mpConfirmCancel">Cancelar</button>\<button id="mpConfirmOk">Confirmar</button>\</div>\`;
         modal = document.createElement('div');
         modal.id = 'mpConfirm';
         modal.style.cssText = `
@@ -4076,7 +4086,10 @@ window.addEventListener('load', function() {
         var badge = document.getElementById('calcShiftBadge');
         if (badge) badge.classList.toggle('on', shiftActive);
         var btn = document.getElementById('btnShift');
-        if (btn) btn.classList.toggle('active', shiftActive);
+        if (btn) {
+            btn.setAttribute('aria-pressed', shiftActive ? 'true' : 'false');
+            btn.setAttribute('aria-label', shiftActive ? 'Segunda función activada' : 'Activar segunda función');
+        }
     }
 
     function calcClampCaret() {
