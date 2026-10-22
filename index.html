@@ -2908,79 +2908,52 @@ window.addEventListener('load', function() {
    HERRAMIENTAS Y BOTONES UI
 ═══════════════════════════════════════════════════════════════ */
     function showToast(msg, type = 'info', duration = 3000) {
-      let t = document.getElementById('mpToast');
-      if (!t) { return; }
-      t.setAttribute('role', 'status');
-      t.setAttribute('aria-live', 'polite');
-      t.setAttribute('aria-atomic', 'true');
-      t.textContent = msg;
-      t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, duration);
-        t = document.createElement('div');
-        t.id = 'mpToast';
-        t.style.cssText = `
-          position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-          padding:10px 20px; border-radius:24px; font-size:13px; font-weight:500;
-          z-index:99999; opacity:0; transition:opacity .25s; pointer-events:none;
-          max-width:320px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,.4);
-        `;
-        document.body.appendChild(t);
-      }
-      const colors = { info:'#2d2d3a', ok:'#1a3a1a', warn:'#3a2d00', err:'#3a1a1a' };
-      const borders = { info:'#555', ok:'#4ade80', warn:'#fbbf24', err:'#f87171' };
-      t.style.background = colors[type] || colors.info;
-      t.style.border = `1px solid ${borders[type] || borders.info}`;
-      t.style.color = '#e0e0e0';
-      t.textContent = msg;
-      t.style.opacity = '1';
-      clearTimeout(t._tid);
-      t._tid = setTimeout(() => t.style.opacity = '0', duration);
+        let t = document.getElementById('mpToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'mpToast';
+            t.setAttribute('role', 'status');
+            t.setAttribute('aria-live', 'polite');
+            t.setAttribute('aria-atomic', 'true');
+            t.style.cssText = `position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 20px; border-radius:24px; font-size:13px; font-weight:500; z-index:99999; opacity:0; transition:opacity .25s; pointer-events:none; max-width:320px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,.4);`;
+            document.body.appendChild(t);
+        }
+        const colors = { info:'#2d2d3a', ok:'#1a3a1a', warn:'#3a2d00', err:'#3a1a1a' };
+        const borders = { info:'#555', ok:'#4ade80', warn:'#fbbf24', err:'#f87171' };
+        t.style.background = colors[type] || colors.info;
+        t.style.border = `1px solid ${borders[type] || borders.info}`;
+        t.style.color = '#e0e0e0';
+        t.textContent = msg;
+        t.style.opacity = '1';
+        clearTimeout(t._tid);
+        t._tid = setTimeout(() => t.style.opacity = '0', duration);
     }
 
+
     function showConfirm(msg, onOk) {
-      let modal = document.getElementById('mpConfirm');
-      if (!modal) { return; }
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('aria-labelledby', 'mpConfirmMsg');
-      modal.innerHTML = \`<div class="mp-confirm-dialog" role="document">\<h2 id="mpConfirmMsg">¿Estás seguro?</h2>\<button id="mpConfirmCancel">Cancelar</button>\<button id="mpConfirmOk">Confirmar</button>\</div>\`;
-        modal = document.createElement('div');
-        modal.id = 'mpConfirm';
-        modal.style.cssText = `
-          display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
-          z-index:99998; align-items:center; justify-content:center;
-        `;
-        modal.innerHTML = `
-          <div style="background:#1e1e1e;border:1px solid #444;border-radius:12px;
-            padding:24px 28px;max-width:340px;width:90%;text-align:center;">
-            <p id="mpConfirmMsg" style="color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5"></p>
-            <div style="display:flex;gap:10px;justify-content:center">
-              <button type="button" id="mpConfirmOk" aria-label="Confirmar acción"
-                style="background:#bb86fc;color:#000;border:none;border-radius:8px;
-                  padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px">
-                Confirmar
-              </button>
-              <button type="button" id="mpConfirmCancel" aria-label="Cancelar acción"
-                style="background:transparent;color:#999;border:1px solid #444;
-                  border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px">
-                Cancelar
-              </button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(modal);
-        document.getElementById('mpConfirmCancel').onclick = () => {
-      closeConfirmModal();
-      }
-      document.getElementById('mpConfirmMsg').textContent = msg;
-      modal.style.display = 'flex';
-      lastModalTrigger = document.activeElement || document.getElementById('btnClear');
-      document.getElementById('mpConfirmOk').focus();
-      document.getElementById('mpConfirmOk').onclick = () => {
-        modal.style.display = 'none';
-        onOk();
-      };
+        let modal = document.getElementById('mpConfirm');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'mpConfirm';
+            modal.style.cssText = `display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:99998; align-items:center; justify-content:center;`;
+            modal.innerHTML = `<div style='background:#1e1e1e;border:1px solid #444;border-radius:12px;padding:24px 28px;max-width:340px;width:90%;text-align:center;'><p id='mpConfirmMsg' style='color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5'></p><div style='display:flex;gap:10px;justify-content:center'><button type='button' id='mpConfirmOk' aria-label='Confirmar acción' style='background:#bb86fc;color:#000;border:none;border-radius:8px;padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px'>Confirmar</button><button type='button' id='mpConfirmCancel' aria-label='Cancelar acción' style='background:transparent;color:#999;border:1px solid #444;border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px'>Cancelar</button></div></div>`;
+            document.body.appendChild(modal);
+            document.getElementById('mpConfirmCancel').onclick = () => { if (typeof closeConfirmModal === 'function') closeConfirmModal(); else modal.style.display = 'none'; };
+        }
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'mpConfirmMsg');
+        document.getElementById('mpConfirmMsg').textContent = msg;
+        modal.style.display = 'flex';
+        lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
+        document.getElementById('mpConfirmOk').onclick = () => {
+            modal.style.display = 'none';
+            if (typeof onOk === 'function') onOk();
+        };
+        document.getElementById('mpConfirmOk').focus();
     }
+    window.showConfirm = showConfirm;
+    window.showToast = showToast;
 
     // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
     let contextMenuOpen = false;
@@ -3610,7 +3583,7 @@ window.addEventListener('load', function() {
 
       // Helper to escape HTML special characters
       function escapeHtml(str) {
-        return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
+        return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#39;');
       }
 
       if (plottedFunctions.length === 0) {
@@ -3652,6 +3625,38 @@ function closeConfirmModal() {
     if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
   }
 }
+  // Focus trap para modales (plot, latex, confirm)
+  document.addEventListener('keydown', function(e) {
+    var plotModal = document.getElementById('plotModal');
+    var latexModal = document.getElementById('latexModal');
+    var confirmModal = document.getElementById('mpConfirm');
+    var activeModal = null;
+    if (plotModal && plotModal.style.display === 'flex') activeModal = plotModal;
+    else if (latexModal && latexModal.classList.contains('open')) activeModal = latexModal;
+    else if (confirmModal && confirmModal.style.display === 'flex') activeModal = confirmModal;
+    if (!activeModal) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (activeModal === plotModal && typeof closePlotModal === 'function') closePlotModal();
+      else if (activeModal === latexModal && typeof closeLatexModal === 'function') closeLatexModal();
+      else if (activeModal === confirmModal && typeof closeConfirmModal === 'function') closeConfirmModal();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    var focusables = Array.from(activeModal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'));
+    if (focusables.length === 0) return;
+    var idx = focusables.indexOf(document.activeElement);
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.shiftKey) {
+      var prev = (idx <= 0) ? focusables.length - 1 : idx - 1;
+      focusables[prev].focus();
+    } else {
+      var next = (idx === -1 || idx >= focusables.length - 1) ? 0 : idx + 1;
+      focusables[next].focus();
+    }
+  }, true);
 
 // Abrir modal
 document.getElementById('btnPlot').onclick = () => {
@@ -3661,8 +3666,7 @@ document.getElementById('btnPlot').onclick = () => {
       document.getElementById('plotError').style.display = 'none';
       updatePlottedFunctionsList();
     };
-    document.getElementById('plotBtnClose').onclick = () =>
-      document.getElementById('plotModal').style.display = 'none';
+    document.getElementById('plotBtnClose').onclick = closePlotModal;
 
     document.getElementById('plotBtnAdd').onclick = function() {
       const exprRaw = document.getElementById('plotExpr').value.trim();
@@ -3753,7 +3757,9 @@ document.getElementById('btnPlot').onclick = () => {
       latexInputEl.value = '';
       latexUpdatePreview();
       latexModalEl.classList.add('open');
+      lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       latexInputEl.focus();
+    }
     function closeLatexModal() {
       latexModalEl.classList.remove('open');
       setTool('select');
