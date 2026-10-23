@@ -2943,8 +2943,10 @@ window.addEventListener('load', function() {
             ctx.translate(RULER_SIZE - (isMobile ? 6 : 8), sy);
             ctx.rotate(-Math.PI / 2);
             ctx.textAlign = 'center';
-            var mathY = -( (y * zoom + panY) / (GRID_BASE * zoom) );
-            ctx.fillText(parseFloat(mathY.toPrecision(12)).toString(), 0, 0);
+            var mathY = -(y / GRID_BASE);
+            var labelY = parseFloat(mathY.toPrecision(12));
+            if (labelY === 0) labelY = 0;
+            ctx.fillText(labelY.toString(), 0, 0);
             ctx.restore();
         }
 
