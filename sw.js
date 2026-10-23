@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v32: Paso 7 — graficador interactivo con canvas nativo
-const CACHE_NAME = 'mathpad-v32';
+// Versión de caché v33: Paso 8.1 — persistencia del graficador por pagina
+const CACHE_NAME = 'mathpad-v33';
 const urlsToCache = [
   './',
   './index.html',
