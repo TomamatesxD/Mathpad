@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v35: Paso 8.3.1 — insertar análisis en el lienzo
-const CACHE_NAME = 'mathpad-v35'; // Versión de caché v35: Paso 8.3.1 — insertar análisis en el lienzo
+// Versión de caché v36: Paso 8.3.1 — correcciones finales (window.canvas, recompute, tabla alineada)
+const CACHE_NAME = 'mathpad-v36'; // Versión de caché v36: Paso 8.3.1 — correcciones finales (window.canvas, recompute, tabla alineada)
 const urlsToCache = [
   './',
   './index.html',

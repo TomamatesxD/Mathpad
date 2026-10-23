@@ -1905,7 +1905,6 @@ window.addEventListener('load', function() {
         renderOnAddRemove: true,
         skipTargetFind: false
     });
-    window.canvas = canvas;
 
 
     // NUEVO: SelecciÃ³n exacta sobre trazos con un pequeÃ±o margen de comodidad
@@ -3811,7 +3810,7 @@ window.addEventListener('load', function() {
       if (!data || !data.ok) return '';
       var lines = [];
       lines.push('Análisis de f(x) = ' + data.expr);
-      lines.push('─────────────────────────────');
+      lines.push('------------------------------');
       lines.push('Ordenada al origen: ' + (data.yIntercept !== null ? 'y = ' + formatNum(data.yIntercept) : 'no definida en el rango'));
       lines.push('Raíces: ' + (data.roots.length ? data.roots.map(function(r) { return 'x = ' + formatNum(r); }).join(', ') : 'ninguna en el rango'));
       if (data.extrema.length) {
@@ -3830,11 +3829,11 @@ window.addEventListener('load', function() {
       lines.push('Puntos de inflexión: ' + (data.inflections.length ? data.inflections.map(function(x) { return 'x = ' + formatNum(x); }).join(', ') : 'ninguno en el rango'));
       lines.push('');
       lines.push('Tabla de valores:');
-      lines.push('  x          | f(x)');
+      lines.push('  ' + 'x'.padStart(10) + ' | ' + 'f(x)'.padStart(10));
       data.table.forEach(function(row) {
         var xStr = formatNum(row.x);
         var yStr = row.y !== null ? formatNum(row.y) : '—';
-        lines.push('  ' + xStr + '      | ' + yStr);
+        lines.push('  ' + xStr.padStart(10) + ' | ' + yStr.padStart(10));
       });
       if (intersections && intersections.length) {
         lines.push('');
@@ -3937,8 +3936,6 @@ window.addEventListener('load', function() {
       if (panel && !panel.hidden) recomputeAnalysis();
     }
     function recomputeAnalysis() {
-      var insertBtn0 = document.getElementById('plotAnalysisInsertBtn');
-      if (insertBtn0) insertBtn0.disabled = (activePlotFunctions.length === 0);
       var sel = document.getElementById('plotAnalysisFnSelect');
       var f1 = document.getElementById('plotAnalysisF1');
       var f2 = document.getElementById('plotAnalysisF2');
