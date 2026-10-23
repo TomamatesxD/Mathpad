@@ -1379,6 +1379,8 @@
         .plot-analysis-value { color: var(--text-main); word-break: break-word; }
         .plot-analysis-intersections { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
         .plot-analysis-intersections h4 { font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+.plot-analysis-actions { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); display: flex; justify-content: flex-end; }
+.plot-analysis-actions button { padding: 8px 16px; font-size: 13px; }
         .plot-value-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 12px; margin-top: 6px; }
         .plot-value-table th, .plot-value-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border-color); }
         .plot-value-table th { color: var(--accent); font-weight: 600; }
@@ -1811,6 +1813,10 @@
               </div>
               <div id="plotIntersectionsContent" class="plot-analysis-content"></div>
             </div>
+  <div class="plot-analysis-actions">
+    <button type="button" id="plotAnalysisInsertBtn" class="plot-btn-primary" aria-label="Insertar el análisis de la función como texto en el lienzo" disabled>Insertar análisis en el lienzo</button>
+  </div>
+
           </div>
         </div>
 
@@ -1899,6 +1905,8 @@ window.addEventListener('load', function() {
         renderOnAddRemove: true,
         skipTargetFind: false
     });
+    window.canvas = canvas;
+
 
     // NUEVO: SelecciÃ³n exacta sobre trazos con un pequeÃ±o margen de comodidad
     fabric.Object.prototype.perPixelTargetFind = true;
@@ -3799,6 +3807,109 @@ window.addEventListener('load', function() {
       });
       return wrap;
     }
+    function buildAnalysisText(data, intersections, f1Expr, f2Expr) {
+      if (!data || !data.ok) return '';
+      var lines = [];
+      lines.push('Análisis de f(x) = ' + data.expr);
+      lines.push('─────────────────────────────');
+      lines.push('Ordenada al origen: ' + (data.yIntercept !== null ? 'y = ' + formatNum(data.yIntercept) : 'no definida en el rango'));
+      lines.push('Raíces: ' + (data.roots.length ? data.roots.map(function(r) { return 'x = ' + formatNum(r); }).join(', ') : 'ninguna en el rango'));
+      if (data.extrema.length) {
+        data.extrema.forEach(function(e) {
+          lines.push((e.type === 'min' ? 'Mínimo local: ' : 'Máximo local: ') + '(' + formatNum(e.x) + ', ' + formatNum(e.y) + ')');
+        });
+      } else {
+        lines.push('Extremos: ninguno en el rango');
+      }
+      lines.push('Dominio (en rango visible): ' + (data.domain.length ? formatIntervals(data.domain) : 'vacío'));
+      lines.push('Imagen (en rango visible): ' + (isFinite(data.range[0]) ? '[' + formatNum(data.range[0]) + ', ' + formatNum(data.range[1]) + ']' : 'no definida'));
+      if (data.monotony.inc.length) lines.push('Crece en: ' + formatIntervals(data.monotony.inc));
+      if (data.monotony.dec.length) lines.push('Decrece en: ' + formatIntervals(data.monotony.dec));
+      if (data.concavity.up.length) lines.push('Cóncava hacia arriba: ' + formatIntervals(data.concavity.up));
+      if (data.concavity.down.length) lines.push('Cóncava hacia abajo: ' + formatIntervals(data.concavity.down));
+      lines.push('Puntos de inflexión: ' + (data.inflections.length ? data.inflections.map(function(x) { return 'x = ' + formatNum(x); }).join(', ') : 'ninguno en el rango'));
+      lines.push('');
+      lines.push('Tabla de valores:');
+      lines.push('  x          | f(x)');
+      data.table.forEach(function(row) {
+        var xStr = formatNum(row.x);
+        var yStr = row.y !== null ? formatNum(row.y) : '—';
+        lines.push('  ' + xStr + '      | ' + yStr);
+      });
+      if (intersections && intersections.length) {
+        lines.push('');
+        lines.push('Intersecciones con g(x) = ' + f2Expr + ':');
+        intersections.forEach(function(p) {
+          lines.push('  (' + formatNum(p.x) + ', ' + formatNum(p.y) + ')');
+        });
+      }
+      return lines.join('\n');
+    }
+
+
+    document.getElementById('plotAnalysisInsertBtn').addEventListener('click', function() {
+      var sel = document.getElementById('plotAnalysisFnSelect');
+      if (!sel || !activePlotFunctions.length) {
+        showToast('Agregá al menos una función para analizar.', 'warn');
+        return;
+      }
+      var idx = parseInt(sel.value, 10);
+      var fObj = activePlotFunctions[idx];
+      if (!fObj) {
+        showToast('Función no encontrada.', 'err');
+        return;
+      }
+      var data = analyzeFunction(fObj);
+      var intersections = [];
+      var f1El = document.getElementById('plotAnalysisF1');
+      var f2El = document.getElementById('plotAnalysisF2');
+      var f2Expr = null;
+      if (activePlotFunctions.length >= 2 && f1El && f2El) {
+        var i1 = parseInt(f1El.value, 10), i2 = parseInt(f2El.value, 10);
+        var A = activePlotFunctions[i1], B = activePlotFunctions[i2];
+        if (A && B && A !== B) {
+          var minA = Math.min(A.xMin, B.xMin), maxA = Math.max(A.xMax, B.xMax);
+          intersections = findIntersections(A, B, minA, maxA, 1000);
+          f2Expr = B.expr;
+        }
+      }
+      var text = buildAnalysisText(data, intersections, fObj.expr, f2Expr);
+      if (!text) {
+        showToast('No se pudo generar el análisis.', 'err');
+        return;
+      }
+      var vpt = canvas.viewportTransform;
+      var fs = parseInt(document.getElementById('fontSizePicker').value, 10) || 12;
+      var fontSize = Math.min(Math.max(fs / (canvas.getZoom() || 1), 8), 32);
+      var color = document.getElementById('colorPicker').value || '#000000';
+      var maxWidth = Math.min((canvas.getWidth() / (canvas.getZoom() || 1)) * 0.6, 600);
+      var tb = new fabric.Textbox(text, {
+        left: 0, top: 0,
+        width: maxWidth,
+        fontSize: fontSize,
+        fontFamily: 'Courier New, Consolas, monospace',
+        fill: color,
+        lineHeight: 1.25,
+        editable: true,
+        selectable: true,
+        evented: true,
+        padding: 6
+      });
+      tb.set({
+        left: (canvas.getWidth() / 2 - vpt[4]) / vpt[0] - tb.getScaledWidth() / 2,
+        top: (canvas.getHeight() / 2 - vpt[5]) / vpt[3] - tb.getScaledHeight() / 2
+      });
+      tb.setCoords();
+      canvas.add(tb);
+      canvas.setActiveObject(tb);
+      setTool('select');
+      canvas.requestRenderAll();
+      saveHistory();
+      document.getElementById('plotModal').style.display = 'none';
+      showToast('Análisis insertado en el lienzo', 'ok');
+    });
+
+
     function updateAnalysisSelectors() {
       var sel = document.getElementById('plotAnalysisFnSelect');
       var f1 = document.getElementById('plotAnalysisF1');
@@ -3821,9 +3932,13 @@ window.addEventListener('load', function() {
       if (!f1.value && activePlotFunctions.length > 0) f1.value = '0';
       if (!f2.value && activePlotFunctions.length > 1) f2.value = '1';
       var panel = document.getElementById('plotAnalysisPanel');
+      var insertBtn = document.getElementById('plotAnalysisInsertBtn');
+      if (insertBtn) insertBtn.disabled = (activePlotFunctions.length === 0);
       if (panel && !panel.hidden) recomputeAnalysis();
     }
     function recomputeAnalysis() {
+      var insertBtn0 = document.getElementById('plotAnalysisInsertBtn');
+      if (insertBtn0) insertBtn0.disabled = (activePlotFunctions.length === 0);
       var sel = document.getElementById('plotAnalysisFnSelect');
       var f1 = document.getElementById('plotAnalysisF1');
       var f2 = document.getElementById('plotAnalysisF2');
@@ -4143,6 +4258,7 @@ window.addEventListener('load', function() {
         empty.className = 'plot-empty';
         empty.textContent = 'Ninguna función graficada aún';
         listEl.appendChild(empty);
+        if (typeof updateAnalysisSelectors === 'function') updateAnalysisSelectors();
         return;
       }
       activePlotFunctions.forEach(function(f, idx) {
