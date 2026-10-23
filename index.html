@@ -1437,6 +1437,80 @@
 
         /* Entradas y botones auxiliares ocultos */
         .hidden-file-input, .hidden-helper { display: none; }
+        /* Graficador rediseño (FASE B) */
+        #plotModal { padding: 6px; overflow: hidden; }
+        .plot-dialog { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 14px; width: min(980px, calc(100vw - 12px)); max-height: 92dvh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; margin: 0 auto; padding: 0; }
+        .plot-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .plot-title { color: var(--accent); margin: 0; font-size: 16px; }
+        .plot-close { background: transparent; border: none; color: var(--text-main); font-size: 20px; line-height: 1; cursor: pointer; min-width: 36px; min-height: 36px; border-radius: 8px; }
+        .plot-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+        .plot-canvas-col { flex: 0 0 60%; min-width: 0; padding: 10px; display: flex; flex-direction: column; min-height: 0; }
+        .plot-canvas-wrap { position: relative; flex: 1; min-height: 0; width: 100%; margin: 0; border-radius: 10px; overflow: hidden; background: var(--bg-dark, #121212); border: 1px solid var(--border-color); touch-action: none; }
+        #plotCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; aspect-ratio: auto; }
+        .plot-hud { position: absolute; bottom: 6px; right: 8px; font-size: 13px; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.55); color: #e0e0e0; pointer-events: none; font-family: system-ui, sans-serif; }
+        :root.light-mode .plot-hud { background: rgba(255,255,255,0.85); color: #212121; }
+        .plot-side { flex: 0 0 40%; min-width: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        .plot-label { font-size: 13px; color: var(--text-main); }
+        .plot-label-sm { font-size: 12px; color: var(--text-main); }
+        .plot-hint { color: var(--text-main); opacity: .7; }
+        .plot-input { width: 100%; box-sizing: border-box; background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 14px; }
+        .plot-color { width: 44px; height: 32px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-panel); }
+        .plot-colorrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .plot-onlyline-wrap { display: flex; align-items: center; }
+        .plot-check { color: var(--text-main); font-size: 13px; }
+        .plot-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .plot-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .plot-tab { background: transparent; border: none; color: var(--text-main); padding: 8px 10px; cursor: pointer; border-bottom: 2px solid transparent; min-height: 36px; font-size: 13px; border-radius: 6px 6px 0 0; }
+        .plot-tab[aria-selected=true] { border-bottom-color: var(--accent); color: var(--accent); font-weight: 700; }
+        .plot-tab:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+        .plot-tabpanel[hidden] { display: none; }
+        .plot-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .plot-function-row { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 999px; font-size: 12px; background: var(--bg-panel); color: var(--text-main); }
+        .plot-function-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .plot-function-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+        .plot-function-delete { background: transparent; border: none; color: inherit; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 2px; }
+        .plot-empty { font-style: italic; color: var(--text-main); opacity: .7; font-size: 12px; }
+        .plot-tangent-wrap, .plot-area-wrap, .plot-analysis-wrap { margin: 0; }
+        .plot-tangent-toggle-label, .plot-area-toggle-label { color: var(--text-main); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .plot-tangent-controls, .plot-area-controls { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+        .plot-tangent-label { color: var(--text-main); font-size: 13px; }
+        .plot-tangent-info, .plot-area-info { font-size: 12px; color: var(--text-main); }
+        .plot-area-inputs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .plot-area-inputs label { color: var(--text-main); font-size: 13px; }
+        .plot-analysis-controls { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+        .plot-analysis-controls label { color: var(--text-main); font-size: 13px; }
+        .plot-analysis-controls select { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; }
+        .plot-analysis-content { font-size: 12px; color: var(--text-main); }
+        .plot-analysis-intersections { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
+        .plot-analysis-intersections h4 { font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+        .plot-analysis-actions { margin-top: 8px; padding-top: 8px; display: flex; justify-content: flex-end; border-top: none; }
+        .plot-analysis-actions button { padding: 8px 16px; font-size: 13px; }
+        .plot-value-table { width: 100%; border-collapse: collapse; font-family: system-ui, sans-serif; font-size: 12px; margin-top: 6px; }
+        .plot-value-table th, .plot-value-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .plot-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-top: 1px solid var(--border-color); background: var(--bg-panel); flex-shrink: 0; position: sticky; bottom: 0; }
+        .plot-btn-primary { flex: 1; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 10px 12px; font-weight: 700; cursor: pointer; font-size: 13px; min-height: 36px; }
+        .plot-btn-danger { background: transparent; color: #cf6679; border: 1px solid #cf6679; border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
+        .plot-btn-ghost { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
+        .plot-error { color: #f87171; font-size: 12px; margin: 8px 12px; display: none; }
+        @media (max-width: 699px) {
+          .plot-body { flex-direction: column; }
+          .plot-canvas-col { flex: 0 0 auto; height: 40dvh; min-height: 220px; padding: 8px; }
+          .plot-side { flex: 1 1 auto; padding: 8px; }
+          .plot-dialog { width: calc(100vw - 12px); }
+        }
+        @media (max-height: 500px) {
+          .plot-dialog { max-height: 100dvh; margin: 0; border-radius: 10px; }
+          .plot-body { flex-direction: row; }
+          .plot-canvas-col { flex: 0 0 55%; height: auto; padding: 6px; }
+          .plot-side { flex: 0 0 45%; padding: 6px; font-size: 13px; }
+          .plot-title { font-size: 14px; }
+          .plot-btn-primary, .plot-btn-danger, .plot-btn-ghost, .plot-close { min-height: 36px; padding: 8px 10px; font-size: 12px; }
+          .plot-tab { min-height: 32px; padding: 6px 8px; font-size: 12px; }
+        }
+        @media (min-width: 700px) {
+          .plot-dialog { max-width: 980px; }
+        }
+
 </style>
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
@@ -1766,114 +1840,122 @@
     <!-- Function Plotter Modal -->
     <div id="plotModal" role="dialog" aria-modal="true" aria-labelledby="plotModalTitle">
       <div class="plot-dialog">
-        <h3 class="plot-title" id="plotModalTitle">📈 Graficar función</h3>
-
-        <label class="plot-label">
-          f(x) = <small class="plot-hint">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
-        </label>
-        <input id="plotExpr" class="plot-input" type="text" value="x^2">
-
-        <div class="plot-grid2">
-          <div>
-            <label class="plot-label-sm">x mínimo</label>
-            <input id="plotXMin" class="plot-input" type="number" value="-5">
-          </div>
-          <div>
-            <label class="plot-label-sm">x máximo</label>
-            <input id="plotXMax" class="plot-input" type="number" value="5">
-          </div>
-        </div>
-
-        <div class="plot-colorrow">
-          <div>
-            <label class="plot-label-sm">Color</label>
-            <input id="plotColorPicker" class="plot-color" type="color" value="#bb86fc">
-          </div>
-          <div class="plot-onlyline-wrap">
-            <label class="plot-check">
-              <input id="plotOnlyLine" class="plot-checkbox" type="checkbox">
-              Fondo transparente (Solo línea)
-            </label>
-          </div>
-        </div>
-        <div id="plotCanvasWrap" class="plot-canvas-wrap">
-          <canvas id="plotCanvas" width="900" height="500" aria-hidden="true">Gráfico de funciones</canvas>
-          <div id="plotHud" class="plot-hud" aria-hidden="true"></div>
-        </div>
-
-        <div id="plotTangentWrap" class="plot-tangent-wrap">
-          <label class="plot-tangent-toggle-label">
-            <input type="checkbox" id="plotTangentToggle" aria-label="Mostrar recta tangente">
-            Mostrar recta tangente
-          </label>
-          <div id="plotTangentControls" class="plot-tangent-controls" hidden>
-            <label class="plot-tangent-label">
-              x₀ = <span id="plotTangentX0Value">0</span>
-            </label>
-            <input type="range" id="plotTangentSlider" min="-10" max="10" step="0.05" value="0" aria-label="Posición x0 de la tangente">
-            <div id="plotTangentInfo" class="plot-tangent-info"></div>
-          </div>
-        </div>
-
-        <div id="plotAreaWrap" class="plot-area-wrap">
-          <label class="plot-area-toggle-label">
-            <input type="checkbox" id="plotAreaToggle" aria-label="Mostrar área bajo la curva">
-            Calcular área bajo la curva
-          </label>
-          <div id="plotAreaControls" class="plot-area-controls" hidden>
-            <div class="plot-area-inputs">
-              <label>a: <input type="number" id="plotAreaA" value="0" step="0.1" aria-label="Límite inferior a"></label>
-              <label>b: <input type="number" id="plotAreaB" value="1" step="0.1" aria-label="Límite superior b"></label>
+        <header class="plot-header">
+          <h3 class="plot-title" id="plotModalTitle">📈 Graficar función</h3>
+          <button type="button" class="plot-close" aria-label="Cerrar el graficador" onclick="document.getElementById('plotBtnClose').click()">✕</button>
+        </header>
+        <div class="plot-body">
+          <div class="plot-canvas-col">
+            <div id="plotCanvasWrap" class="plot-canvas-wrap">
+              <canvas id="plotCanvas" width="900" height="500" aria-hidden="true">Gráfico de funciones</canvas>
+              <div id="plotHud" class="plot-hud" aria-hidden="true"></div>
             </div>
-            <div id="plotAreaInfo" class="plot-area-info"></div>
-            <button type="button" id="plotAreaInsertBtn" class="plot-btn-primary" aria-label="Insertar área en el lienzo">Insertar área en el lienzo</button>
           </div>
-        </div>
-
-        <div class="plot-section">
-          <label class="plot-label">Funciones graficadas:</label>
-          <div id="plotFunctionsList" class="plot-list">
-            <span class="plot-empty">Ninguna función graficada aún</span>
-          </div>
-        </div>
-
-        <div id="plotAnalysisWrap" class="plot-analysis-wrap">
-          <button type="button" id="plotAnalysisToggle" class="plot-analysis-toggle" aria-expanded="false" aria-controls="plotAnalysisPanel">
-            <span id="plotAnalysisToggleText">Mostrar análisis</span>
-            <span class="plot-analysis-chevron" aria-hidden="true">▾</span>
-          </button>
-          <div id="plotAnalysisPanel" class="plot-analysis-panel" hidden>
-            <div class="plot-analysis-controls">
-              <label>Función a analizar:
-                <select id="plotAnalysisFnSelect" aria-label="Función a analizar"></select>
-              </label>
+          <div class="plot-side">
+            <label class="plot-label">f(x) = <small class="plot-hint">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small></label>
+            <input id="plotExpr" class="plot-input" type="text" value="x^2">
+            <label class="plot-label">Funciones graficadas:</label>
+            <div id="plotFunctionsList" class="plot-chips">
+              <span class="plot-empty">Ninguna función graficada aún</span>
             </div>
-            <div id="plotAnalysisContent" class="plot-analysis-content"></div>
-            <div class="plot-analysis-intersections">
-              <h4>Intersecciones entre dos funciones</h4>
-              <div class="plot-analysis-controls">
-                <label>f₁: <select id="plotAnalysisF1" aria-label="Primera función"></select></label>
-                <label>f₂: <select id="plotAnalysisF2" aria-label="Segunda función"></select></label>
+            <div class="plot-tabs" role="tablist" aria-label="Opciones del graficador">
+              <button type="button" role="tab" id="plotTabFuncion" class="plot-tab" aria-selected="true" aria-controls="plotPanelFuncion" tabindex="0">Función</button>
+              <button type="button" role="tab" id="plotTabTangente" class="plot-tab" aria-selected="false" aria-controls="plotPanelTangente" tabindex="-1">Tangente</button>
+              <button type="button" role="tab" id="plotTabArea" class="plot-tab" aria-selected="false" aria-controls="plotPanelArea" tabindex="-1">Área</button>
+              <button type="button" role="tab" id="plotTabAnalisis" class="plot-tab" aria-selected="false" aria-controls="plotPanelAnalisis" tabindex="-1">Análisis</button>
+            </div>
+            <div role="tabpanel" id="plotPanelFuncion" class="plot-tabpanel">
+              <div class="plot-grid2">
+                <div>
+                  <label class="plot-label-sm">x mínimo</label>
+                  <input id="plotXMin" class="plot-input" type="number" value="-5">
+                </div>
+                <div>
+                  <label class="plot-label-sm">x máximo</label>
+                  <input id="plotXMax" class="plot-input" type="number" value="5">
+                </div>
               </div>
-              <div id="plotIntersectionsContent" class="plot-analysis-content"></div>
+              <div class="plot-colorrow">
+                <div>
+                  <label class="plot-label-sm">Color</label>
+                  <input id="plotColorPicker" class="plot-color" type="color" value="#bb86fc">
+                </div>
+                <div class="plot-onlyline-wrap">
+                  <label class="plot-check">
+                    <input id="plotOnlyLine" class="plot-checkbox" type="checkbox">
+                    Fondo transparente (Solo línea)
+                  </label>
+                </div>
+              </div>
             </div>
-  <div class="plot-analysis-actions">
-    <button type="button" id="plotAnalysisInsertBtn" class="plot-btn-primary" aria-label="Insertar el análisis de la función como texto en el lienzo" disabled>Insertar análisis en el lienzo</button>
-  </div>
-
+            <div role="tabpanel" id="plotPanelTangente" class="plot-tabpanel" hidden>
+              <div id="plotTangentWrap" class="plot-tangent-wrap">
+                <label class="plot-tangent-toggle-label">
+                  <input type="checkbox" id="plotTangentToggle" aria-label="Mostrar recta tangente">
+                  Mostrar recta tangente
+                </label>
+                <div id="plotTangentControls" class="plot-tangent-controls" hidden>
+                  <label class="plot-tangent-label">
+                    x₀ = <span id="plotTangentX0Value">0</span>
+                  </label>
+                  <input type="range" id="plotTangentSlider" min="-10" max="10" step="0.05" value="0" aria-label="Posición x0 de la tangente">
+                  <div id="plotTangentInfo" class="plot-tangent-info"></div>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" id="plotPanelArea" class="plot-tabpanel" hidden>
+              <div id="plotAreaWrap" class="plot-area-wrap">
+                <label class="plot-area-toggle-label">
+                  <input type="checkbox" id="plotAreaToggle" aria-label="Mostrar área bajo la curva">
+                  Calcular área bajo la curva
+                </label>
+                <div id="plotAreaControls" class="plot-area-controls" hidden>
+                  <div class="plot-area-inputs">
+                    <label>a: <input type="number" id="plotAreaA" value="0" step="0.1" aria-label="Límite inferior a"></label>
+                    <label>b: <input type="number" id="plotAreaB" value="1" step="0.1" aria-label="Límite superior b"></label>
+                  </div>
+                  <div id="plotAreaInfo" class="plot-area-info"></div>
+                  <button type="button" id="plotAreaInsertBtn" class="plot-btn-primary" aria-label="Insertar área en el lienzo">Insertar área en el lienzo</button>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" id="plotPanelAnalisis" class="plot-tabpanel" hidden>
+              <div id="plotAnalysisWrap" class="plot-analysis-wrap">
+                <button type="button" id="plotAnalysisToggle" class="hidden-helper" aria-hidden="true" tabindex="-1">Mostrar análisis</button>
+                <div id="plotAnalysisPanel" class="plot-analysis-panel">
+                  <div class="plot-analysis-controls">
+                    <label>Función a analizar:
+                      <select id="plotAnalysisFnSelect" aria-label="Función a analizar"></select>
+                    </label>
+                  </div>
+                  <div id="plotAnalysisContent" class="plot-analysis-content"></div>
+                  <div class="plot-analysis-intersections">
+                    <h4>Intersecciones entre dos funciones</h4>
+                    <div class="plot-analysis-controls">
+                      <label>f₁: <select id="plotAnalysisF1" aria-label="Primera función"></select></label>
+                      <label>f₂: <select id="plotAnalysisF2" aria-label="Segunda función"></select></label>
+                    </div>
+                    <div id="plotIntersectionsContent" class="plot-analysis-content"></div>
+                  </div>
+                  <div class="plot-analysis-actions">
+                    <button type="button" id="plotAnalysisInsertBtn" class="plot-btn-primary" aria-label="Insertar el análisis de la función como texto en el lienzo" disabled>Insertar análisis en el lienzo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div class="plot-actions">
+        <div class="plot-actions" role="group" aria-label="Acciones del graficador">
           <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">+ Agregar</button>
+          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar en el lienzo</button>
           <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico">Reset vista</button>
           <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas">Limpiar</button>
-          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar en el lienzo</button>
           <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador">Cerrar</button>
         </div>
         <p id="plotError" class="plot-error"></p>
       </div>
     </div>
+
 
 <!-- Formula LaTeX Modal -->
     <div id="latexModal" role="dialog" aria-modal="true" aria-labelledby="latexModalTitle">
@@ -4687,9 +4769,74 @@ window.addEventListener('load', function() {
       });
     };
 
-    document.getElementById('plotBtnClose').onclick = function() {
+    function closePlotModal() {
       document.getElementById('plotModal').style.display = 'none';
-    };
+      if (typeof lastModalTrigger !== 'undefined' && lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
+    }
+    document.getElementById('plotBtnClose').onclick = closePlotModal;
+
+    // Pestañas del graficador
+    var plotTabDefs = [
+      { btn: 'plotTabFuncion', panel: 'plotPanelFuncion' },
+      { btn: 'plotTabTangente', panel: 'plotPanelTangente' },
+      { btn: 'plotTabArea', panel: 'plotPanelArea' },
+      { btn: 'plotTabAnalisis', panel: 'plotPanelAnalisis' }
+    ];
+    function activatePlotTab(idx) {
+      plotTabDefs.forEach(function(t, i) {
+        var b = document.getElementById(t.btn);
+        var p = document.getElementById(t.panel);
+        var sel = (i === idx);
+        if (b) { b.setAttribute('aria-selected', sel ? 'true' : 'false'); b.tabIndex = sel ? 0 : -1; }
+        if (p) { if (sel) p.removeAttribute('hidden'); else p.setAttribute('hidden', ''); }
+      });
+      if (idx === 3) {
+        if (typeof updateAnalysisSelectors === 'function') updateAnalysisSelectors();
+        if (typeof recomputeAnalysis === 'function') recomputeAnalysis();
+      }
+    }
+    plotTabDefs.forEach(function(t, i) {
+      var b = document.getElementById(t.btn);
+      if (!b) return;
+      b.addEventListener('click', function() { activatePlotTab(i); });
+      b.addEventListener('keydown', function(e) {
+        var cur = i;
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          var nxt = (cur + 1) % plotTabDefs.length;
+          activatePlotTab(nxt);
+          var nb = document.getElementById(plotTabDefs[nxt].btn);
+          if (nb) nb.focus();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          var prv = (cur - 1 + plotTabDefs.length) % plotTabDefs.length;
+          activatePlotTab(prv);
+          var pb = document.getElementById(plotTabDefs[prv].btn);
+          if (pb) pb.focus();
+        }
+      });
+    });
+
+    // Trampa de foco dentro del modal
+    var plotModalEl = document.getElementById('plotModal');
+    if (plotModalEl) {
+      plotModalEl.addEventListener('keydown', function(e) {
+        if (e.key !== 'Tab') return;
+        var nodes = plotModalEl.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        var list = [];
+        for (var n = 0; n < nodes.length; n++) {
+          var el = nodes[n];
+          if (el.disabled) continue;
+          if (el.getAttribute('aria-hidden') === 'true') continue;
+          if (el.offsetParent === null && el !== document.body) continue;
+          list.push(el);
+        }
+        if (!list.length) return;
+        var first = list[0], last = list[list.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+    }
 
     document.getElementById('plotAnalysisToggle').addEventListener('click', function() {
       var panel = document.getElementById('plotAnalysisPanel');
@@ -4713,6 +4860,7 @@ window.addEventListener('load', function() {
       document.getElementById('plotError').style.display = 'none';
       updatePlotFunctionsList();
       requestDrawPlot();
+      if (typeof activatePlotTab === 'function') activatePlotTab(0);
     };
 
     window.addEventListener('resize', requestPlotResizeDraw);
