@@ -1404,6 +1404,15 @@
         #plotTangentSlider { width: 100%; accent-color: var(--accent); cursor: pointer; }
         .plot-tangent-info { font-size: 12px; font-family: 'Courier New', monospace; color: var(--text-main); word-break: break-word; }
         .plot-tangent-info strong { color: var(--accent); }
+        .plot-area-wrap { margin: 10px 0; padding-top: 8px; border-top: 1px dashed var(--border-color); }
+        .plot-area-toggle-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-main); margin-bottom: 8px; }
+        .plot-area-controls { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; background: rgba(0,0,0,0.15); border-radius: 8px; }
+        :root.light-mode .plot-area-controls { background: rgba(0,0,0,0.04); }
+        .plot-area-inputs { display: flex; gap: 12px; flex-wrap: wrap; }
+        .plot-area-inputs label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-main); }
+        .plot-area-inputs input { background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 8px; font-size: 13px; width: 80px; }
+        .plot-area-info { font-size: 13px; font-family: 'Courier New', monospace; color: var(--text-main); padding: 4px 0; }
+        .plot-area-info strong { color: var(--accent); }
         .plot-section { margin-bottom: 14px; }
         .plot-list { background: #121212; border: 1px solid #555; border-radius: 8px; padding: 8px; min-height: 40px; max-height: 120px; overflow-y: auto; font-size: 13px; color: #888; }
         .plot-empty { font-style: italic; }
@@ -1805,6 +1814,21 @@
             </label>
             <input type="range" id="plotTangentSlider" min="-10" max="10" step="0.05" value="0" aria-label="Posición x0 de la tangente">
             <div id="plotTangentInfo" class="plot-tangent-info"></div>
+          </div>
+        </div>
+
+        <div id="plotAreaWrap" class="plot-area-wrap">
+          <label class="plot-area-toggle-label">
+            <input type="checkbox" id="plotAreaToggle" aria-label="Mostrar área bajo la curva">
+            Calcular área bajo la curva
+          </label>
+          <div id="plotAreaControls" class="plot-area-controls" hidden>
+            <div class="plot-area-inputs">
+              <label>a: <input type="number" id="plotAreaA" value="0" step="0.1" aria-label="Límite inferior a"></label>
+              <label>b: <input type="number" id="plotAreaB" value="1" step="0.1" aria-label="Límite superior b"></label>
+            </div>
+            <div id="plotAreaInfo" class="plot-area-info"></div>
+            <button type="button" id="plotAreaInsertBtn" class="plot-btn-primary" aria-label="Insertar área en el lienzo">Insertar área en el lienzo</button>
           </div>
         </div>
 
@@ -3525,8 +3549,10 @@ window.addEventListener('load', function() {
     var plotFramePending = false;
     var plotResizeTimer = null;
     var tangentState = { active: false, x0: 0, fObj: null, y0: NaN, m: NaN };
+    var areaState = { active: false, a: 0, b: 1, value: null, fObj: null };
     window.plotView = plotView;
     window.activePlotFunctions = activePlotFunctions;
+    window.areaState = areaState;
 
     function niceStep(range, targetTicks) {
       if (!(range > 0)) return 1;
@@ -3969,6 +3995,24 @@ window.addEventListener('load', function() {
     });
 
 
+    function computeArea(fn, a, b, n) {
+      if (a >= b) return null;
+      var steps = n || 1000;
+      var dx = (b - a) / steps;
+      var sum = 0;
+      for (var i = 0; i < steps; i++) {
+        var x1 = a + i * dx;
+        var x2 = a + (i + 1) * dx;
+        var y1 = safeEvaluate(fn, x1);
+        var y2 = safeEvaluate(fn, x2);
+        if (!isFinite(y1) || !isFinite(y2)) return null;
+        if (Math.abs(y1) > 1e6 || Math.abs(y2) > 1e6) return null;
+        if (Math.abs(y2 - y1) > 500) return null;
+        sum += (y1 + y2) * dx / 2;
+      }
+      return sum;
+    }
+
     function updateTangentUI() {
       var toggle = document.getElementById('plotTangentToggle');
       var controls = document.getElementById('plotTangentControls');
@@ -4036,6 +4080,102 @@ window.addEventListener('load', function() {
     var _tgSlider = document.getElementById('plotTangentSlider');
     if (_tgSlider) _tgSlider.addEventListener('input', recomputeTangent);
 
+    function updateAreaUI() {
+      var toggle = document.getElementById('plotAreaToggle');
+      var controls = document.getElementById('plotAreaControls');
+      if (!toggle || !controls) return;
+      if (toggle.checked && activePlotFunctions.length > 0) {
+        controls.hidden = false;
+        var sel = document.getElementById('plotAnalysisFnSelect');
+        var idx = 0;
+        if (sel && sel.value !== '') idx = parseInt(sel.value, 10);
+        if (!isFinite(idx) || idx < 0 || idx >= activePlotFunctions.length) idx = 0;
+        areaState.fObj = activePlotFunctions[idx];
+        areaState.active = true;
+        var aInput = document.getElementById('plotAreaA');
+        var bInput = document.getElementById('plotAreaB');
+        if (aInput && areaState.fObj) {
+          if (aInput.value === '' || !isFinite(parseFloat(aInput.value))) aInput.value = String(areaState.fObj.xMin);
+        }
+        if (bInput && areaState.fObj) {
+          if (bInput.value === '' || !isFinite(parseFloat(bInput.value))) bInput.value = String(areaState.fObj.xMax);
+        }
+        if (aInput && areaState.fObj) aInput.min = String(areaState.fObj.xMin);
+        if (aInput && areaState.fObj) aInput.max = String(areaState.fObj.xMax);
+        if (bInput && areaState.fObj) bInput.min = String(areaState.fObj.xMin);
+        if (bInput && areaState.fObj) bInput.max = String(areaState.fObj.xMax);
+        recomputeArea();
+      } else {
+        controls.hidden = true;
+        areaState.active = false;
+        areaState.fObj = null;
+        areaState.value = null;
+        requestDrawPlot();
+      }
+    }
+    function recomputeArea() {
+      if (!areaState || !areaState.active || !areaState.fObj) return;
+      var aInput = document.getElementById('plotAreaA');
+      var bInput = document.getElementById('plotAreaB');
+      var a = aInput ? parseFloat(aInput.value) : areaState.a;
+      var b = bInput ? parseFloat(bInput.value) : areaState.b;
+      var info = document.getElementById('plotAreaInfo');
+      if (!isFinite(a) || !isFinite(b) || a >= b) {
+        if (info) info.textContent = 'Intervalo inválido (a debe ser < b)';
+        areaState.value = null;
+        requestDrawPlot();
+        return;
+      }
+      var value = computeArea(areaState.fObj.compiled, a, b, 1000);
+      if (value === null) {
+        if (info) info.textContent = 'Área no definida (discontinuidad en [a, b])';
+        areaState.value = null;
+        requestDrawPlot();
+        return;
+      }
+      areaState.a = a;
+      areaState.b = b;
+      areaState.value = value;
+      if (info) info.textContent = 'Área ≈ ' + formatNum(value) + ' (de ' + formatNum(a) + ' a ' + formatNum(b) + ')';
+      requestDrawPlot();
+    }
+    var _areaToggle = document.getElementById('plotAreaToggle');
+    if (_areaToggle) _areaToggle.addEventListener('change', updateAreaUI);
+    var _areaA = document.getElementById('plotAreaA');
+    if (_areaA) _areaA.addEventListener('input', recomputeArea);
+    var _areaB = document.getElementById('plotAreaB');
+    if (_areaB) _areaB.addEventListener('input', recomputeArea);
+    var _areaInsertBtn = document.getElementById('plotAreaInsertBtn');
+    if (_areaInsertBtn) _areaInsertBtn.addEventListener('click', function() {
+      if (areaState.value === null || !areaState.fObj) return;
+      var text = 'Área bajo la curva\n'
+        + 'f(x) = ' + areaState.fObj.expr + '\n'
+        + 'Intervalo: [' + formatNum(areaState.a) + ', ' + formatNum(areaState.b) + ']\n'
+        + 'Área ≈ ' + formatNum(areaState.value);
+      var cvs = (typeof canvas !== 'undefined') ? canvas : (window.canvas || null);
+      if (!cvs) return;
+      var cw = cvs.getWidth ? cvs.getWidth() : cvs.width;
+      var ch = cvs.getHeight ? cvs.getHeight() : cvs.height;
+      var vpt = cvs.viewportTransform || [1,0,0,1,0,0];
+      var zoom = vpt[0] || 1;
+      var cx = (-vpt[4]) / zoom + (cw / zoom) / 2;
+      var cy = (-vpt[5]) / zoom + (ch / zoom) / 2;
+      var fontSize = Math.max(14, Math.min(32, Math.round(24 / zoom)));
+      var tb = new fabric.Textbox(text, {
+        left: cx, top: cy, originX: 'center', originY: 'center',
+        fontSize: fontSize, fill: (document.getElementById('colorPicker') ? document.getElementById('colorPicker').value : '#ffffff'),
+        textAlign: 'left', editable: true, width: Math.min(600, cw / zoom * 0.8)
+      });
+      cvs.add(tb);
+      cvs.setActiveObject(tb);
+      cvs.requestRenderAll();
+      if (typeof setTool === 'function') setTool('select');
+      if (typeof saveHistory === 'function') saveHistory();
+      var modal = document.getElementById('plotModal');
+      if (modal) modal.style.display = 'none';
+      if (typeof showToast === 'function') showToast('📐 Área insertada en el lienzo', 'ok');
+    });
+
     function updateAnalysisSelectors() {
       var sel = document.getElementById('plotAnalysisFnSelect');
       var f1 = document.getElementById('plotAnalysisF1');
@@ -4062,6 +4202,7 @@ window.addEventListener('load', function() {
       if (insertBtn) insertBtn.disabled = (activePlotFunctions.length === 0);
       if (panel && !panel.hidden) recomputeAnalysis();
       if (typeof updateTangentUI === 'function') updateTangentUI();
+      if (typeof updateAreaUI === 'function') updateAreaUI();
     }
     function recomputeAnalysis() {
       var sel = document.getElementById('plotAnalysisFnSelect');
@@ -4230,6 +4371,29 @@ window.addEventListener('load', function() {
       }
 
       var v = createView(plotCanvasEl, plotView);
+      // Área bajo la curva
+      if (typeof areaState !== 'undefined' && areaState.active && areaState.fObj && isFinite(areaState.value) && areaState.a < areaState.b) {
+        var aX = Math.max(areaState.a, plotView.xMin);
+        var bX = Math.min(areaState.b, plotView.xMax);
+        if (aX < bX) {
+          var stepsA = Math.max(50, Math.floor((bX - aX) * 20));
+          ctx.beginPath();
+          ctx.moveTo(v.xToPixel(aX), v.yToPixel(0));
+          for (var ia = 0; ia <= stepsA; ia++) {
+            var xa = aX + (bX - aX) * (ia / stepsA);
+            var ya = safeEvaluate(areaState.fObj.compiled, xa);
+            if (!isFinite(ya)) continue;
+            ctx.lineTo(v.xToPixel(xa), v.yToPixel(ya));
+          }
+          ctx.lineTo(v.xToPixel(bX), v.yToPixel(0));
+          ctx.closePath();
+          ctx.fillStyle = isLight ? 'rgba(52, 152, 219, 0.25)' : 'rgba(52, 152, 219, 0.35)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(52, 152, 219, 0.8)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
       activePlotFunctions.forEach(function(f) {
         if (!f.visible) return;
         var fromX = Math.max(f.xMin, plotView.xMin);

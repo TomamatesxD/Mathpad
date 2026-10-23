@@ -4,7 +4,7 @@
 
 
 // Versión de caché v38: Paso 8.3.2 — recta tangente interactiva
-const CACHE_NAME = 'mathpad-v38'; // Versión de caché v38: Paso 8.3.2 — recta tangente interactiva
+const CACHE_NAME = 'mathpad-v39'; // Versión de caché v39: Paso 8.3.3 — área bajo la curva
 const urlsToCache = [
   './',
   './index.html',
