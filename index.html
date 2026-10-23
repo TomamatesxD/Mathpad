@@ -4162,7 +4162,7 @@ document.getElementById('btnPlot').onclick = () => {
     }
 
     function calcEnterEditKeep() {
-        if (justEvaluated) justEvaluated = false;
+        if (justEvaluated) { justEvaluated = false; calcSave(); }
     }
 
     function calcRender() {
@@ -4234,6 +4234,7 @@ document.getElementById('btnPlot').onclick = () => {
         calcTokens.splice(calcCaret, 0, tok);
         calcCaret++;
         calcRender();
+        calcSave();
     }
 
     function calcUpdate(append) {
@@ -4247,6 +4248,7 @@ document.getElementById('btnPlot').onclick = () => {
         calcHistory.push({ expression, result, timestamp: Date.now(), tokens: calcTokens.map(function(t) { return { show: t.show, js: t.js, kind: t.kind }; }) });
         if (calcHistory.length > 50) calcHistory.shift(); // Limitar a 50 entradas
         updateCalcHistoryUI();
+        calcSave();
     }
 
     function updateCalcHistoryUI() {
@@ -4354,6 +4356,7 @@ document.getElementById('btnPlot').onclick = () => {
             if (tc.js.charAt(0) === '-') { tc.js = tc.js.slice(1); tc.show = tc.show.replace(/^-/, ''); }
             else { tc.js = '-' + tc.js; tc.show = '-' + tc.show; }
             calcRender();
+            calcSave();
             return;
         }
         if (i >= 0 && calcTokens[i].kind === 'num') {
@@ -4374,6 +4377,7 @@ document.getElementById('btnPlot').onclick = () => {
             if (tail > calcTokens.length - (j + arr.length)) tail = calcTokens.length - (j + arr.length);
             calcCaret = j + arr.length + tail;
             calcRender();
+            calcSave();
             return;
         }
         calcPushToken({ show: '-', js: '-', kind: 'neg' });
@@ -4520,11 +4524,13 @@ document.getElementById('btnPlot').onclick = () => {
             else calcCaret = 0;
             justEvaluated = false;
             calcRender();
+            calcSave();
             return;
         }
         calcCaret += delta;
         calcClampCaret();
         calcRender();
+        calcSave();
     }
 
     function calcMoveCaretTo(pos, fromEdit) {
@@ -4534,6 +4540,7 @@ document.getElementById('btnPlot').onclick = () => {
         calcCaret = pos;
         calcClampCaret();
         calcRender();
+        calcSave();
     }
 
     function calcBumpCaretRepeat(delta) {
@@ -4752,13 +4759,14 @@ document.getElementById('btnPlot').onclick = () => {
         return res2;
     }
     document.getElementById('calcClear').onclick = function() { calcTokens = []; calcCaret = 0; calcError = null; justEvaluated = false; calcSetShift(false); resDisplay.textContent = '0'; calcRender(); calcSave(); };
-    document.getElementById('calcDel').onclick = function() { if (calcError) { calcClearErrorIfNeeded(); return; } calcEnterEditKeep(); calcClampCaret(); if (calcCaret > 0) { calcTokens.splice(calcCaret - 1, 1); calcCaret--; } calcRender(); };
+    document.getElementById('calcDel').onclick = function() { if (calcError) { calcClearErrorIfNeeded(); return; } calcEnterEditKeep(); calcClampCaret(); if (calcCaret > 0) { calcTokens.splice(calcCaret - 1, 1); calcCaret--; } calcRender(); calcSave(); };
     function calcDeleteForward() {
         if (calcError) { calcClearErrorIfNeeded(); return; }
         calcEnterEditKeep();
         calcClampCaret();
         if (calcCaret < calcTokens.length) calcTokens.splice(calcCaret, 1);
         calcRender();
+        calcSave();
     }
     document.getElementById('calcEquals').onclick = function() {
         calcSetShift(false);
@@ -4928,11 +4936,11 @@ document.getElementById('btnPlot').onclick = () => {
 
     // ── Persistencia de la calculadora (localStorage) ──
     window.addEventListener('pagehide', function() {
-        if (calcDirty) calcSave();
+        calcSave();
     });
 
     document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'hidden' && calcDirty) calcSave();
+        if (document.visibilityState === 'hidden') calcSave();
     });
 
     // Restaurar estado guardado al arrancar, antes del primer pintado
