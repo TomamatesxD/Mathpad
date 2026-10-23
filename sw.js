@@ -4,7 +4,7 @@
 
 
 // Versión de caché v33: Paso 8.1 — persistencia del graficador por pagina
-const CACHE_NAME = 'mathpad-v33';
+const CACHE_NAME = 'mathpad-v34'; // Versión de caché v34: Paso 8.2 — análisis matemático de funciones en panel
 const urlsToCache = [
   './',
   './index.html',

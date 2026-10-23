@@ -1362,6 +1362,26 @@
         #plotModal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .65); z-index: 9000; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; overflow-y: auto; }
         .plot-dialog { background: #1e1e1e; border: 1px solid #444; border-radius: 14px; padding: 28px 32px; width: 90%; max-width: 500px; max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; }
         .plot-title { color: #bb86fc; margin-bottom: 20px; font-size: 16px; }
+        .plot-analysis-wrap { margin: 10px 0; border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .plot-analysis-toggle { display: flex; justify-content: space-between; align-items: center; width: 100%; background: transparent; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.15s; }
+        .plot-analysis-toggle:hover { background: rgba(255,255,255,0.05); }
+        :root.light-mode .plot-analysis-toggle:hover { background: rgba(0,0,0,0.05); }
+        .plot-analysis-chevron { transition: transform 0.2s; }
+        .plot-analysis-toggle[aria-expanded="true"] .plot-analysis-chevron { transform: rotate(180deg); }
+        .plot-analysis-panel { padding: 10px 0; }
+        .plot-analysis-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+        .plot-analysis-controls label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-main); }
+        .plot-analysis-controls select { background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 8px; font-size: 12px; max-width: 180px; }
+        .plot-analysis-content { font-size: 12.5px; line-height: 1.7; color: var(--text-main); margin-bottom: 12px; }
+        .plot-analysis-row { display: flex; gap: 10px; padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
+        :root.light-mode .plot-analysis-row { border-bottom-color: rgba(0,0,0,0.08); }
+        .plot-analysis-label { font-weight: 600; color: var(--accent); min-width: 140px; flex-shrink: 0; }
+        .plot-analysis-value { color: var(--text-main); word-break: break-word; }
+        .plot-analysis-intersections { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
+        .plot-analysis-intersections h4 { font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+        .plot-value-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 12px; margin-top: 6px; }
+        .plot-value-table th, .plot-value-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border-color); }
+        .plot-value-table th { color: var(--accent); font-weight: 600; }
         .plot-label { color: #aaa; font-size: 12px; display: block; margin-bottom: 6px; }
         .plot-label-sm { color: #aaa; font-size: 12px; display: block; margin-bottom: 4px; }
         .plot-hint { color: #666; }
@@ -1768,6 +1788,29 @@
           <label class="plot-label">Funciones graficadas:</label>
           <div id="plotFunctionsList" class="plot-list">
             <span class="plot-empty">Ninguna funciÃ³n graficada aÃºn</span>
+          </div>
+        </div>
+
+        <div id="plotAnalysisWrap" class="plot-analysis-wrap">
+          <button type="button" id="plotAnalysisToggle" class="plot-analysis-toggle" aria-expanded="false" aria-controls="plotAnalysisPanel">
+            <span id="plotAnalysisToggleText">Mostrar análisis</span>
+            <span class="plot-analysis-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div id="plotAnalysisPanel" class="plot-analysis-panel" hidden>
+            <div class="plot-analysis-controls">
+              <label>Función a analizar:
+                <select id="plotAnalysisFnSelect" aria-label="Función a analizar"></select>
+              </label>
+            </div>
+            <div id="plotAnalysisContent" class="plot-analysis-content"></div>
+            <div class="plot-analysis-intersections">
+              <h4>Intersecciones entre dos funciones</h4>
+              <div class="plot-analysis-controls">
+                <label>f₁: <select id="plotAnalysisF1" aria-label="Primera función"></select></label>
+                <label>f₂: <select id="plotAnalysisF2" aria-label="Segunda función"></select></label>
+              </div>
+              <div id="plotIntersectionsContent" class="plot-analysis-content"></div>
+            </div>
           </div>
         </div>
 
@@ -3481,6 +3524,338 @@ window.addEventListener('load', function() {
         return (typeof y === 'number' && Number.isFinite(y)) ? y : NaN;
       } catch (e) { return NaN; }
     }
+    function formatNum(v) {
+      if (typeof v !== 'number' || !isFinite(v)) return '—';
+      if (Math.abs(v) < 1e-9) return '0';
+      if (Math.abs(v) >= 1e5 || Math.abs(v) < 1e-4) return v.toExponential(3);
+      return v.toFixed(4).replace(/0+$/, '').replace(/\.$/, '');
+    }
+    function fprime(fn, x, h) {
+      return (fn(x + h) - fn(x - h)) / (2 * h);
+    }
+    function fsecond(fn, x, h) {
+      return (fprime(fn, x + h, h) - fprime(fn, x - h, h)) / (2 * h);
+    }
+    function bisect(fn, a, b, iters) {
+      var fa = fn(a);
+      for (var i = 0; i < iters; i++) {
+        var m = (a + b) / 2;
+        var fm = fn(m);
+        if (fm === 0 || (b - a) < 1e-9) return m;
+        if (fa * fm < 0) { b = m; } else { a = m; fa = fm; }
+      }
+      return (a + b) / 2;
+    }
+    function findSignChanges(fn, a, b, samples, yMaxAbs) {
+      var result = [];
+      var n = samples;
+      var prevX = a, prevY = fn(a);
+      for (var i = 1; i <= n; i++) {
+        var x = a + (b - a) * (i / n);
+        var y = fn(x);
+        if (yMaxAbs && (Math.abs(prevY) > yMaxAbs || Math.abs(y) > yMaxAbs)) { prevX = x; prevY = y; continue; }
+        if (isFinite(prevY) && isFinite(y) && prevY * y < 0) {
+          result.push({ a: prevX, b: x });
+        } else if (y === 0 && isFinite(y)) {
+          result.push({ a: x, b: x });
+        }
+        prevX = x; prevY = y;
+      }
+      var dedup = [];
+      for (var k = 0; k < result.length; k++) {
+        var r = result[k];
+        if (!dedup.length || (r.a - dedup[dedup.length - 1].b) > 1e-4) dedup.push(r);
+      }
+      return dedup;
+    }
+    function findRoots(fn, a, b, samples) {
+      var changes = findSignChanges(fn, a, b, samples);
+      var roots = [];
+      for (var i = 0; i < changes.length; i++) {
+        var c = changes[i];
+        if (c.a === c.b) { roots.push(c.a); continue; }
+        roots.push(bisect(fn, c.a, c.b, 40));
+      }
+      var dedupRoots = [];
+      for (var r = 0; r < roots.length; r++) {
+        if (dedupRoots.length === 0 || Math.abs(roots[r] - dedupRoots[dedupRoots.length - 1]) >= 1e-6) dedupRoots.push(roots[r]);
+      }
+      return dedupRoots;
+    }
+    function findExtrema(fn, a, b, samples, h, yMaxAbs) {
+      var dfn = function(x) { return fprime(fn, x, h); };
+      var changes = findSignChanges(dfn, a, b, samples, yMaxAbs);
+      var result = [];
+      for (var i = 0; i < changes.length; i++) {
+        var c = changes[i];
+        var xStar;
+        if (c.a === c.b) { xStar = c.a; }
+        else { xStar = bisect(dfn, c.a, c.b, 40); }
+        var d2 = fsecond(fn, xStar, h);
+        if (!isFinite(d2) || Math.abs(d2) < 1e-6) continue;
+        var yStar = fn(xStar);
+        if (!isFinite(yStar)) continue;
+        result.push({ x: xStar, y: yStar, type: d2 > 0 ? 'min' : 'max' });
+      }
+      return result;
+    }
+    function findInflections(fn, a, b, samples, h, yMaxAbs) {
+      var d2fn = function(x) { return fsecond(fn, x, h); };
+      var changes = findSignChanges(d2fn, a, b, samples, yMaxAbs);
+      var result = [];
+      for (var i = 0; i < changes.length; i++) {
+        var c = changes[i];
+        if (c.a === c.b) { result.push(c.a); continue; }
+        result.push(bisect(d2fn, c.a, c.b, 40));
+      }
+      return result;
+    }
+    function computeDomain(fn, a, b, samples) {
+      var n = samples, intervals = [], open = null;
+      for (var i = 0; i <= n; i++) {
+        var x = a + (b - a) * (i / n);
+        var y = fn(x);
+        var ok = isFinite(y) && Math.abs(y) < 1e6;
+        if (ok && open === null) open = x;
+        else if (!ok && open !== null) { intervals.push([open, x]); open = null; }
+      }
+      if (open !== null) intervals.push([open, b]);
+      return intervals;
+    }
+    function computeRange(fn, a, b, samples) {
+      var mn = Infinity, mx = -Infinity;
+      for (var i = 0; i <= samples; i++) {
+        var x = a + (b - a) * (i / samples);
+        var y = fn(x);
+        if (isFinite(y) && Math.abs(y) < 1e6) {
+          if (y < mn) mn = y;
+          if (y > mx) mx = y;
+        }
+      }
+      return [mn, mx];
+    }
+    function computeMonotony(fn, a, b, samples, h, yMaxAbs) {
+      var dfn = function(x) { return fprime(fn, x, h); };
+      var inc = [], dec = [], curSign = null, segStart = a;
+      for (var i = 0; i <= 200; i++) {
+        var x = a + (b - a) * (i / 200);
+        var d = dfn(x);
+        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
+        var s = d > 0 ? 1 : -1;
+        if (curSign === null) { curSign = s; segStart = x; }
+        else if (s !== curSign) {
+          var segment = [segStart, x];
+          if (curSign > 0) inc.push(segment); else dec.push(segment);
+          curSign = s; segStart = x;
+        }
+      }
+      if (curSign !== null) {
+        var seg = [segStart, b];
+        if (curSign > 0) inc.push(seg); else dec.push(seg);
+      }
+      return { inc: inc, dec: dec };
+    }
+    function computeConcavity(fn, a, b, samples, h, yMaxAbs) {
+      var d2fn = function(x) { return fsecond(fn, x, h); };
+      var up = [], down = [], curSign = null, segStart = a;
+      for (var i = 0; i <= 200; i++) {
+        var x = a + (b - a) * (i / 200);
+        var d = d2fn(x);
+        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
+        var s = d > 0 ? 1 : -1;
+        if (curSign === null) { curSign = s; segStart = x; }
+        else if (s !== curSign) {
+          var segment = [segStart, x];
+          if (curSign > 0) up.push(segment); else down.push(segment);
+          curSign = s; segStart = x;
+        }
+      }
+      if (curSign !== null) {
+        var seg2 = [segStart, b];
+        if (curSign > 0) up.push(seg2); else down.push(seg2);
+      }
+      return { up: up, down: down };
+    }
+    function buildValueTable(fn, a, b, rows) {
+      var result = [];
+      for (var i = 0; i < rows; i++) {
+        var x = a + (b - a) * (i / (rows - 1));
+        var y = fn(x);
+        result.push({ x: x, y: isFinite(y) ? y : null });
+      }
+      return result;
+    }
+    function findIntersections(f1, f2, a, b, samples) {
+      var diff = function(x) {
+        var y1 = safeEvaluate(f1.compiled, x);
+        var y2 = safeEvaluate(f2.compiled, x);
+        if (!isFinite(y1) || !isFinite(y2)) return NaN;
+        return y1 - y2;
+      };
+      var roots = findRoots(diff, a, b, samples);
+      var points = [];
+      roots.forEach(function(r) {
+        var y = safeEvaluate(f1.compiled, r);
+        if (isFinite(y)) points.push({ x: r, y: y });
+      });
+      return points;
+    }
+    function analyzeFunction(fObj) {
+      var a = fObj.xMin, b = fObj.xMax;
+      var samples = 1000;
+      var h = (b - a) / 2000;
+      var yMaxAbs = 1e6;
+      var fn = function(x) { return safeEvaluate(fObj.compiled, x); };
+      var yAt0 = (a <= 0 && b >= 0) ? safeEvaluate(fObj.compiled, 0) : NaN;
+      return {
+        ok: true,
+        expr: fObj.expr,
+        yIntercept: isFinite(yAt0) ? yAt0 : null,
+        roots: findRoots(fn, a, b, samples),
+        extrema: findExtrema(fn, a, b, samples, h, yMaxAbs),
+        domain: computeDomain(fn, a, b, samples),
+        range: computeRange(fn, a, b, samples),
+        monotony: computeMonotony(fn, a, b, samples, h, yMaxAbs),
+        concavity: computeConcavity(fn, a, b, samples, h, yMaxAbs),
+        inflections: findInflections(fn, a, b, samples, h, yMaxAbs),
+        table: buildValueTable(fn, a, b, 10)
+      };
+    }
+    function makeAnalysisRow(label, value) {
+      var row = document.createElement('div');
+      row.className = 'plot-analysis-row';
+      var l = document.createElement('span');
+      l.className = 'plot-analysis-label';
+      l.textContent = label;
+      var v = document.createElement('span');
+      v.className = 'plot-analysis-value';
+      v.textContent = value;
+      row.appendChild(l); row.appendChild(v);
+      return row;
+    }
+    function formatIntervals(arr) {
+      if (!arr.length) return '—';
+      return arr.map(function(iv) { return '(' + formatNum(iv[0]) + ', ' + formatNum(iv[1]) + ')'; }).join(' ∪ ');
+    }
+    function renderAnalysis(data) {
+      var wrap = document.createElement('div');
+      if (!data || !data.ok) {
+        wrap.textContent = 'Sin datos.';
+        return wrap;
+      }
+      wrap.appendChild(makeAnalysisRow('Ordenada al origen', data.yIntercept !== null ? 'y = ' + formatNum(data.yIntercept) : 'no definida en el rango'));
+      wrap.appendChild(makeAnalysisRow('Raíces', data.roots.length ? data.roots.map(function(r) { return 'x = ' + formatNum(r); }).join(', ') : 'ninguna en el rango'));
+      if (data.extrema.length) {
+        data.extrema.forEach(function(e) {
+          wrap.appendChild(makeAnalysisRow(e.type === 'min' ? 'Mínimo local' : 'Máximo local', '(' + formatNum(e.x) + ', ' + formatNum(e.y) + ')'));
+        });
+      } else {
+        wrap.appendChild(makeAnalysisRow('Extremos', 'ninguno en el rango'));
+      }
+      wrap.appendChild(makeAnalysisRow('Dominio (rango)', data.domain.length ? formatIntervals(data.domain) : 'vacío'));
+      wrap.appendChild(makeAnalysisRow('Imagen (rango)', isFinite(data.range[0]) ? '[' + formatNum(data.range[0]) + ', ' + formatNum(data.range[1]) + ']' : 'no definida'));
+      if (data.monotony.inc.length) wrap.appendChild(makeAnalysisRow('Crece en', formatIntervals(data.monotony.inc)));
+      if (data.monotony.dec.length) wrap.appendChild(makeAnalysisRow('Decrece en', formatIntervals(data.monotony.dec)));
+      if (data.concavity.up.length) wrap.appendChild(makeAnalysisRow('Cóncava hacia arriba', formatIntervals(data.concavity.up)));
+      if (data.concavity.down.length) wrap.appendChild(makeAnalysisRow('Cóncava hacia abajo', formatIntervals(data.concavity.down)));
+      wrap.appendChild(makeAnalysisRow('Puntos de inflexión', data.inflections.length ? data.inflections.map(function(x) { return 'x = ' + formatNum(x); }).join(', ') : 'ninguno en el rango'));
+      var tableWrap = document.createElement('div');
+      var title = document.createElement('div');
+      title.style.marginTop = '10px';
+      title.style.marginBottom = '4px';
+      title.style.fontWeight = '600';
+      title.style.color = 'var(--accent)';
+      title.textContent = 'Tabla de valores';
+      tableWrap.appendChild(title);
+      var table = document.createElement('table');
+      table.className = 'plot-value-table';
+      var thead = document.createElement('thead');
+      var trh = document.createElement('tr');
+      var th1 = document.createElement('th'); th1.textContent = 'x';
+      var th2 = document.createElement('th'); th2.textContent = 'f(x)';
+      trh.appendChild(th1); trh.appendChild(th2);
+      thead.appendChild(trh); table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      data.table.forEach(function(row) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td'); td1.textContent = formatNum(row.x);
+        var td2 = document.createElement('td'); td2.textContent = row.y !== null ? formatNum(row.y) : '—';
+        tr.appendChild(td1); tr.appendChild(td2);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrap.appendChild(table);
+      wrap.appendChild(tableWrap);
+      return wrap;
+    }
+    function renderIntersections(fn1, fn2, points) {
+      var wrap = document.createElement('div');
+      if (!points.length) {
+        wrap.textContent = 'Sin intersecciones en el rango visible.';
+        return wrap;
+      }
+      points.forEach(function(p) {
+        wrap.appendChild(makeAnalysisRow('Intersección', '(' + formatNum(p.x) + ', ' + formatNum(p.y) + ')'));
+      });
+      return wrap;
+    }
+    function updateAnalysisSelectors() {
+      var sel = document.getElementById('plotAnalysisFnSelect');
+      var f1 = document.getElementById('plotAnalysisF1');
+      var f2 = document.getElementById('plotAnalysisF2');
+      if (!sel || !f1 || !f2) return;
+      var prevSel = sel.value, prevF1 = f1.value, prevF2 = f2.value;
+      sel.textContent = ''; f1.textContent = ''; f2.textContent = '';
+      activePlotFunctions.forEach(function(f, i) {
+        var idx = String(i);
+        var label = 'f(x) = ' + f.expr;
+        var o1 = document.createElement('option'); o1.value = idx; o1.textContent = label;
+        var o2 = o1.cloneNode(true);
+        var o3 = o1.cloneNode(true);
+        sel.appendChild(o1); f1.appendChild(o2); f2.appendChild(o3);
+      });
+      if (prevSel && sel.querySelector('option[value="' + prevSel + '"]')) sel.value = prevSel;
+      if (prevF1 && f1.querySelector('option[value="' + prevF1 + '"]')) f1.value = prevF1;
+      if (prevF2 && f2.querySelector('option[value="' + prevF2 + '"]')) f2.value = prevF2;
+      if (!sel.value && activePlotFunctions.length > 0) sel.value = '0';
+      if (!f1.value && activePlotFunctions.length > 0) f1.value = '0';
+      if (!f2.value && activePlotFunctions.length > 1) f2.value = '1';
+      var panel = document.getElementById('plotAnalysisPanel');
+      if (panel && !panel.hidden) recomputeAnalysis();
+    }
+    function recomputeAnalysis() {
+      var sel = document.getElementById('plotAnalysisFnSelect');
+      var f1 = document.getElementById('plotAnalysisF1');
+      var f2 = document.getElementById('plotAnalysisF2');
+      var content = document.getElementById('plotAnalysisContent');
+      var intersContent = document.getElementById('plotIntersectionsContent');
+      if (!sel || !content) return;
+      content.textContent = ''; intersContent.textContent = '';
+      if (!activePlotFunctions.length) {
+        var msg = document.createElement('div'); msg.textContent = 'Agregá una función para analizar.';
+        content.appendChild(msg);
+        return;
+      }
+      var idx = parseInt(sel.value, 10);
+      var fObj = activePlotFunctions[idx];
+      if (!fObj) { var e1 = document.createElement('div'); e1.textContent = 'Función no encontrada.'; content.appendChild(e1); return; }
+      var data = analyzeFunction(fObj);
+      content.appendChild(renderAnalysis(data));
+      if (activePlotFunctions.length < 2) {
+        var m2 = document.createElement('div'); m2.textContent = 'Necesitás al menos 2 funciones para calcular intersecciones.';
+        intersContent.appendChild(m2); return;
+      }
+      var i1 = parseInt(f1.value, 10), i2 = parseInt(f2.value, 10);
+      var A = activePlotFunctions[i1], B = activePlotFunctions[i2];
+      if (!A || !B) return;
+      if (A === B) {
+        var m3 = document.createElement('div'); m3.textContent = 'Elegí dos funciones distintas.';
+        intersContent.appendChild(m3); return;
+      }
+      var minA = Math.min(A.xMin, B.xMin), maxA = Math.max(A.xMax, B.xMax);
+      var pts = findIntersections(A, B, minA, maxA, 1000);
+      intersContent.appendChild(renderIntersections(A, B, pts));
+    }
     function createView(canvas, state) {
       var w = canvas.clientWidth, h = canvas.clientHeight;
       var xSpan = state.xMax - state.xMin, ySpan = state.yMax - state.yMin;
@@ -3800,6 +4175,7 @@ window.addEventListener('load', function() {
         row.appendChild(del);
         listEl.appendChild(row);
       });
+      if (typeof updateAnalysisSelectors === 'function') updateAnalysisSelectors();
     }
 
     document.getElementById('plotBtnAdd').onclick = function() {
@@ -3872,6 +4248,22 @@ window.addEventListener('load', function() {
     document.getElementById('plotBtnClose').onclick = function() {
       document.getElementById('plotModal').style.display = 'none';
     };
+
+    document.getElementById('plotAnalysisToggle').addEventListener('click', function() {
+      var panel = document.getElementById('plotAnalysisPanel');
+      var txt = document.getElementById('plotAnalysisToggleText');
+      var open = panel.hidden;
+      panel.hidden = !open;
+      this.setAttribute('aria-expanded', open ? 'true' : 'false');
+      txt.textContent = open ? 'Ocultar análisis' : 'Mostrar análisis';
+      if (open) {
+        updateAnalysisSelectors();
+        recomputeAnalysis();
+      }
+    });
+    document.getElementById('plotAnalysisFnSelect').addEventListener('change', recomputeAnalysis);
+    document.getElementById('plotAnalysisF1').addEventListener('change', recomputeAnalysis);
+    document.getElementById('plotAnalysisF2').addEventListener('change', recomputeAnalysis);
     document.getElementById('btnPlot').onclick = function() {
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       document.getElementById('plotModal').style.display = 'flex';
@@ -4337,6 +4729,7 @@ window.addEventListener('load', function() {
     window.__mathpad.calcRestore = calcRestore;
     window.__mathpad.updateCalcHistoryUI = updateCalcHistoryUI;
     window.__mathpad.calcRender = calcRender;
+    window.analyzeFunction = analyzeFunction;
 
     function calcSetShift(on) {
         shiftActive = !!on;
