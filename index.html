@@ -1423,7 +1423,7 @@
         .plot-error { color: #f87171; font-size: 12px; margin-top: 10px; display: none; }
         .plot-canvas-wrap { position: relative; width: 100%; margin: 12px 0; border-radius: 10px; overflow: hidden; background: var(--bg-dark); border: 1px solid var(--border-color); touch-action: none; }
         #plotCanvas { display: block; width: 100%; aspect-ratio: 9 / 5; height: auto; cursor: crosshair; touch-action: none; }
-        .plot-hud { position: absolute; bottom: 6px; right: 8px; font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.55); color: #e0e0e0; pointer-events: none; font-family: 'Courier New', monospace; }
+        .plot-hud { position: absolute; bottom: 6px; right: 8px; font-size: 13px; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.55); color: #e0e0e0; pointer-events: none; font-family: system-ui, -apple-system, sans-serif; }
         :root.light-mode .plot-hud { background: rgba(255,255,255,0.85); color: #212121; }
         .plot-canvas-wrap:focus-within { border-color: var(--accent); }
         .plot-function-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid var(--border-color); }
@@ -2863,7 +2863,7 @@ window.addEventListener('load', function() {
             ctx.translate(RULER_SIZE - (isMobile ? 6 : 8), sy);
             ctx.rotate(-Math.PI / 2);
             ctx.textAlign = 'center';
-            ctx.fillText(parseFloat((y / GRID_BASE).toPrecision(12)).toString(), 0, 0);
+            ctx.fillText(parseFloat((-(y / GRID_BASE)).toPrecision(12)).toString(), 0, 0);
             ctx.restore();
         }
 
@@ -3965,14 +3965,14 @@ window.addEventListener('load', function() {
       }
       var vpt = canvas.viewportTransform;
       var fs = parseInt(document.getElementById('fontSizePicker').value, 10) || 12;
-      var fontSize = Math.min(Math.max(fs / (canvas.getZoom() || 1), 8), 32);
+      var fontSize = Math.min(Math.max(fs / (canvas.getZoom() || 1), 12), 36);
       var color = document.getElementById('colorPicker').value || '#000000';
       var maxWidth = Math.min((canvas.getWidth() / (canvas.getZoom() || 1)) * 0.6, 600);
       var tb = new fabric.Textbox(text, {
         left: 0, top: 0,
         width: maxWidth,
         fontSize: fontSize,
-        fontFamily: 'Courier New, Consolas, monospace',
+        fontFamily: 'Arial, Helvetica, sans-serif',
         fill: color,
         lineHeight: 1.25,
         editable: true,
@@ -4347,7 +4347,7 @@ window.addEventListener('load', function() {
         }
 
         ctx.fillStyle = isLight ? '#333' : '#e0e0e0';
-        ctx.font = '11px "Segoe UI", sans-serif';
+        ctx.font = '12px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         for (var tx = Math.ceil(plotView.xMin / stepX) * stepX; tx <= plotView.xMax; tx += stepX) {
           if (Math.abs(tx) < 1e-9) continue;
