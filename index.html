@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Entorno de Estudio MatemÃ¡tico</title>
+    <title>Entorno de Estudio Matemático</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="manifest" href="./manifest.json">
     <style>
@@ -49,7 +49,7 @@
             overscroll-behavior: none; /* NUEVO: Blindaje PWA */
         }
 
-        /* â”€â”€ BARRA DE RECUPERACIÃ“N DE SESIÃ“N (CRÃTICO) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+        /* ── BARRA DE RECUPERACIÓN DE SESIÓN (CRÍTICO) ──────────────── */
         #recoverBar {
             display: none;
             position: fixed;
@@ -76,9 +76,9 @@
         :root.light-mode #btnDoRecover { background: #7c3aed; color: #fff; }
         :root.light-mode #btnDiscardRecover { color: #92400e; border-color: #f59e0b; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-            TOP BAR - Cabecera sÃ³lida (Docked)
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+            TOP BAR - Cabecera sólida (Docked)
+        ════════════════════════════════════════════════════════════════ */
         .top-bar {
             position: relative;
             width: 100%;
@@ -96,8 +96,8 @@
             pointer-events: auto;
             padding-top: env(safe-area-inset-top, 0px);
 
-        /* â•â•â• Accesibilidad PC (#9): la barra se desplaza sin romper su diseÃ±o â•â•â• */
-            flex-wrap: nowrap;              /* nunca salta de lÃ­nea */
+        /* ═══ Accesibilidad PC (#9): la barra se desplaza sin romper su diseño ═══ */
+            flex-wrap: nowrap;              /* nunca salta de línea */
             overflow-x: auto;               /* scroll horizontal real */
             overflow-y: hidden;
             scrollbar-width: none;          /* Firefox: oculta la barra */
@@ -209,9 +209,9 @@
 
         .top-bar select:hover { border-color: var(--accent); }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            LEFT SIDEBAR - Barra lateral de herramientas
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .left-sidebar {
             position: fixed;
             top: var(--toolbar-h);
@@ -264,9 +264,9 @@
             color: var(--accent);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           BOTTOM BAR - Barra inferior de navegaciÃ³n
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+           BOTTOM BAR - Barra inferior de navegación
+        ════════════════════════════════════════════════════════════════ */
         .bottom-bar {
             position: fixed;
             right: 12px;
@@ -339,9 +339,9 @@
             text-align: center;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           MAIN CONTENT - Ãrea del canvas (Docked)
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+           MAIN CONTENT - Área del canvas (Docked)
+        ════════════════════════════════════════════════════════════════ */
         .main-content {
             display: flex;
             flex: 1;
@@ -351,9 +351,9 @@
             margin-bottom: 0;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CANVAS
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .canvas-wrapper {
             flex: 1;
             position: relative;
@@ -375,9 +375,9 @@
 
         .canvas-container { position: absolute !important; top: 0; left: 0; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CALCULADORA
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .calculator-panel {
             width: var(--calc-w);
             background: #23262b;
@@ -596,12 +596,12 @@
         }
         .calc-keys button.equals:hover { background: var(--accent-hover); }
 
-        /* CientÃ­ficas */
+        /* Científicas */
         .sci-btn { display: none !important; }
         .sci-mode .sci-btn { display: flex !important; }
         .sci-mode .calc-keys { grid-template-columns: repeat(5, 1fr); }
 
-        /* BotÃ³n de memoria */
+        /* Botón de memoria */
         .calc-memory-btn {
             background: rgba(187,134,252,0.15);
             color: var(--accent);
@@ -650,7 +650,7 @@
             background: rgba(0,0,0,0.08);
         }
 
-        /* Fila SHIFT (estilo calculadora cientÃ­fica) */
+        /* Fila SHIFT (estilo calculadora científica) */
         .calc-shift-row {
             display: flex;
             gap: 4px;
@@ -703,7 +703,7 @@
             pointer-events: none;
         }
 
-        /* Tecla igual azul estilo calculadora cientÃ­fica */
+        /* Tecla igual azul estilo calculadora científica */
         .calc-num-keys button.equals {
             background: #2563eb;
             border-bottom-color: #1a44a8;
@@ -750,9 +750,9 @@
             font-weight: 500;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            CURSORES
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .cursor-pen    { cursor: crosshair !important; }
         .cursor-text   { cursor: text !important; }
         .cursor-eraser { cursor: cell !important; }
@@ -761,9 +761,9 @@
         .cursor-cross  { cursor: crosshair !important; }
         .cursor-fill { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M19 11l-8-8-8 8h16z"/><path d="M3 11v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8H3z"/><path d="M12 11v10"/></svg>') 12 12, pointer !important; }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            RESPONSIVE LAYOUT
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         @media (max-width: 768px) {
             :root { --sidebar-w: 52px; }
             .top-bar {
@@ -841,7 +841,7 @@
             }
         }
 
-        /* Celular en horizontal (p. ej. 874x402): barras mÃ¡s delgadas */
+        /* Celular en horizontal (p. ej. 874x402): barras más delgadas */
         @media (max-height: 500px) {
             :root {
                 --toolbar-h: 42px;
@@ -901,9 +901,9 @@
             }
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            TRANSICIONES GLOBALES
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         .top-bar button,
         .top-bar select,
         .left-sidebar button,
@@ -919,9 +919,9 @@
                         opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
            MODO CLARO
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ════════════════════════════════════════════════════════════════ */
         :root.light-mode {
             --bg-dark: #f5f5f5;
             --bg-panel: #ffffff;
@@ -1038,7 +1038,7 @@
             border-color: #f59e0b;
         }
 
-        /* BotÃ³n de toggle para modo claro/oscuro */
+        /* Botón de toggle para modo claro/oscuro */
         .theme-toggle {
             width: 40px;
             height: 40px;
@@ -1064,9 +1064,9 @@
             border-color: var(--border-color);
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
             CONTEXT-MENU PANEL - Controles contextuales
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+         ════════════════════════════════════════════════════════════════ */
         .context-menu {
             position: fixed;
             top: calc(var(--toolbar-h) + 8px);
@@ -1130,9 +1130,9 @@
             color: #1e293b;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-            FOCUS MODE â€” modo concentraciÃ³n (pantalla completa de dibujo)
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+            FOCUS MODE — modo concentración (pantalla completa de dibujo)
+         ════════════════════════════════════════════════════════════════ */
         .focus-exit-btn { display: none; }
         body.focus-mode .top-bar { display: none !important; }
         body.focus-mode .main-content { margin-left: 0 !important; }
@@ -1210,9 +1210,9 @@
             stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════════════════════════
             SVG ICON STYLING
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+         ════════════════════════════════════════════════════════════════ */
         .left-sidebar button svg,
         .top-bar button svg {
             width: 20px;
@@ -1267,9 +1267,9 @@
             display: none !important;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-            MODAL LATEX â€” variables CSS: se adapta a tema claro/oscuro
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        /* ═══════════════════════════════════════════════════════════════
+            MODAL LATEX — variables CSS: se adapta a tema claro/oscuro
+         ══════════════════════════════════════════════════════════════ */
         #latexModal {
             display: none;
             position: fixed;
@@ -1379,8 +1379,8 @@
         .plot-analysis-value { color: var(--text-main); word-break: break-word; }
         .plot-analysis-intersections { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
         .plot-analysis-intersections h4 { font-size: 13px; color: var(--accent); margin-bottom: 8px; }
-.plot-analysis-actions { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); display: flex; justify-content: flex-end; }
-.plot-analysis-actions button { padding: 8px 16px; font-size: 13px; }
+        .plot-analysis-actions { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-color); display: flex; justify-content: flex-end; }
+        .plot-analysis-actions button { padding: 8px 16px; font-size: 13px; }
         .plot-value-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 12px; margin-top: 6px; }
         .plot-value-table th, .plot-value-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border-color); }
         .plot-value-table th { color: var(--accent); font-weight: 600; }
@@ -1431,7 +1431,6 @@
         .plot-function-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .plot-function-delete { background: transparent; border: none; color: inherit; cursor: pointer; font-size: 16px; line-height: 1; }
         @media (min-width: 700px) { .plot-dialog { max-width: 760px; } }
-"
 
         /* Modal LaTeX */
         .latex-title-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -1453,7 +1452,7 @@
 </head>
 <body>
 
-    <button type="button" id="btnExitFocus" class="focus-exit-btn" title="Salir de modo concentraciÃ³n [Esc]" aria-label="Salir de modo concentraciÃ³n">
+    <button type="button" id="btnExitFocus" class="focus-exit-btn" title="Salir de modo concentración [Esc]" aria-label="Salir de modo concentración">
         <svg viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
     </button>
     <button type="button" id="btnFocusTools" class="focus-tools-btn" title="Mostrar/ocultar herramientas" aria-label="Mostrar herramientas">
@@ -1461,12 +1460,12 @@
     </button>
 
 <div id="recoverBar">
-  <span>ðŸ“‹ SesiÃ³n guardada el <strong id="recoverDate"></strong> â€” Â¿Recuperar?</span>
+  <span>📋 Sesión guardada el <strong id="recoverDate"></strong> — ¿Recuperar?</span>
   <div>
-    <button type="button" id="btnDoRecover" aria-label="Recuperar sesiÃ³n guardada">
+    <button type="button" id="btnDoRecover" aria-label="Recuperar sesión guardada">
       Recuperar
     </button>
-    <button type="button" id="btnDiscardRecover" aria-label="Descartar sesiÃ³n guardada">
+    <button type="button" id="btnDiscardRecover" aria-label="Descartar sesión guardada">
       Descartar
     </button>
   </div>
@@ -1476,10 +1475,10 @@
     <div class="top-bar" role="toolbar" aria-label="Barra de sistema">
         <!-- Archivo -->
         <div class="tool-group">
-            <button type="button" id="btnSaveProj" title="Guardar SesiÃ³n en PC" aria-label="Guardar SesiÃ³n en PC">
+            <button type="button" id="btnSaveProj" title="Guardar Sesión en PC" aria-label="Guardar Sesión en PC">
                 <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h10"/></svg>
             </button>
-            <button type="button" id="btnLoadProj" title="Cargar SesiÃ³n desde PC" aria-label="Cargar SesiÃ³n desde PC">
+            <button type="button" id="btnLoadProj" title="Cargar Sesión desde PC" aria-label="Cargar Sesión desde PC">
                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             </button>
             <button type="button" id="btnExportPDF" title="Exportar PDF" aria-label="Exportar PDF">
@@ -1503,9 +1502,9 @@
         <!-- Entorno -->
         <div class="tool-group">
             <select id="bgSelect" title="Tipo de fondo" aria-label="Tipo de fondo">
-                <option value="bg-lined" selected>ðŸ“„ Rayado</option>
-                <option value="bg-grid">ðŸ“Š CuadrÃ­cula</option>
-                <option value="bg-plain">â¬œ Liso</option>
+                <option value="bg-lined" selected>📄 Rayado</option>
+                <option value="bg-grid">📊 Cuadrícula</option>
+                <option value="bg-plain">⬜ Liso</option>
             </select>
             <!-- NUEVO: Selector de color de fondo -->
             <label class="bg-color-label" title="Color de la hoja">
@@ -1520,7 +1519,7 @@
             <button type="button" id="btnToolSettings" title="Ajustes de trazo y color" aria-label="Ajustes de trazo y color">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 6.8 3 11.5c0 2.8 2 4.5 4.3 4.5h1.4c.9 0 1.6.7 1.6 1.6 0 .5-.2.9-.5 1.2-.4.4-.6.9-.6 1.5 0 1 .9 1.7 2 1.7 5 0 9.8-4.3 9.8-9.5C21 6.8 17 3 12 3Z"/><circle cx="7.3" cy="10.2" r="1.15"/><circle cx="10.6" cy="7" r="1.15"/><circle cx="14.9" cy="7" r="1.15"/><circle cx="17.7" cy="10.2" r="1.15"/></svg>
             </button>
-            <button type="button" id="btnFocusMode" title="Modo concentraciÃ³n [Z]" aria-label="Modo concentraciÃ³n">
+            <button type="button" id="btnFocusMode" title="Modo concentración [Z]" aria-label="Modo concentración">
                 <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
             </button>
             <button type="button" id="btnClear" class="btn-danger" title="Limpiar todo" aria-label="Limpiar todo">
@@ -1587,7 +1586,7 @@
                 <path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 11V4a2 2 0 0 0-4 0v6"/><path d="M10 11V5a2 2 0 0 0-4 0v9l-3-3a2 2 0 0 0-3 3l5 7h9a5 5 0 0 0 5-5v-6Z"/>
             </svg>
         </button>
-        <button type="button" id="btnPen" title="LÃ¡piz [P]" aria-label="LÃ¡piz [P]">
+        <button type="button" id="btnPen" title="Lápiz [P]" aria-label="Lápiz [P]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
         <button type="button" id="btnHighlight" title="Resaltador" aria-label="Resaltador">
@@ -1606,7 +1605,7 @@
         <button type="button" id="btnEraserStroke" title="Borrador [E]" aria-label="Borrador [E]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         </button>
-        <button type="button" id="btnRuler" title="Regla/CompÃ¡s [R]" aria-label="Regla/CompÃ¡s [R]">
+        <button type="button" id="btnRuler" title="Regla/Compás [R]" aria-label="Regla/Compás [R]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="8" x2="6" y2="12"/><line x1="10" y1="8" x2="10" y2="12"/><line x1="14" y1="8" x2="14" y2="12"/><line x1="18" y1="8" x2="18" y2="12"/></svg>
         </button>
         <button type="button" id="btnToggleAxes" title="Mostrar/Ocultar Ejes [A]" aria-label="Mostrar/Ocultar Ejes [A]">
@@ -1615,29 +1614,29 @@
 
         <div class="tool-separator"></div>
 
-        <!-- Formas e InserciÃ³n (acceso directo) -->
-        <button type="button" id="menuBtnLine" title="LÃ­nea" aria-label="LÃ­nea">
+        <!-- Formas e Inserción (acceso directo) -->
+        <button type="button" id="menuBtnLine" title="Línea" aria-label="Línea">
             <svg viewBox="0 0 24 24"><path d="M4 20L20 4"/></svg>
         </button>
-        <button type="button" id="menuBtnRect" title="RectÃ¡ngulo" aria-label="RectÃ¡ngulo">
+        <button type="button" id="menuBtnRect" title="Rectángulo" aria-label="Rectángulo">
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/></svg>
         </button>
-        <button type="button" id="menuBtnCircle" title="CÃ­rculo" aria-label="CÃ­rculo">
+        <button type="button" id="menuBtnCircle" title="Círculo" aria-label="Círculo">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
         </button>
-        <button type="button" id="menuBtnTriangle" title="TriÃ¡ngulo" aria-label="TriÃ¡ngulo">
+        <button type="button" id="menuBtnTriangle" title="Triángulo" aria-label="Triángulo">
             <svg viewBox="0 0 24 24"><path d="M12 4L20 20H4z"/></svg>
         </button>
 
         <div class="tool-separator"></div>
 
-        <button type="button" id="menuBtnLatex" title="FÃ³rmula LaTeX" aria-label="FÃ³rmula LaTeX">
+        <button type="button" id="menuBtnLatex" title="Fórmula LaTeX" aria-label="Fórmula LaTeX">
             <svg viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>
         </button>
         <button type="button" id="menuBtnImage" title="Insertar imagen" aria-label="Insertar imagen">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
         </button>
-        <button type="button" id="menuBtnPlot" title="Graficar funciÃ³n" aria-label="Graficar funciÃ³n">
+        <button type="button" id="menuBtnPlot" title="Graficar función" aria-label="Graficar función">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22" stroke-width="1.5"/><line x1="2" y1="12" x2="22" y2="12" stroke-width="1.5"/><path d="M4 6 Q 12 24 20 6" stroke-width="2"/></svg>
         </button>
     </div>
@@ -1648,25 +1647,25 @@
             <label title="Color del trazo"><span aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 3 3 6.8 3 11.5c0 2.8 2 4.5 4.3 4.5h1.4c.9 0 1.6.7 1.6 1.6 0 .5-.2.9-.5 1.2-.4.4-.6.9-.6 1.5 0 1 .9 1.7 2 1.7 5 0 9.8-4.3 9.8-9.5C21 6.8 17 3 12 3Z"/><circle cx="7.3" cy="10.2" r="1.15"/><circle cx="10.6" cy="7" r="1.15"/><circle cx="14.9" cy="7" r="1.15"/><circle cx="17.7" cy="10.2" r="1.15"/></svg></span> <input type="color" id="colorPicker" value="#000000"></label>
         </div>
         <div class="context-menu-group" id="ctxGroupWidth">
-            <label title="Grosor del trazo">ðŸ“ <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
+            <label title="Grosor del trazo">📏 <input type="range" id="widthPicker" min="1" max="50" value="3"></label>
             <span id="widthValue">3</span>
         </div>
         <div class="context-menu-group" id="ctxGroupFont">
-            <label title="TamaÃ±o de fuente">ðŸ”¤ <input type="number" id="fontSizePicker" min="8" max="120" value="16"></label>
+            <label title="Tamaño de fuente">🔤 <input type="number" id="fontSizePicker" min="8" max="120" value="16"></label>
         </div>
-        <button type="button" id="btnCloseContext" class="context-close-btn" title="Cerrar ajustes" aria-label="Cerrar ajustes">âœ•</button>
+        <button type="button" id="btnCloseContext" class="context-close-btn" title="Cerrar ajustes" aria-label="Cerrar ajustes">✕</button>
     </div>
 
-    <!-- BOTTOM BAR - NavegaciÃ³n de pÃ¡ginas -->
-    <nav class="bottom-bar" aria-label="NavegaciÃ³n de pÃ¡ginas">
-        <button type="button" id="btnPrevPage" title="PÃ¡gina anterior" aria-label="PÃ¡gina anterior">
+    <!-- BOTTOM BAR - Navegación de páginas -->
+    <nav class="bottom-bar" aria-label="Navegación de páginas">
+        <button type="button" id="btnPrevPage" title="Página anterior" aria-label="Página anterior">
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <span id="pageIndicator" title="PÃ¡gina actual">1 / 1</span>
-        <button type="button" id="btnNextPage" title="PÃ¡gina siguiente" aria-label="PÃ¡gina siguiente">
+        <span id="pageIndicator" title="Página actual">1 / 1</span>
+        <button type="button" id="btnNextPage" title="Página siguiente" aria-label="Página siguiente">
             <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
         </button>
-        <button type="button" id="btnAddPage" title="Nueva pÃ¡gina" aria-label="Nueva pÃ¡gina">
+        <button type="button" id="btnAddPage" title="Nueva página" aria-label="Nueva página">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -1687,10 +1686,10 @@
         <div class="calculator-panel hidden" id="calcPanel">
             <!-- Cabecera calculadora -->
             <div class="calc-header">
-                <span>MathPad CientÃ­fica</span>
+                <span>MathPad Científica</span>
                 <div class="calc-mode-bar">
                     <button type="button" id="btnAngleMode" class="calc-mode-btn" title="Grados/Radianes" aria-label="Cambiar entre grados y radianes">DEG</button>
-                    <button type="button" id="btnSD" class="calc-mode-btn" title="FracciÃ³n/Decimal" aria-label="Alternar fracciÃ³n y decimal">Sâ‡”D</button>
+                    <button type="button" id="btnSD" class="calc-mode-btn" title="Fracción/Decimal" aria-label="Alternar fracción y decimal">S⇔D</button>
                 </div>
             </div>
             <div class="calc-display">
@@ -1699,7 +1698,8 @@
                     <span id="calcAngleBadge" class="calc-angle-badge">DEG</span>
                     <span id="calcMemBadge" class="calc-mem-badge hidden">M</span>
                 </div>
-                <div class="calc-expr" id="calcExpr" tabindex="0" role="textbox" aria-label="ExpresiÃ³n de la calculadora"></div>
+                <!-- [html-validate-disable-next prefer-native-element] -->
+                <div class="calc-expr" id="calcExpr" tabindex="0" role="textbox" aria-label="Expresión de la calculadora"></div>
                 <div class="calc-result" id="calcResult" draggable="true" role="status" aria-live="polite" aria-atomic="true">0</div>
             </div>
         <div class="calc-shift-row">
@@ -1707,53 +1707,53 @@
         </div>
         <div class="calc-controls">
             <label>
-                <input type="checkbox" id="toggleSci"> CientÃ­fica
+                <input type="checkbox" id="toggleSci"> Científica
             </label>
             <button type="button" id="calcMemory" class="calc-memory-btn" title="Memoria (M+/M-/MR/MC)" aria-label="Memoria (M+/M-/MR/MC)">M</button>
         </div>
         <div class="calc-sci-keys" id="calcSciKeys">
-            <button type="button" class="sci-btn operator" data-tok="^2" data-shift="^3" data-shift-label="x3" aria-label="x al cuadrado">xÂ²</button>
-            <button type="button" class="sci-btn operator" data-tok="^(" data-shift="root" data-shift-label="y-raiz" aria-label="x a la y">xÊ¸</button>
-            <button type="button" class="sci-btn operator" data-tok="sqrt(" data-shift="cbrt(" data-shift-label="cubica" aria-label="RaÃ­z cuadrada">âˆš</button>
-            <button type="button" class="sci-btn operator" data-tok="pi" aria-label="Pi">Ï€</button>
-            <button type="button" class="sci-btn operator" data-tok="e" aria-label="NÃºmero e">e</button>
+            <button type="button" class="sci-btn operator" data-tok="^2" data-shift="^3" data-shift-label="x3" aria-label="x al cuadrado">x²</button>
+            <button type="button" class="sci-btn operator" data-tok="^(" data-shift="root" data-shift-label="y-raiz" aria-label="x a la y">xʸ</button>
+            <button type="button" class="sci-btn operator" data-tok="sqrt(" data-shift="cbrt(" data-shift-label="cubica" aria-label="Raíz cuadrada">√</button>
+            <button type="button" class="sci-btn operator" data-tok="pi" aria-label="Pi">π</button>
+            <button type="button" class="sci-btn operator" data-tok="e" aria-label="Número e">e</button>
             <button type="button" class="sci-btn operator" data-tok="sin(" data-shift="asin(" data-shift-label="sin-1" aria-label="Seno">sin</button>
             <button type="button" class="sci-btn operator" data-tok="cos(" data-shift="acos(" data-shift-label="cos-1" aria-label="Coseno">cos</button>
             <button type="button" class="sci-btn operator" data-tok="tan(" data-shift="atan(" data-shift-label="tan-1" aria-label="Tangente">tan</button>
             <button type="button" class="sci-btn operator" data-tok="log10(" data-shift="10^(" data-shift-label="10x" aria-label="Logaritmo base 10">log</button>
             <button type="button" class="sci-btn operator" data-tok="ln(" data-shift="e^(" data-shift-label="ex" aria-label="Logaritmo natural">ln</button>
-            <button type="button" class="sci-btn operator" data-tok="(" data-shift="abs(" data-shift-label="Abs" aria-label="ParÃ©ntesis abierto">(</button>
-            <button type="button" class="sci-btn operator" data-tok=")" aria-label="ParÃ©ntesis cerrado">)</button>
+            <button type="button" class="sci-btn operator" data-tok="(" data-shift="abs(" data-shift-label="Abs" aria-label="Paréntesis abierto">(</button>
+            <button type="button" class="sci-btn operator" data-tok=")" aria-label="Paréntesis cerrado">)</button>
             <button type="button" class="sci-btn operator" data-tok="^(-1)" data-shift="!" data-shift-label="!" aria-label="Uno sobre x">1/x</button>
             <button type="button" class="sci-btn operator" data-tok="%" aria-label="Porcentaje">%</button>
-            <button type="button" class="sci-btn operator" id="btnSDKey" aria-label="Alternar fracciÃ³n y decimal">Sâ‡”D</button>
+            <button type="button" class="sci-btn operator" id="btnSDKey" aria-label="Alternar fracción y decimal">S⇔D</button>
         </div>
         <div class="calc-num-keys" id="calcNumKeys">
             <button type="button" data-tok="7">7</button>
             <button type="button" data-tok="8">8</button>
             <button type="button" data-tok="9">9</button>
-            <button type="button" class="orange" id="calcDel" aria-label="Borrar Ãºltimo token">DEL</button>
+            <button type="button" class="orange" id="calcDel" aria-label="Borrar último token">DEL</button>
             <button type="button" class="orange" id="calcClear" aria-label="Limpiar todo">AC</button>
             <button type="button" data-tok="4">4</button>
             <button type="button" data-tok="5">5</button>
             <button type="button" data-tok="6">6</button>
-            <button type="button" class="operator" data-tok="*" data-shift="nPr" data-shift-label="nPr" aria-label="Multiplicar">Ã—</button>
-            <button type="button" class="operator" data-tok="/" data-shift="nCr" data-shift-label="nCr" aria-label="Dividir">Ã·</button>
+            <button type="button" class="operator" data-tok="*" data-shift="nPr" data-shift-label="nPr" aria-label="Multiplicar">×</button>
+            <button type="button" class="operator" data-tok="/" data-shift="nCr" data-shift-label="nCr" aria-label="Dividir">÷</button>
             <button type="button" data-tok="1">1</button>
             <button type="button" data-tok="2">2</button>
             <button type="button" data-tok="3">3</button>
             <button type="button" class="operator" data-tok="+" aria-label="Sumar">+</button>
-            <button type="button" class="operator" data-tok="-" aria-label="Restar">âˆ’</button>
+            <button type="button" class="operator" data-tok="-" aria-label="Restar">−</button>
             <button type="button" data-tok="0">0</button>
             <button type="button" data-tok=".">.</button>
-            <button type="button" data-tok="Ans" aria-label="Ãšltimo resultado">Ans</button>
+            <button type="button" data-tok="Ans" aria-label="Último resultado">Ans</button>
             <button type="button" data-tok="EXP" aria-label="Multiplicar por diez elevado a">EXP</button>
-            <button type="button" data-tok="+/-" aria-label="Cambiar signo">Â±</button>
+            <button type="button" data-tok="+/-" aria-label="Cambiar signo">±</button>
         </div>
         <div class="calc-num-keys">
             <button type="button" class="equals" id="calcEquals" aria-label="Igual">=</button>
-            <button type="button" id="calcCaretLeft" aria-label="Mover cursor a la izquierda">â—„</button>
-            <button type="button" id="calcCaretRight" aria-label="Mover cursor a la derecha">â–º</button>
+            <button type="button" id="calcCaretLeft" aria-label="Mover cursor a la izquierda">◄</button>
+            <button type="button" id="calcCaretRight" aria-label="Mover cursor a la derecha">►</button>
         </div>
         <!-- Historial de operaciones -->
         <div class="calc-history" id="calcHistory">
@@ -1766,20 +1766,20 @@
     <!-- Function Plotter Modal -->
     <div id="plotModal" role="dialog" aria-modal="true" aria-labelledby="plotModalTitle">
       <div class="plot-dialog">
-        <h3 class="plot-title" id="plotModalTitle">ðŸ“ˆ Graficar funciÃ³n</h3>
+        <h3 class="plot-title" id="plotModalTitle">📈 Graficar función</h3>
 
         <label class="plot-label">
-          f(x) = <small class="plot-hint">(usÃ¡: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
+          f(x) = <small class="plot-hint">(usá: sin, cos, tan, sqrt, abs, log, pi, e, ^)</small>
         </label>
         <input id="plotExpr" class="plot-input" type="text" value="x^2">
 
         <div class="plot-grid2">
           <div>
-            <label class="plot-label-sm">x mÃ­nimo</label>
+            <label class="plot-label-sm">x mínimo</label>
             <input id="plotXMin" class="plot-input" type="number" value="-5">
           </div>
           <div>
-            <label class="plot-label-sm">x mÃ¡ximo</label>
+            <label class="plot-label-sm">x máximo</label>
             <input id="plotXMax" class="plot-input" type="number" value="5">
           </div>
         </div>
@@ -1792,16 +1792,14 @@
           <div class="plot-onlyline-wrap">
             <label class="plot-check">
               <input id="plotOnlyLine" class="plot-checkbox" type="checkbox">
-              Fondo transparente (Solo lÃ­nea)
+              Fondo transparente (Solo línea)
             </label>
           </div>
         </div>
         <div id="plotCanvasWrap" class="plot-canvas-wrap">
-          <canvas id="plotCanvas" width="900" height="500" aria-label="GrÃ¡fico de funciones"></canvas>
+          <canvas id="plotCanvas" width="900" height="500" aria-hidden="true">Gráfico de funciones</canvas>
           <div id="plotHud" class="plot-hud" aria-hidden="true"></div>
         </div>
-
-"
 
         <div id="plotTangentWrap" class="plot-tangent-wrap">
           <label class="plot-tangent-toggle-label">
@@ -1835,7 +1833,7 @@
         <div class="plot-section">
           <label class="plot-label">Funciones graficadas:</label>
           <div id="plotFunctionsList" class="plot-list">
-            <span class="plot-empty">Ninguna funciÃ³n graficada aÃºn</span>
+            <span class="plot-empty">Ninguna función graficada aún</span>
           </div>
         </div>
 
@@ -1867,10 +1865,10 @@
         </div>
 
         <div class="plot-actions">
-          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar funciÃ³n al grÃ¡fico">+ Agregar</button>
-          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del grÃ¡fico">Reset vista</button>
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">+ Agregar</button>
+          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico">Reset vista</button>
           <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas">Limpiar</button>
-          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar grÃ¡fico en el lienzo">Insertar en el lienzo</button>
+          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar en el lienzo</button>
           <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador">Cerrar</button>
         </div>
         <p id="plotError" class="plot-error"></p>
@@ -1880,10 +1878,10 @@
 <!-- Formula LaTeX Modal -->
     <div id="latexModal" role="dialog" aria-modal="true" aria-labelledby="latexModalTitle">
       <div class="latex-box">
-        <h3 class="latex-title" id="latexModalTitle"><svg class="latex-title-icon" viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>FÃ³rmula LaTeX</h3>
+        <h3 class="latex-title" id="latexModalTitle"><svg class="latex-title-icon" viewBox="0 0 24 24"><path d="M17.5 5H7.5L13.5 12 7.5 19H17.5"/></svg>Fórmula LaTeX</h3>
 
         <input id="latexInput" class="latex-input" type="text"
-          placeholder="Ejemplo: \frac{a}{b}  Â·  x^2 + y^2 = r^2"
+          placeholder="Ejemplo: \frac{a}{b}  ·  x^2 + y^2 = r^2"
           autocomplete="off" spellcheck="false">
 
         <div class="latex-chips" id="latexChips"></div>
@@ -1892,15 +1890,15 @@
         <p id="latexError" class="latex-error"></p>
 
         <p class="latex-hint">
-          GuÃ­a rÃ¡pida: fracciones <code>\frac{num}{den}</code>, potencias <code>x^{2}</code>,
-          raÃ­ces <code>\sqrt{x}</code>, integrales <code>\int_{a}^{b} f(x)\,dx</code>,
+          Guía rápida: fracciones <code>\frac{num}{den}</code>, potencias <code>x^{2}</code>,
+          raíces <code>\sqrt{x}</code>, integrales <code>\int_{a}^{b} f(x)\,dx</code>,
           sumatorias <code>\sum_{i=1}^{n}</code>, letras griegas <code>\pi \alpha \theta</code>.
-          Haz clic en un ejemplo para usarlo y la vista previa mostrarÃ¡ el resultado al instante.
+          Haz clic en un ejemplo para usarlo y la vista previa mostrará el resultado al instante.
         </p>
 
         <div class="latex-actions">
           <button id="latexCancelBtn" type="button" aria-label="Cancelar y cerrar el editor de LaTeX">Cancelar</button>
-          <button id="latexInsertBtn" type="button" aria-label="Insertar fÃ³rmula LaTeX en el lienzo">Insertar fÃ³rmula</button>
+          <button id="latexInsertBtn" type="button" aria-label="Insertar fórmula LaTeX en el lienzo">Insertar fórmula</button>
         </div>
       </div>
     </div>
@@ -1910,22 +1908,22 @@
     <input type="file" id="imgFileInput" class="hidden-file-input" accept="image/*">
 
     <!-- Botones ocultos para funciones -->
-    <button type="button" id="btnLatex" class="hidden-helper" aria-label="FÃ³rmula LaTeX"></button>
+    <button type="button" id="btnLatex" class="hidden-helper" aria-label="Fórmula LaTeX"></button>
     <button type="button" id="btnInsertImage" class="hidden-helper" aria-label="Insertar imagen"></button>
-    <button type="button" id="btnPlot" class="hidden-helper" aria-label="Graficar funciÃ³n"></button>
+    <button type="button" id="btnPlot" class="hidden-helper" aria-label="Graficar función"></button>
 
 
 
 
-    <!-- Service Worker fÃ­sico: registro de ./sw.js en la raÃ­z del sitio.
-         (Registro vÃ­a Blob/URL.createObjectURL eliminado: los navegadores
+    <!-- Service Worker físico: registro de ./sw.js en la raíz del sitio.
+         (Registro vía Blob/URL.createObjectURL eliminado: los navegadores
          modernos lo bloquean por seguridad.) -->
     <script>
     (function(){
       if('serviceWorker' in navigator && ['http:','https:'].includes(location.protocol)){
         window.addEventListener('load', function(){
           navigator.serviceWorker.register('./sw.js')
-            .then(function(r){ console.log('Service Worker registrado con Ã©xito:', r.scope); })
+            .then(function(r){ console.log('Service Worker registrado con éxito:', r.scope); })
             .catch(function(err){ console.error('Error al registrar Service Worker', err); });
         });
       }
@@ -1934,7 +1932,7 @@
     <script>
 
 window.addEventListener('load', function() {
-    const GRID_BASE = 30; // TamaÃ±o fijo de la celda de cuadrÃ­cula en pÃ­xeles
+    const GRID_BASE = 30; // Tamaño fijo de la celda de cuadrícula en píxeles
 
     // Solicitar persistencia de almacenamiento (evita que el navegador borre los datos)
     if (navigator.storage && navigator.storage.persist) {
@@ -1953,18 +1951,18 @@ window.addEventListener('load', function() {
     });
 
 
-    // NUEVO: SelecciÃ³n exacta sobre trazos con un pequeÃ±o margen de comodidad
+    // NUEVO: Selección exacta sobre trazos con un pequeño margen de comodidad
     fabric.Object.prototype.perPixelTargetFind = true;
     canvas.targetFindTolerance = 8;
 
-        /* PINCEL LÃPIZ NORMAL */
+        /* PINCEL LÁPIZ NORMAL */
     const standardBrush = new fabric.PencilBrush(canvas);
     standardBrush.color = document.getElementById('colorPicker').value;
     standardBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
     canvas.freeDrawingBrush = standardBrush;
 
-        // PORTADO DESDE INDEX.HTML: Sincroniza el color de la tinta segÃºn el tema activo
-    // (evita que el lÃ¡piz quede invisible sobre fondos claros/oscuros)
+        // PORTADO DESDE INDEX.HTML: Sincroniza el color de la tinta según el tema activo
+    // (evita que el lápiz quede invisible sobre fondos claros/oscuros)
     // Reutilizable: se llama al iniciar y al cambiar de tema
     var syncDefaultInkColor = function() {
         var isLight = document.documentElement.classList.contains('light-mode');
@@ -1988,15 +1986,15 @@ window.addEventListener('load', function() {
     let calcVisible = false;
     let focusMode = false;
     let focusResizeTimer = null;
-    let showAxes = false; // Control de las reglas de mediciÃ³n
+    let showAxes = false; // Control de las reglas de medición
     let activeShape = null, startX = 0, startY = 0;
-    // Variables para herramienta de regla/compÃ¡s
+    // Variables para herramienta de regla/compás
     let rulerStartPoint = null;
     let rulerCurrentLine = null;
-    let rulerSnapAngle = 15; // Grados para snapping (15Â°, 30Â°, 45Â°, 60Â°, 75Â°, 90Â°)
+    let rulerSnapAngle = 15; // Grados para snapping (15°, 30°, 45°, 60°, 75°, 90°)
     let rulerSnapLength = 50; // Pixeles para snapping de longitud
 
-    /* VARIABLES PAGINACIÃ“N Y RESALTADOR */
+    /* VARIABLES PAGINACIÓN Y RESALTADOR */
     let pages = [null];
     let currentPage = 0;
     let pagePlots = [[]];
@@ -2007,16 +2005,16 @@ window.addEventListener('load', function() {
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
 
-    // Gestos tÃ¡ctiles: declaradas antes de resizeCanvas() para evitar TDZ
+    // Gestos táctiles: declaradas antes de resizeCanvas() para evitar TDZ
     // (resizeCanvas() las asigna y ResizeObserver puede invocarla de inmediato)
     let lastTouchDistance = 0;
     let lastTouchCenter = null;
     let isTouchPanning = false;
     let twoFingerGesture = false;
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    RESIZE Y FONDO
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     function resizeCanvas() {
         if (!canvas || !canvasWrapper) return;
         var w = canvasWrapper.clientWidth;
@@ -2050,7 +2048,7 @@ window.addEventListener('load', function() {
     });
     resizeCanvas();
 
-    // Alinear el fondo del canvas con el valor del menÃº al iniciar
+    // Alinear el fondo del canvas con el valor del menú al iniciar
     // (evita desajuste entre la clase del contenedor y el <select>)
     var initBg = document.getElementById('bgSelect').value;
     canvasWrapper.className = 'canvas-wrapper ' + initBg;
@@ -2086,7 +2084,7 @@ window.addEventListener('load', function() {
         syncBackground();
     });
 
-    // Gestos tÃ¡ctiles: pinch-to-zoom y pan con dos dedos (detecciÃ³n nativa, sin Event.js)
+    // Gestos táctiles: pinch-to-zoom y pan con dos dedos (detección nativa, sin Event.js)
     // (variables declaradas arriba, antes de resizeCanvas(), para evitar TDZ)
     function resetTouchGesture() {
         lastTouchDistance = 0;
@@ -2112,8 +2110,8 @@ window.addEventListener('load', function() {
         if (evt.preventDefault) evt.preventDefault();
     }
 
-    // Pinch a nivel DOM: Fabric 5.3 no dispara 'mouse:down' para el 2.Âº dedo
-    // fuera del modo dibujo, asÃ­ que se detecta aquÃ­ para toda herramienta.
+    // Pinch a nivel DOM: Fabric 5.3 no dispara 'mouse:down' para el 2.º dedo
+    // fuera del modo dibujo, así que se detecta aquí para toda herramienta.
     canvasWrapper.addEventListener('touchstart', function(e) {
         closeContextMenu();
         if (document.body.classList.contains('focus-tools-open')) {
@@ -2125,9 +2123,9 @@ window.addEventListener('load', function() {
         if (e.touches && e.touches.length === 2) { beginTwoFingerGesture(e); e.preventDefault(); }
     }, { passive: false, capture: true });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    EVENTOS UNIFICADOS DE PUNTERO (mouse/touch/pen)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     canvas.on('mouse:down', function(opt) {
         var evt = opt.e;
         closeContextMenu();
@@ -2138,7 +2136,7 @@ window.addEventListener('load', function() {
             document.activeElement.blur();
         }
 
-        // Gesto tÃ¡ctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
+        // Gesto táctil nativo de 2 dedos: pinch-to-zoom y pan (vale en toda herramienta)
         if (evt.touches && evt.touches.length === 2) {
             beginTwoFingerGesture(evt);
             return;
@@ -2146,7 +2144,7 @@ window.addEventListener('load', function() {
 
         if (currentTool === 'select') return;
 
-        // BotÃ³n 1 (izquierdo) o touch
+        // Botón 1 (izquierdo) o touch
 
         if (evt.button === 1 || currentTool === 'pan' || (isSpaceDown && currentTool !== 'eraser')) {
             isPanning = true;
@@ -2173,14 +2171,14 @@ window.addEventListener('load', function() {
         }
 
 
-        // --- INICIO HERRAMIENTA DE RELLENO HÃBRIDO ---
+        // --- INICIO HERRAMIENTA DE RELLENO HÍBRIDO ---
         if (currentTool === 'fill') {
             const target = canvas.findTarget(opt.e, false);
             const color = document.getElementById('colorPicker').value;
 
             // 1. RELLENO VECTORIAL INTELIGENTE (Solo figuras cerradas perfectas)
             if (target && !target.isBackground && !target.isEraserMask) {
-                // Solo pintar fill directamente en polÃ­gonos cerrados nativos
+                // Solo pintar fill directamente en polígonos cerrados nativos
                 if (['rect', 'circle', 'triangle', 'ellipse'].includes(target.type)) {
                     target.set('fill', color);
                     canvas.requestRenderAll();
@@ -2188,13 +2186,13 @@ window.addEventListener('load', function() {
                     return;
                 }
                 // Si es imagen, texto, path o grupo, NO HAREMOS RETURN.
-                // Dejamos que el cÃ³digo continÃºe hacia el Flood Fill.
+                // Dejamos que el código continúe hacia el Flood Fill.
             }
 
             // 2. FLOOD FILL RASTER (Lectura Directa 1:1)
             var retina = canvas.getRetinaScaling(); // Conservado para el vectorizado posterior (fromURL)
             var rectEl = canvas.lowerCanvasEl.getBoundingClientRect();
-            // Escala real entre los pÃ­xeles lÃ³gicos del canvas y su tamaÃ±o fÃ­sico en el DOM
+            // Escala real entre los píxeles lógicos del canvas y su tamaño físico en el DOM
             var scaleX = canvas.lowerCanvasEl.width / rectEl.width;
             var scaleY = canvas.lowerCanvasEl.height / rectEl.height;
 
@@ -2206,7 +2204,7 @@ window.addEventListener('load', function() {
                 clientY = opt.e.touches[0].clientY;
             }
 
-            // Mapeo exacto de pÃ­xeles fÃ­sicos
+            // Mapeo exacto de píxeles físicos
             var px = Math.round((clientX - rectEl.left) * scaleX);
             var py = Math.round((clientY - rectEl.top) * scaleY);
 
@@ -2214,7 +2212,7 @@ window.addEventListener('load', function() {
             var h = canvas.lowerCanvasEl.height;
             if (px < 0 || px >= w || py < 0 || py >= h) return;
 
-            // Aislamiento sÃ­ncrono de la Regla (El navegador no lo renderiza visualmente)
+            // Aislamiento síncrono de la Regla (El navegador no lo renderiza visualmente)
             var prevAxes = typeof showAxes !== 'undefined' ? showAxes : false;
             if (prevAxes) {
                 showAxes = false;
@@ -2229,7 +2227,7 @@ window.addEventListener('load', function() {
                 data = imgData.data;
             } catch (e) {
                 if (prevAxes) { showAxes = true; canvas.renderAll(); }
-                showToast('ðŸ”’ Error: Imagen externa bloquea la pintura', 'err');
+                showToast('🔒 Error: Imagen externa bloquea la pintura', 'err');
                 return;
             }
 
@@ -2304,9 +2302,9 @@ window.addEventListener('load', function() {
             }
 
             if (touchesBorder) {
-                // FIX: El bote de pintura NUNCA debe alterar el fondo automÃ¡ticamente.
-                // El fondo solo se cambia con la herramienta especÃ­fica de color de hoja.
-                showToast('âš ï¸ Ãrea abierta. Cierra la lÃ­nea o usa el selector de fondo arriba.', 'warn', 4000);
+                // FIX: El bote de pintura NUNCA debe alterar el fondo automáticamente.
+                // El fondo solo se cambia con la herramienta específica de color de hoja.
+                showToast('⚠️ Área abierta. Cierra la línea o usa el selector de fondo arriba.', 'warn', 4000);
                 return;
             }
 
@@ -2321,7 +2319,7 @@ window.addEventListener('load', function() {
                 var pImgData = pCtx.createImageData(pW, pH);
                 var pData = pImgData.data;
 
-                // Mapear solo los pÃ­xeles afectados al nuevo minicanvas
+                // Mapear solo los píxeles afectados al nuevo minicanvas
                 for (var y = minY; y <= maxY; y++) {
                     for (var x = minX; x <= maxX; x++) {
                         var srcIdx = (y * w + x) * 4;
@@ -2336,7 +2334,7 @@ window.addEventListener('load', function() {
                 }
                 pCtx.putImageData(pImgData, 0, 0);
 
-                // Inyectar en Fabric ajustando la cÃ¡mara
+                // Inyectar en Fabric ajustando la cámara
                 fabric.Image.fromURL(patchCanvas.toDataURL(), function(img) {
                     var vpt = canvas.viewportTransform;
                     img.set({
@@ -2353,7 +2351,7 @@ window.addEventListener('load', function() {
                     canvas.add(img);
                     if (target) {
                         var targetIdx = canvas.getObjects().indexOf(target);
-                        // Si es dibujo a mano (path/group), el relleno va DETRÃS del trazo
+                        // Si es dibujo a mano (path/group), el relleno va DETRÁS del trazo
                         if (['path', 'group'].includes(target.type)) {
                             img.moveTo(Math.max(0, targetIdx));
                         } else {
@@ -2361,7 +2359,7 @@ window.addEventListener('load', function() {
                             img.moveTo(targetIdx + 1);
                         }
                     } else {
-                        // Si se hizo clic en el vacÃ­o
+                        // Si se hizo clic en el vacío
                         img.sendToBack();
                     }
                     canvas.requestRenderAll();
@@ -2370,7 +2368,7 @@ window.addEventListener('load', function() {
             }
             return;
         }
-        // --- FIN HERRAMIENTA DE RELLENO HÃBRIDO ---
+        // --- FIN HERRAMIENTA DE RELLENO HÍBRIDO ---
 
         if (['line', 'rect', 'circle', 'triangle'].includes(currentTool)) {
             var pointer = canvas.getPointer(evt);
@@ -2398,13 +2396,13 @@ window.addEventListener('load', function() {
             itext.enterEditing(); itext.selectAll(); canvas.requestRenderAll();
         }
 
-        // Herramienta regla: iniciar lÃ­nea con snapping
+        // Herramienta regla: iniciar línea con snapping
         if (currentTool === 'ruler') {
             var pointer = canvas.getPointer(evt);
             rulerStartPoint = { x: pointer.x, y: pointer.y };
             var color = document.getElementById('colorPicker').value;
             // Escala adaptativa: grosor/trazo inversos al zoom para que la regla
-            // se vea SIEMPRE con el mismo tamaÃ±o en el viewport visible
+            // se vea SIEMPRE con el mismo tamaño en el viewport visible
             var rulZoom = canvas.getZoom() || 1;
             rulerCurrentLine = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
                 stroke: color,
@@ -2417,7 +2415,7 @@ window.addEventListener('load', function() {
         }
     });
 
-    // Distancia mÃ­nima de un punto p a un segmento a-b (proyecciÃ³n clamped)
+    // Distancia mínima de un punto p a un segmento a-b (proyección clamped)
     function distToSegment(p, a, b) {
         const abx = b.x - a.x, aby = b.y - a.y;
         const lenSq = abx * abx + aby * aby;
@@ -2466,15 +2464,15 @@ window.addEventListener('load', function() {
         return segments;
     }
 
-    // â”€â”€ Instant Erase: hit-test econÃ³mico + borrado inmediato, sin trazo
-    //    fantasma y sin findTarget por pÃ­xel (que causaba el lag). â”€â”€
-    var hasErasedObjects = false;      // Â¿se borrÃ³ algo en este trazo?
+    // ── Instant Erase: hit-test económico + borrado inmediato, sin trazo
+    //    fantasma y sin findTarget por píxel (que causaba el lag). ──
+    var hasErasedObjects = false;      // ¿se borró algo en este trazo?
     var suppressRemoveHistory = false; // silencia object:removed durante el barrido
 
     function instantEraseAt(opt) {
         var pointer = canvas.getPointer(opt.e);
         var zoom = canvas.getZoom() || 1;
-        // Radio de colisiÃ³n adaptado a la escala visual actual del lienzo
+        // Radio de colisión adaptado a la escala visual actual del lienzo
         var baseRadius = (parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6;
         var radius = baseRadius / zoom;
         var objects = canvas.getObjects();
@@ -2482,7 +2480,7 @@ window.addEventListener('load', function() {
 
         suppressRemoveHistory = true; // el historial se guarda UNA vez en mouse:up
         try {
-            // Dos pasadas: primero trazos finos (path/line/contornos), luego Ã¡reas sÃ³lidas; un solo borrado por llamada
+            // Dos pasadas: primero trazos finos (path/line/contornos), luego áreas sólidas; un solo borrado por llamada
             for (var pass = 0; pass < 2 && !removed; pass++) {
             // Orden inverso: los objetos de arriba se procesan primero
             for (var i = objects.length - 1; i >= 0; i--) {
@@ -2492,7 +2490,7 @@ window.addEventListener('load', function() {
                 var strokePad = ((obj.strokeWidth || 0) / 2);
                 var hitRadius = radius + strokePad;
 
-                // 1. Filtro rÃ¡pido en coordenadas de lienzo (absolute = true)
+                // 1. Filtro rápido en coordenadas de lienzo (absolute = true)
                 var b = obj.getBoundingRect(true);
                 if (pointer.x < b.left - hitRadius || pointer.x > b.left + b.width + hitRadius ||
                     pointer.y < b.top - hitRadius || pointer.y > b.top + b.height + hitRadius) {
@@ -2501,20 +2499,20 @@ window.addEventListener('load', function() {
 
                 var hit = false;
 
-                // 2. Objetos de Ã¡rea sÃ³lida (texto, imÃ¡genes, parches de relleno o figuras con relleno activo)
+                // 2. Objetos de área sólida (texto, imágenes, parches de relleno o figuras con relleno activo)
                 var solidTypes = ['rect', 'triangle', 'ellipse', 'circle', 'polygon'];
                 var hasSolidArea = obj.isFillPatch ||
                     ['i-text', 'text', 'image', 'group'].includes(obj.type) ||
                     (solidTypes.includes(obj.type) && obj.fill && obj.fill !== 'transparent' && obj.fill !== 'none');
 
-                // En la pasada 0 solo se prueban trazos finos; las Ã¡reas sÃ³lidas esperan a la pasada 1
+                // En la pasada 0 solo se prueban trazos finos; las áreas sólidas esperan a la pasada 1
                 if (pass === 0 && hasSolidArea) continue;
 
                 if (hasSolidArea) {
                     try { hit = obj.containsPoint(pointer, null, true); } catch (err) { hit = false; }
                 }
 
-                // 3. Trazos de lÃ¡piz/resaltador (path): distancia continua punto-a-segmento en espacio local
+                // 3. Trazos de lápiz/resaltador (path): distancia continua punto-a-segmento en espacio local
                 if (!hit && obj.type === 'path' && obj.path) {
                     var localPt = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
                     var scaleX = obj.scaleX || 1;
@@ -2540,7 +2538,7 @@ window.addEventListener('load', function() {
                         }
                     }
                 } else if (!hit) {
-                    // 4. Figuras geomÃ©tricas huecas, lÃ­neas y grupos (contorno en espacio de lienzo)
+                    // 4. Figuras geométricas huecas, líneas y grupos (contorno en espacio de lienzo)
                     var segs = getShapeSegmentsInCanvasSpace(obj);
                     for (var s = 0; s < segs.length && !hit; s++) {
                         if (distToSegment(pointer, segs[s].a, segs[s].b) <= hitRadius) {
@@ -2566,13 +2564,13 @@ window.addEventListener('load', function() {
     canvas.on('mouse:move', function(opt) {
         var e = opt.e;
 
-        // Si el 2.Âº dedo llegÃ³ sin 'mouse:down' (fuera del modo dibujo),
-        // se inicia el gesto aquÃ­ antes de la lÃ³gica de zoom.
+        // Si el 2.º dedo llegó sin 'mouse:down' (fuera del modo dibujo),
+        // se inicia el gesto aquí antes de la lógica de zoom.
         if (e.touches && e.touches.length === 2 && !isTouchPanning) {
             beginTwoFingerGesture(e);
         }
 
-        // Gesto tÃ¡ctil nativo: pinch-to-zoom y pan con dos dedos
+        // Gesto táctil nativo: pinch-to-zoom y pan con dos dedos
         if (isTouchPanning && e.touches && e.touches.length === 2) {
             var distance = Math.hypot(
                 e.touches[1].clientX - e.touches[0].clientX,
@@ -2603,18 +2601,18 @@ window.addEventListener('load', function() {
             return;
         }
 
-        // Si ya no hay 2 dedos, resetear el gesto tÃ¡ctil
+        // Si ya no hay 2 dedos, resetear el gesto táctil
         if (isTouchPanning && (!e.touches || e.touches.length !== 2)) {
             resetTouchGesture();
         }
 
-        // DetecciÃ³n universal de arrastre: usar el tracker de mouse:down como fuente de verdad
-        // (mÃ¡s confiable que e.buttons/touches que Fabric.js puede no propagar correctamente)
+        // Detección universal de arrastre: usar el tracker de mouse:down como fuente de verdad
+        // (más confiable que e.buttons/touches que Fabric.js puede no propagar correctamente)
         var isDragging = isPointerDown;
 
 
 
-        // Borrador unificado: borrado por contacto con hit-test econÃ³mico
+        // Borrador unificado: borrado por contacto con hit-test económico
         if (currentTool === 'eraser' && isDragging) {
             instantEraseAt(opt);
             return;
@@ -2623,7 +2621,7 @@ window.addEventListener('load', function() {
 
         if (currentTool === 'select') return;
 
-        // Forzar renderizado en tiempo real para lÃ¡piz y resaltador
+        // Forzar renderizado en tiempo real para lápiz y resaltador
         if (isDragging && (currentTool === 'pen' || currentTool === 'highlight')) {
             canvas.requestRenderAll();
             return;
@@ -2662,7 +2660,7 @@ window.addEventListener('load', function() {
             canvas.requestRenderAll();
         }
 
-        // Herramienta regla: actualizar lÃ­nea con snapping
+        // Herramienta regla: actualizar línea con snapping
         if (currentTool === 'ruler' && rulerStartPoint && isDragging) {
             var pointer = canvas.getPointer(opt.e);
             var dx = pointer.x - rulerStartPoint.x;
@@ -2670,7 +2668,7 @@ window.addEventListener('load', function() {
             var length = Math.sqrt(dx * dx + dy * dy);
             var angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-            // Snapping a Ã¡ngulos
+            // Snapping a ángulos
             var snappedAngle = Math.round(angle / rulerSnapAngle) * rulerSnapAngle;
             var angleRad = snappedAngle * Math.PI / 180;
 
@@ -2683,7 +2681,7 @@ window.addEventListener('load', function() {
             var endX = rulerStartPoint.x + Math.cos(angleRad) * snappedLength;
             var endY = rulerStartPoint.y + Math.sin(angleRad) * snappedLength;
 
-            // Actualizar lÃ­nea
+            // Actualizar línea
             rulerCurrentLine.set({ x2: endX, y2: endY });
             canvas.requestRenderAll();
         }
@@ -2740,7 +2738,7 @@ window.addEventListener('load', function() {
             activeShape = null; saveHistory();
         }
 
-        // Finalizar herramienta regla: convertir lÃ­nea en objeto permanente
+        // Finalizar herramienta regla: convertir línea en objeto permanente
         if (currentTool === 'ruler' && rulerCurrentLine) {
             var dx = Math.abs((rulerCurrentLine.x2 || 0) - (rulerCurrentLine.x1 || 0));
             var dy = Math.abs((rulerCurrentLine.y2 || 0) - (rulerCurrentLine.y1 || 0));
@@ -2760,9 +2758,9 @@ window.addEventListener('load', function() {
         }
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       REGLAS DE BORDE DINÃMICAS (ESTILO WORD / PHOTOSHOP)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════════════════════════════════════════════
+       REGLAS DE BORDE DINÁMICAS (ESTILO WORD / PHOTOSHOP)
+    ═══════════════════════════════════════════════════════════════ */
     canvas.on('after:render', function(opt) {
         if (!showAxes) return;
         if (!opt || !opt.ctx) return;
@@ -2783,19 +2781,19 @@ window.addEventListener('load', function() {
         var isLight = document.documentElement.classList.contains('light-mode');
         var isMobile = window.innerWidth < 768;
 
-        // DiseÃ±o: Proporciones legibles. MÃ¡s grueso y con mejor tipografÃ­a en mÃ³viles.
+        // Diseño: Proporciones legibles. Más grueso y con mejor tipografía en móviles.
         var RULER_SIZE = isMobile ? 28 : 24;
         var fontSize = isMobile ? 12 : 10;
         var bg = isLight ? '#f8fafc' : '#1e293b';
         var fg = isLight ? '#475569' : '#94a3b8';
         var lineCol = isLight ? '#cbd5e1' : '#334155';
 
-        // 1. Dibujar fondos sÃ³lidos de la regla (Borde superior e izquierdo)
+        // 1. Dibujar fondos sólidos de la regla (Borde superior e izquierdo)
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, w, RULER_SIZE);
         ctx.fillRect(0, 0, RULER_SIZE, h);
 
-        // 2. LÃ­neas separadoras entre la regla y el lienzo
+        // 2. Líneas separadoras entre la regla y el lienzo
         ctx.strokeStyle = lineCol;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -2803,7 +2801,7 @@ window.addEventListener('load', function() {
         ctx.moveTo(RULER_SIZE, 0); ctx.lineTo(RULER_SIZE, h);
         ctx.stroke();
 
-        // 3. LÃ³gica matemÃ¡tica de escala dinÃ¡mica (GeoGebra style)
+        // 3. Lógica matemática de escala dinámica (GeoGebra style)
         ctx.fillStyle = fg;
         ctx.strokeStyle = fg;
         ctx.font = fontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
@@ -2868,7 +2866,7 @@ window.addEventListener('load', function() {
             ctx.restore();
         }
 
-        // 4. Bloque de la esquina superior izquierda (para que no se crucen los nÃºmeros)
+        // 4. Bloque de la esquina superior izquierda (para que no se crucen los números)
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, RULER_SIZE, RULER_SIZE);
         ctx.strokeStyle = lineCol;
@@ -2877,14 +2875,14 @@ window.addEventListener('load', function() {
         ctx.restore();
     });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   MÃSCARAS E HISTORIAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   MÁSCARAS E HISTORIAL
+═══════════════════════════════════════════════════════════════ */
 
     canvas.on('path:created', function(opt) {
         if (twoFingerGesture) { canvas.remove(opt.path); return; }
-        // Borrador unificado: ya no genera paths (borrado instantÃ¡neo en
-        // mouse:move); aquÃ­ solo lÃ¡piz/resaltador guardan su historial.
+        // Borrador unificado: ya no genera paths (borrado instantáneo en
+        // mouse:move); aquí solo lápiz/resaltador guardan su historial.
         saveHistory();
     });
 
@@ -2903,7 +2901,7 @@ window.addEventListener('load', function() {
     });
 
 
-    // LÃ­mite prÃ¡cticamente ilimitado de pasos (#undo/redo)
+    // Límite prácticamente ilimitado de pasos (#undo/redo)
     const MAX_HISTORY = 1000;
     const MAX_HISTORY_CHARS = 60000000;
 
@@ -2912,7 +2910,7 @@ window.addEventListener('load', function() {
     function saveHistory() {
         if (isHistoryAction) return;
         var snap = JSON.stringify(canvas.toJSON(['isEraserMask']));
-        // Anti-duplicados: un estado idÃ©ntico al Ãºltimo no ocupa un Ã­ndice
+        // Anti-duplicados: un estado idéntico al último no ocupa un índice
         // nuevo (evita que un doble guardado haga que un undo "no haga nada")
         if (historyStack.length && historyStack[historyStack.length - 1] === snap) return;
         redoStack = [];
@@ -2929,16 +2927,16 @@ window.addEventListener('load', function() {
     }
 
     // #BUGFIX texto: entrada de historial INDEPENDIENTE al terminar de editar.
-    // AsÃ­, deshacer borra SOLO el texto (con su contenido final) y no arrastra
-    // consigo el Ãºltimo trazo dibujado, que ya tiene su propio Ã­ndice vÃ­a
+    // Así, deshacer borra SOLO el texto (con su contenido final) y no arrastra
+    // consigo el último trazo dibujado, que ya tiene su propio índice vía
     // path:created.
     canvas.on('text:editing:exited', function(opt) {
         var t = opt && opt.target;
         if (t && (t.text === '' || t.text == null)) {
-            // Caja vacÃ­a: se elimina sin ensuciar la cadena de undo
+            // Caja vacía: se elimina sin ensuciar la cadena de undo
             canvas.remove(t);
             canvas.requestRenderAll();
-            return; // object:removed dispararÃ¡ saveHistory (dedupe lo filtra)
+            return; // object:removed disparará saveHistory (dedupe lo filtra)
         }
         saveHistory();
     });
@@ -2951,9 +2949,9 @@ window.addEventListener('load', function() {
         });
     }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   PAGINACIÃ“N
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   PAGINACIÓN
+═══════════════════════════════════════════════════════════════ */
     function saveCurrentPage() {
   pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask']));
   pagePlots[currentPage] = serializePlots();
@@ -3070,9 +3068,9 @@ window.addEventListener('load', function() {
     document.getElementById('btnPrevPage').onclick = () => { if (currentPage > 0) goToPage(currentPage - 1); };
     document.getElementById('btnNextPage').onclick = () => { if (currentPage < pages.length - 1) goToPage(currentPage + 1); };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    HERRAMIENTAS Y BOTONES UI
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     function showToast(msg, type = 'info', duration = 3000) {
         let t = document.getElementById('mpToast');
         if (!t) {
@@ -3102,7 +3100,7 @@ window.addEventListener('load', function() {
             modal = document.createElement('div');
             modal.id = 'mpConfirm';
             modal.style.cssText = `display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:99998; align-items:center; justify-content:center;`;
-            modal.innerHTML = `<div style='background:#1e1e1e;border:1px solid #444;border-radius:12px;padding:24px 28px;max-width:340px;width:90%;text-align:center;'><p id='mpConfirmMsg' style='color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5'></p><div style='display:flex;gap:10px;justify-content:center'><button type='button' id='mpConfirmOk' aria-label='Confirmar acciÃ³n' style='background:#bb86fc;color:#000;border:none;border-radius:8px;padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px'>Confirmar</button><button type='button' id='mpConfirmCancel' aria-label='Cancelar acciÃ³n' style='background:transparent;color:#999;border:1px solid #444;border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px'>Cancelar</button></div></div>`;
+            modal.innerHTML = `<div style='background:#1e1e1e;border:1px solid #444;border-radius:12px;padding:24px 28px;max-width:340px;width:90%;text-align:center;'><p id='mpConfirmMsg' style='color:#e0e0e0;margin-bottom:20px;font-size:14px;line-height:1.5'></p><div style='display:flex;gap:10px;justify-content:center'><button type='button' id='mpConfirmOk' aria-label='Confirmar acción' style='background:#bb86fc;color:#000;border:none;border-radius:8px;padding:9px 22px;font-weight:600;cursor:pointer;font-size:14px'>Confirmar</button><button type='button' id='mpConfirmCancel' aria-label='Cancelar acción' style='background:transparent;color:#999;border:1px solid #444;border-radius:8px;padding:9px 22px;cursor:pointer;font-size:14px'>Cancelar</button></div></div>`;
             document.body.appendChild(modal);
             document.getElementById('mpConfirmCancel').onclick = () => { if (typeof closeConfirmModal === 'function') closeConfirmModal(); else modal.style.display = 'none'; };
         }
@@ -3121,7 +3119,7 @@ window.addEventListener('load', function() {
     window.showConfirm = showConfirm;
     window.showToast = showToast;
 
-    // Estado del menÃº contextual (cerrado por defecto para no invadir la hoja)
+    // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
     let contextMenuOpen = false;
 
     function setTool(tool) {
@@ -3143,7 +3141,7 @@ window.addEventListener('load', function() {
                 o.hoverCursor = isSelect ? null : 'default';
             }
         });
-        // (Nota: Si la herramienta es 'fill', su propia rama sobreescribirÃ¡ evented=true mÃ¡s abajo)
+        // (Nota: Si la herramienta es 'fill', su propia rama sobreescribirá evented=true más abajo)
 
 
         let btnMap = { 'pen':'btnPen', 'highlight':'btnHighlight', 'fill':'btnFill', 'text':'btnText', 'eraser':'btnEraserStroke', 'select':'btnSelect', 'pan':'btnPan', 'line':'menuBtnLine', 'rect':'menuBtnRect', 'circle':'menuBtnCircle', 'triangle':'menuBtnTriangle', 'ruler':'btnRuler' };
@@ -3151,7 +3149,7 @@ window.addEventListener('load', function() {
         let targetBtnId = btnMap[tool];
         if (targetBtnId) {
             let btn = document.getElementById(targetBtnId);
-            if (btn) btn.classList.add('active'); // Solo agrega la clase si el botÃ³n existe en el HTML
+            if (btn) btn.classList.add('active'); // Solo agrega la clase si el botón existe en el HTML
         }
 
         if (tool === 'pen') {
@@ -3185,7 +3183,7 @@ window.addEventListener('load', function() {
         else if (tool === 'eraser') {
             canvas.isDrawingMode = false; // NUNCA dibuja pincel fantasma
             canvasWrapper.classList.add('cursor-eraser');
-            // Objetos detectables para el hit-test instantÃ¡neo pero no seleccionables
+            // Objetos detectables para el hit-test instantáneo pero no seleccionables
             canvas.forEachObject(o => {
                 if (o.isEraserMask !== true) {
                     o.evented = true;
@@ -3200,8 +3198,8 @@ window.addEventListener('load', function() {
         else if (tool === 'pan') { canvasWrapper.classList.add('cursor-pan'); }
         else if (['line', 'rect', 'circle', 'triangle'].includes(tool)) { canvasWrapper.classList.add('cursor-cross'); }
 
-        // MenÃº contextual inteligente: cerrado por defecto, se alterna al
-        // re-clicar la herramienta activa o con el botÃ³n de ajustes.
+        // Menú contextual inteligente: cerrado por defecto, se alterna al
+        // re-clicar la herramienta activa o con el botón de ajustes.
         var contextMenu = document.getElementById('contextMenu');
         var ctxColor = document.getElementById('ctxGroupColor');
         var ctxWidth = document.getElementById('ctxGroupWidth');
@@ -3259,7 +3257,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
 
-    // Formas e inserciÃ³n â€” acceso directo desde el sidebar
+    // Formas e inserción — acceso directo desde el sidebar
     document.getElementById('menuBtnLine').onclick = () => setTool('line');
     document.getElementById('menuBtnRect').onclick = () => setTool('rect');
     document.getElementById('menuBtnCircle').onclick = () => setTool('circle');
@@ -3322,14 +3320,14 @@ window.addEventListener('load', function() {
         const isLight = document.documentElement.classList.contains('light-mode');
         localStorage.setItem('mathpad_theme', isLight ? 'light' : 'dark');
 
-        // Restaurar color de hoja predeterminado segÃºn el tema
+        // Restaurar color de hoja predeterminado según el tema
         var newBg = isLight ? '#ffffff' : '#1a1a1a';
         document.documentElement.style.setProperty('--paper-bg', newBg);
         if (bgColorPicker) bgColorPicker.value = newBg;
 
-        showToast(isLight ? 'â˜€ï¸ Modo claro' : 'ðŸŒ™ Modo oscuro', 'info', 1500);
+        showToast(isLight ? '☀️ Modo claro' : '🌙 Modo oscuro', 'info', 1500);
 
-                // Sincronizar el lÃ¡piz si estaba usando un color neutro (reutiliza funciÃ³n unificada)
+                // Sincronizar el lápiz si estaba usando un color neutro (reutiliza función unificada)
         syncDefaultInkColor();
 
         // Redibujar el lienzo para que los ejes/regla (dibujados en after:render)
@@ -3348,12 +3346,12 @@ window.addEventListener('load', function() {
     syncDefaultInkColor();
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    EXPORTAR PDF, JSON Y PNG
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     // Lee el color de fondo actual de la hoja desde la variable CSS --paper-bg
     // Calcula el bounding box del contenido activo (con padding), para exportar
-    // exactamente lo que hay dibujado en lugar de recortar al tamaÃ±o por defecto.
+    // exactamente lo que hay dibujado en lugar de recortar al tamaño por defecto.
     function getCanvasBounds(canvas) {
         var objects = canvas.getObjects();
         var hasContent = false;
@@ -3460,7 +3458,7 @@ window.addEventListener('load', function() {
     /* FUNCIONALIDAD DE IMAGEN */
     function insertImageOnCanvas(dataURL) {
       fabric.Image.fromURL(dataURL, function(img) {
-        if (!img || !img.width || !img.height) { showToast('Imagen invÃ¡lida', 'err'); return; }
+        if (!img || !img.width || !img.height) { showToast('Imagen inválida', 'err'); return; }
         const vpt = canvas.viewportTransform;
         const maxW = canvas.getWidth() * 0.55;
         if (img.width > maxW) img.scaleToWidth(maxW);
@@ -3474,7 +3472,7 @@ window.addEventListener('load', function() {
         setTool('select');
         canvas.requestRenderAll();
         saveHistory();
-        showToast('ðŸ–¼ Imagen insertada', 'ok');
+        showToast('🖼 Imagen insertada', 'ok');
       });
     }
 
@@ -3510,7 +3508,7 @@ window.addEventListener('load', function() {
       if (textData && textData.trim() !== '') {
           var vpt = canvas.viewportTransform;
           var rect = cw.getBoundingClientRect();
-          // Calcular coordenadas exactas donde se soltÃ³ el mouse
+          // Calcular coordenadas exactas donde se soltó el mouse
           var canvasX = (e.clientX - rect.left - vpt[4]) / vpt[0];
           var canvasY = (e.clientY - rect.top - vpt[5]) / vpt[3];
 
@@ -3532,14 +3530,14 @@ window.addEventListener('load', function() {
           return;
       }
 
-      // 2. LÃ³gica original para imÃ¡genes
+      // 2. Lógica original para imágenes
       const file = e.dataTransfer.files[0];
       if (!file) return;
       try {
         const url = await fileToDataURL(file);
         insertImageOnCanvas(url);
         setTool('select');
-      } catch { showToast('Solo se admiten imÃ¡genes', 'warn'); }
+      } catch { showToast('Solo se admiten imágenes', 'warn'); }
     });
 
     // Paso 7: graficador interactivo con canvas nativo
@@ -4726,14 +4724,14 @@ window.addEventListener('load', function() {
     });
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
     LATEX Y PORTAPAPELES
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ═══════════════════════════════════════════════════════════════ */
 
         /* ================================================================
-       HERRAMIENTA LATEX â€” Modal con vista previa, ejemplos y ayuda.
-       La fÃ³rmula se centra en el viewport VISIBLE del lienzo, toma el
-       color activo del usuario (colorPicker) y su tamaÃ±o en pantalla
+       HERRAMIENTA LATEX — Modal con vista previa, ejemplos y ayuda.
+       La fórmula se centra en el viewport VISIBLE del lienzo, toma el
+       color activo del usuario (colorPicker) y su tamaño en pantalla
        es coherente con fontSizePicker y el zoom actual.
        ================================================================ */
     var latexModalEl   = document.getElementById('latexModal');
@@ -4750,10 +4748,10 @@ window.addEventListener('load', function() {
       return (cp && cp.value) ? cp.value : '#000000';
     }
     function latexShowErr() {
-      latexErrorEl.textContent = 'Sintaxis LaTeX invÃ¡lida: revisa llaves { }, ^, _ y los comandos con \\.';
+      latexErrorEl.textContent = 'Sintaxis LaTeX inválida: revisa llaves { }, ^, _ y los comandos con \\.';
     }
 
-    // Renderiza y valida (lanza error si MathJax detecta merror/sintaxis invÃ¡lida)
+    // Renderiza y valida (lanza error si MathJax detecta merror/sintaxis inválida)
     function latexRenderInto(container, tex) {
       var holder = MathJax.tex2svg(tex);
       if (!holder || !holder.querySelector || !holder.querySelector('svg')) throw new Error('sin-svg');
@@ -4767,7 +4765,7 @@ window.addEventListener('load', function() {
       latexErrorEl.textContent = '';
       latexPreviewEl.style.color = latexActiveColor(); // WYSIWYG: color activo real
       if (!tex) {
-        latexPreviewEl.innerHTML = '<span style="opacity:.5;font-size:12px">Vista previa de tu fÃ³rmulaâ€¦</span>';
+        latexPreviewEl.innerHTML = '<span style="opacity:.5;font-size:12px">Vista previa de tu fórmula…</span>';
         return;
       }
       try { latexRenderInto(latexPreviewEl, tex); }
@@ -4799,7 +4797,7 @@ window.addEventListener('load', function() {
       if (e.key === 'Enter') { e.preventDefault(); document.getElementById('latexInsertBtn').click(); }
     });
     latexInputEl.addEventListener('input', latexUpdatePreview);
-    // BUGFIX: mientras se escribe la fÃ³rmula, ningÃºn handler global (space/
+    // BUGFIX: mientras se escribe la fórmula, ningún handler global (space/
     // herramientas/Esc) debe procesar estas teclas. Solo Escape cierra el modal.
     ['keydown', 'keypress', 'keyup'].forEach(function(evName) {
       latexInputEl.addEventListener(evName, function(e) {
@@ -4809,7 +4807,7 @@ window.addEventListener('load', function() {
       });
     });
 
-    // Chips de ejemplos rÃ¡pidos: un clic carga la fÃ³rmula en el input
+    // Chips de ejemplos rápidos: un clic carga la fórmula en el input
     (function buildLatexChips() {
       var wrap = document.getElementById('latexChips');
       LATEX_EXAMPLES.forEach(function(tex) {
@@ -4826,7 +4824,7 @@ window.addEventListener('load', function() {
       var ecuacion = latexInputEl.value.trim();
       if (!ecuacion) return;
       try {
-        latexRenderInto(latexPreviewEl, ecuacion); // validaciÃ³n previa
+        latexRenderInto(latexPreviewEl, ecuacion); // validación previa
 
         var svgElement = MathJax.tex2svg(ecuacion).querySelector('svg');
         fabric.loadSVGFromString(new XMLSerializer().serializeToString(svgElement), function(objects, options) {
@@ -4835,7 +4833,7 @@ window.addEventListener('load', function() {
           // COLOR DE TEMA: mismo color activo que usan texto y formas
           var col = latexActiveColor();
 
-          // TAMAÃ‘O ARMÃ“NICO: alto en pantalla â‰ˆ herramienta Texto,
+          // TAMAÑO ARMÓNICO: alto en pantalla ≈ herramienta Texto,
           // compensando el zoom/paneo actuales del lienzo
           var vpt  = canvas.viewportTransform;
           var zoom = vpt[0] || 1;
@@ -4867,7 +4865,7 @@ window.addEventListener('load', function() {
           setTool('select');
           saveHistory();
           canvas.requestRenderAll();
-          showToast('âœ” FÃ³rmula insertada en el centro (tema y escala actuales)', 'ok');
+          showToast('✔ Fórmula insertada en el centro (tema y escala actuales)', 'ok');
         });
 
         closeLatexModal();
@@ -4912,16 +4910,16 @@ window.addEventListener('load', function() {
         }
     });
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LÃ“GICA CALCULADORA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   LÓGICA CALCULADORA
+═══════════════════════════════════════════════════════════════ */
     var btnCalcToggle = document.getElementById('btnCalcToggle');
     function toggleCalc() {
         calcVisible = !calcVisible;
         document.body.classList.toggle('calc-open', calcVisible);
         calcPanel.classList.toggle('hidden', !calcVisible);
         btnCalcToggle.classList.toggle('active', calcVisible);
-        // Cerrar menÃº de memoria al togglear calculadora
+        // Cerrar menú de memoria al togglear calculadora
         const memMenu = document.getElementById('calcMemoryMenu');
         if (memMenu) memMenu.style.display = 'none';
         setTimeout(resizeCanvas, 270);
@@ -4953,13 +4951,13 @@ window.addEventListener('load', function() {
     let calcMemory = 0; // Memoria de la calculadora
     let calcHistory = []; // Historial de operaciones
     let angleMode = 'DEG'; // Modo angular: 'DEG', 'RAD' o 'GRA'
-    let lastAns = null;    // Ãšltimo resultado numÃ©rico vÃ¡lido
-    let calcTokens = [];   // ExpresiÃ³n como array de tokens {show, js, kind}
-    let calcCaret = 0; // PosiciÃ³n del cursor: 0..calcTokens.length
+    let lastAns = null;    // Último resultado numérico válido
+    let calcTokens = [];   // Expresión como array de tokens {show, js, kind}
+    let calcCaret = 0; // Posición del cursor: 0..calcTokens.length
     let calcError = null;  // null | 'Math ERROR' | 'Syntax ERROR'
-    let justEvaluated = false; // true tras = hasta la prÃ³xima tecla
-    let calcDirty = false; // true cuando el estado cambiÃ³ // true tras '=' hasta la prÃ³xima tecla
-    let shiftActive = false;   // SHIFT armado para segunda funciÃ³n
+    let justEvaluated = false; // true tras = hasta la próxima tecla
+    let calcDirty = false; // true cuando el estado cambió // true tras '=' hasta la próxima tecla
+    let shiftActive = false;   // SHIFT armado para segunda función
     const CALC_FMT = { precision: 15 };
 
     function CalcMathError(msg) { this.name = 'MathError'; this.message = msg || 'Math ERROR'; }
@@ -5031,11 +5029,11 @@ window.addEventListener('load', function() {
         if (b) b.classList.toggle('hidden', !(calcMemory !== 0));
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ═════════════════════════════════════════════════════════════
        PERSISTENCIA DE LA CALCULADORA (localStorage, clave mathpad_calc)
        Todos los accesos a localStorage van dentro de try/catch;
        cualquier fallo se ignora silenciosamente.
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    ══════════════════════════════════════════════════════════════ */
     function calcSave() {
         try {
             calcDirty = false;
@@ -5068,21 +5066,21 @@ window.addEventListener('load', function() {
         }
     }
 
-    // Validar un token restaurado contra TOKEN_MAP y excepciones vÃ¡lidas.
+    // Validar un token restaurado contra TOKEN_MAP y excepciones válidas.
     // Devuelve el token reconstruido/aceptado o null si hay que descartarlo.
     function sanitizeCalcToken(t) {
         if (!t || typeof t !== 'object') return null;
         var show = t.show, js = t.js, kind = t.kind;
         if (typeof show !== 'string' || typeof js !== 'string' || typeof kind !== 'string') return null;
         if ('num op post infix func open close const exp neg'.indexOf(kind) === -1) return null;
-        // 1. ReconstrucciÃ³n desde TOKEN_MAP: js y kind deben coincidir con una entrada
+        // 1. Reconstrucción desde TOKEN_MAP: js y kind deben coincidir con una entrada
         for (var key in TOKEN_MAP) {
             var def = TOKEN_MAP[key];
             if (def.js === js && def.kind === kind) {
                 return { show: def.show, js: def.js, kind: def.kind };
             }
         }
-        // 2. Excepciones vÃ¡lidas fuera de TOKEN_MAP (MR, Sâ‡”D, Â±)
+        // 2. Excepciones válidas fuera de TOKEN_MAP (MR, S⇔D, ±)
         if (kind === 'neg') {
             if (show === '-' && js === '-') return { show: '-', js: '-', kind: 'neg' };
             return null;
@@ -5101,7 +5099,7 @@ window.addEventListener('load', function() {
     function calcRestore(state) {
         if (!state || typeof state !== 'object') return;
         try {
-            // Tokens de la expresiÃ³n (validados uno por uno; nunca se pasan a math.evaluate)
+            // Tokens de la expresión (validados uno por uno; nunca se pasan a math.evaluate)
             if (Array.isArray(state.calcTokens)) {
                 var tokens = [];
                 for (var i = 0; i < state.calcTokens.length; i++) {
@@ -5111,7 +5109,7 @@ window.addEventListener('load', function() {
                 calcTokens = tokens;
                 calcCaret = Math.max(0, Math.min(typeof state.calcCaret === 'number' ? state.calcCaret : tokens.length, tokens.length));
             }
-            // Historial (mÃ¡ximo 50 entradas; se descartan entradas con tokens invÃ¡lidos)
+            // Historial (máximo 50 entradas; se descartan entradas con tokens inválidos)
             if (Array.isArray(state.calcHistory)) {
                 var hist = [];
                 for (var j = 0; j < state.calcHistory.length; j++) {
@@ -5160,14 +5158,14 @@ window.addEventListener('load', function() {
             }
             // Nunca se restaura calcError
         } catch (e) {
-            // Estado invÃ¡lido: ignorar por completo
+            // Estado inválido: ignorar por completo
         }
     }
 
-    // â”€â”€ PUNTO DE PRUEBA (Playwright) â€” no afecta la ejecuciÃ³n en producciÃ³n â”€â”€
+    // ── PUNTO DE PRUEBA (Playwright) — no afecta la ejecución en producción ──
     // Solo expone funciones internas para que las pruebas puedan inyectar un
     // estado completo (el mismo formato que escribe calcSave) y verificar
-    // restauraciÃ³n, renderizado e escape del historial sin depender de
+    // restauración, renderizado e escape del historial sin depender de
     // temporizadores de pagehide.
     window.__mathpad = window.__mathpad || {};
     window.__mathpad.calcRestore = calcRestore;
@@ -5182,7 +5180,7 @@ window.addEventListener('load', function() {
         var btn = document.getElementById('btnShift');
         if (btn) {
             btn.setAttribute('aria-pressed', shiftActive ? 'true' : 'false');
-            btn.setAttribute('aria-label', shiftActive ? 'Segunda funciÃ³n activada' : 'Activar segunda funciÃ³n');
+            btn.setAttribute('aria-label', shiftActive ? 'Segunda función activada' : 'Activar segunda función');
         }
         if (badge) {
           badge.textContent = on ? 'S' : '';
@@ -5298,7 +5296,7 @@ window.addEventListener('load', function() {
             return;
         }
 
-        // Mostrar las Ãºltimas 10 entradas en orden inverso (texto escapado con textContent)
+        // Mostrar las últimas 10 entradas en orden inverso (texto escapado con textContent)
         const recentHistory = calcHistory.slice(-10).reverse();
         recentHistory.forEach(function(item, index) {
             const date = new Date(item.timestamp);
@@ -5311,7 +5309,7 @@ window.addEventListener('load', function() {
 
             var exprDiv = document.createElement('div');
             exprDiv.className = 'history-expr';
-            exprDiv.textContent = timeStr + ' â€” ' + item.expression;
+            exprDiv.textContent = timeStr + ' — ' + item.expression;
 
             var resDiv = document.createElement('div');
             resDiv.className = 'history-result';
@@ -5486,11 +5484,11 @@ window.addEventListener('load', function() {
                 i++;
                 continue;
             }
-            if (ch === 'Ã—' || ch === 'âœ•') { out.push(tokenFromKey('*')); i++; continue; }
-            if (ch === 'Ã·') { out.push(tokenFromKey('/')); i++; continue; }
-            if (ch === 'âˆ’') { out.push(tokenFromKey('-')); i++; continue; }
-            if (ch === 'Ï€') { out.push(tokenFromKey('pi')); i++; continue; }
-            if (ch === 'âˆš') { out.push(tokenFromKey('sqrt(')); i++; continue; }
+            if (ch === '×' || ch === '✕') { out.push(tokenFromKey('*')); i++; continue; }
+            if (ch === '÷') { out.push(tokenFromKey('/')); i++; continue; }
+            if (ch === '−') { out.push(tokenFromKey('-')); i++; continue; }
+            if (ch === 'π') { out.push(tokenFromKey('pi')); i++; continue; }
+            if (ch === '√') { out.push(tokenFromKey('sqrt(')); i++; continue; }
             if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
                 var jw = i;
                 while (jw < s.length && isWordChar(s[jw])) jw++;
@@ -5838,7 +5836,7 @@ window.addEventListener('load', function() {
         calcSave();
     });
 
-    // BotÃ³n DEG/RAD/GRA
+    // Botón DEG/RAD/GRA
     var btnAngleMode = document.getElementById('btnAngleMode');
     var calcAngleBadge = document.getElementById('calcAngleBadge');
     if (btnAngleMode) {
@@ -5857,7 +5855,7 @@ window.addEventListener('load', function() {
     if (btnShiftEl) {
         btnShiftEl.onclick = function() { calcClearErrorIfNeeded(); calcSetShift(!shiftActive); };
     }
-    // BotÃ³n Sâ‡”D (header y teclado)
+    // Botón S⇔D (header y teclado)
     function toggleSD() {
         var current = resDisplay.textContent;
         if (!current || current === 'Math ERROR' || current === 'Syntax ERROR' || current === '0') return;
@@ -5916,10 +5914,10 @@ window.addEventListener('load', function() {
         btnSDKey.onclick = function() { toggleSD(); };
     }
 
-    // BotÃ³n de memoria - mostrar menÃº
+    // Botón de memoria - mostrar menú
     document.getElementById('calcMemory').onclick = function(e) {
         e.stopPropagation();
-        // Crear menÃº contextual de memoria
+        // Crear menú contextual de memoria
         let menu = document.getElementById('calcMemoryMenu');
         if (!menu) {
             menu = document.createElement('div');
@@ -5947,19 +5945,19 @@ window.addEventListener('load', function() {
             });
         }
 
-        // Posicionar menÃº manteniendo 100% dentro del viewport
+        // Posicionar menú manteniendo 100% dentro del viewport
         const btnRect = this.getBoundingClientRect();
         let menuRect = menu.getBoundingClientRect();
         let vh = window.innerHeight;
 
-        // Calcular posiciÃ³n inicial a la derecha del botÃ³n
+        // Calcular posición inicial a la derecha del botón
         menu.style.right = Math.max(4, window.innerWidth - btnRect.right) + 'px';
         menu.style.left = 'auto';
         menu.style.top = Math.max(4, Math.min(btnRect.bottom + 4, vh - menuRect.height - 4)) + 'px';
         menu.style.display = 'block';
     };
 
-    // Cerrar menÃº de memoria al hacer clic fuera
+    // Cerrar menú de memoria al hacer clic fuera
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('calcMemoryMenu');
         if (menu && !menu.contains(e.target) && e.target !== document.getElementById('calcMemory')) {
@@ -5967,7 +5965,7 @@ window.addEventListener('load', function() {
         }
     });
 
-    // â”€â”€ Persistencia de la calculadora (localStorage) â”€â”€
+    // ── Persistencia de la calculadora (localStorage) ──
     window.addEventListener('pagehide', function() {
         calcSave();
     });
@@ -5999,20 +5997,20 @@ window.addEventListener('load', function() {
         if (e.target.id === 'calcResult') {
             e.dataTransfer.setData('text/plain', resDisplay.textContent);
         } else if (e.target.closest('.calc-history-item')) {
-            // Si arrastra el historial, tomamos la expresiÃ³n y el resultado (ej: "2+2 = 4")
+            // Si arrastra el historial, tomamos la expresión y el resultado (ej: "2+2 = 4")
             const item = e.target.closest('.calc-history-item');
-            const expr = item.querySelector('.history-expr').innerText.split('â€”')[1].trim();
+            const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
             const res = item.querySelector('.history-result').innerText.replace('= ', '');
             e.dataTransfer.setData('text/plain', expr + ' = ' + res);
         }
     });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ARRASTRE TÃCTIL (Calculadora â†’ Lienzo)
-       Los eventos tÃ¡ctiles no activan el HTML5 Drag & Drop nativo,
-       asÃ­ que implementamos un sistema paralelo con touchstart/touchend.
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-    let touchDragData = null; // Almacena el texto a soltar durante el arrastre tÃ¡ctil
+    /* ═══════════════════════════════════════════════════════════════
+       ARRASTRE TÁCTIL (Calculadora → Lienzo)
+       Los eventos táctiles no activan el HTML5 Drag & Drop nativo,
+       así que implementamos un sistema paralelo con touchstart/touchend.
+    ═══════════════════════════════════════════════════════════════ */
+    let touchDragData = null; // Almacena el texto a soltar durante el arrastre táctil
 
     // touchstart: capturar el texto del elemento arrastrado
     document.getElementById('calcPanel').addEventListener('touchstart', function(e) {
@@ -6022,7 +6020,7 @@ window.addEventListener('load', function() {
         if (target.id === 'calcResult') {
             touchDragData = resDisplay.textContent;
         } else if (item) {
-            const expr = item.querySelector('.history-expr').innerText.split('â€”')[1].trim();
+            const expr = item.querySelector('.history-expr').innerText.split('—')[1].trim();
             const res = item.querySelector('.history-result').innerText.replace('= ', '');
             touchDragData = expr + ' = ' + res;
         } else {
@@ -6033,18 +6031,18 @@ window.addEventListener('load', function() {
         // No hacemos preventDefault para no bloquear el scroll del historial
     }, { passive: true });
 
-    // touchend: verificar si se soltÃ³ sobre el canvas y crear el IText
+    // touchend: verificar si se soltó sobre el canvas y crear el IText
     document.addEventListener('touchend', function(e) {
         if (!touchDragData) return; // No hay datos de arrastre activo
 
         const touch = e.changedTouches[0];
         if (!touch) { touchDragData = null; return; }
 
-        // Verificar si el dedo se levantÃ³ sobre el canvas-wrapper
+        // Verificar si el dedo se levantó sobre el canvas-wrapper
         const elementAtTouch = document.elementFromPoint(touch.clientX, touch.clientY);
         if (!elementAtTouch) { touchDragData = null; return; }
 
-        // Buscar si el elemento (o algÃºn padre) es el canvas-wrapper
+        // Buscar si el elemento (o algún padre) es el canvas-wrapper
         let el = elementAtTouch;
         let isOverCanvas = false;
         while (el) {
@@ -6079,22 +6077,22 @@ window.addEventListener('load', function() {
         canvas.setActiveObject(itext);
         setTool('select');
         saveHistory();
-        showToast('ðŸ“ Texto insertado desde calculadora', 'ok');
+        showToast('📝 Texto insertado desde calculadora', 'ok');
 
         // Limpiar el estado de arrastre
         touchDragData = null;
     }, { passive: true });
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    /* ═══════════════════════════════════════════════════════════════
        BARRA DE HERRAMIENTAS EN PC (#9): arrastre tipo "drag to scroll",
-       rueda del ratÃ³n verticalâ†’horizontal y flechas â†/â†’ solo cuando el
-       cursor estÃ¡ sobre la barra (no interfiere con el canvas).
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       rueda del ratón vertical→horizontal y flechas ←/→ solo cuando el
+       cursor está sobre la barra (no interfiere con el canvas).
+    ═══════════════════════════════════════════════════════════════ */
     (function initToolbarNav() {
       var bar = document.querySelector('.top-bar');
       if (!bar) return;
 
-      // â”€â”€ Click & Drag para desplazar la barra â”€â”€
+      // ── Click & Drag para desplazar la barra ──
       var isDown = false, startX = 0, scrollLeft0 = 0, dragged = false;
       bar.addEventListener('mousedown', function(e) {
         isDown = true; dragged = false;
@@ -6110,12 +6108,12 @@ window.addEventListener('load', function() {
         if (dragged) bar.scrollLeft = scrollLeft0 - dx;
       });
 
-      // Un arrastre no debe activar el botÃ³n donde terminÃ³ el clic
+      // Un arrastre no debe activar el botón donde terminó el clic
       bar.addEventListener('click', function(e) {
         if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; }
       }, true);
 
-      // â”€â”€ Rueda del ratÃ³n: vertical â†’ scroll horizontal â”€â”€
+      // ── Rueda del ratón: vertical → scroll horizontal ──
       // BUGFIX: Ctrl/Cmd + rueda pertenece al zoom nativo del navegador,
       // se libera ANTES de cualquier preventDefault().
       bar.addEventListener('wheel', function(e) {
@@ -6128,7 +6126,7 @@ window.addEventListener('load', function() {
         bar.scrollLeft += d;
       }, { passive: false });
 
-      // â”€â”€ Flechas â†/â†’ solo con el cursor sobre la barra â”€â”€
+      // ── Flechas ←/→ solo con el cursor sobre la barra ──
       var barHover = false;
       bar.addEventListener('mouseenter', function() { barHover = true; });
       bar.addEventListener('mouseleave', function() { barHover = false; });
@@ -6141,13 +6139,13 @@ window.addEventListener('load', function() {
       }, true);
     })();
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       LÃMITES DE LA CALCULADORA (#responsive): con mucho zoom del
+    /* ═══════════════════════════════════════════════════════════════
+       LÍMITES DE LA CALCULADORA (#responsive): con mucho zoom del
        navegador o pantallas muy chicas, el panel debe permanecer
-       Ã­ntegramente dentro de la ventana visible y acotado al viewport.
+       íntegramente dentro de la ventana visible y acotado al viewport.
        Solo corrige posiciones definidas por JavaScript (inline left/top),
-       para no interferir con las transiciones CSS del modo mÃ³vil.
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       para no interferir con las transiciones CSS del modo móvil.
+    ═══════════════════════════════════════════════════════════════ */
     (function clampCalcSetup() {
       var panel = document.getElementById('calcPanel');
       if (!panel) return;
@@ -6165,7 +6163,7 @@ window.addEventListener('load', function() {
         if (!isNaN(sl)) panel.style.left = Math.max(0, Math.min(sl, vw - r.width))  + 'px';
         if (!isNaN(st)) panel.style.top  = Math.max(0, Math.min(st, vh - r.height)) + 'px';
 
-        // Reporte opcional en consola si algÃºn borde sigue fuera (layout puro)
+        // Reporte opcional en consola si algún borde sigue fuera (layout puro)
         var rr = panel.getBoundingClientRect();
         if ((rr.left < -4 || rr.right > vw + 4 || rr.top < -4 || rr.bottom > vh + 4) && window.console) {
           console.info('[MathPad] calculadora fuera de viewport tras clamp:', Math.round(rr.left), Math.round(rr.right), '/', vw);
@@ -6178,13 +6176,13 @@ window.addEventListener('load', function() {
       clampCalcToViewport();
     })();
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    ATAJOS DE TECLADO (KEYDOWN / KEYUP)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
     document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { redoStack.push(historyStack.pop()); loadState(historyStack[historyStack.length - 1]); } };
     document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
     document.getElementById('btnClear').onclick = function() {
-        showConfirm('Â¿Limpiar todo el lienzo? Esta acciÃ³n no se puede deshacer.', () => {
+        showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => {
             withoutHistory(function() { canvas.clear(); });
             canvas.setBackgroundColor('', canvas.renderAll.bind(canvas));
             saveHistory();
@@ -6305,7 +6303,7 @@ window.addEventListener('load', function() {
         if (e.ctrlKey && e.code === 'KeyS') {
             e.preventDefault();
             doAutoSave();
-            showToast('ðŸ’¾ Proyecto guardado (Ctrl+S)', 'ok');
+            showToast('💾 Proyecto guardado (Ctrl+S)', 'ok');
         }
         if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); document.getElementById('btnUndo').click(); }
         if (e.ctrlKey && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) { e.preventDefault(); document.getElementById('btnRedo').click(); }
@@ -6322,24 +6320,24 @@ window.addEventListener('load', function() {
     setTool('pen');
     saveHistory(); // Guardar el primer estado en blanco
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       LÃMITES DE ERROR GLOBALES (ERROR BOUNDARIES)
-    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════════════════════════════════════════════
+       LÍMITES DE ERROR GLOBALES (ERROR BOUNDARIES)
+    ═══════════════════════════════════════════════════════════════ */
     window.addEventListener('error', function(e) {
         console.error('Error global interceptado:', e.error);
         if (typeof showToast === 'function') {
-            showToast('âš ï¸ OcurriÃ³ un error. Tu trabajo estÃ¡ protegido.', 'err', 4000);
+            showToast('⚠️ Ocurrió un error. Tu trabajo está protegido.', 'err', 4000);
         }
     });
 
     window.addEventListener('unhandledrejection', function(e) {
         console.error('Promesa rechazada interceptada:', e.reason);
         if (typeof showToast === 'function') {
-            showToast('âš ï¸ Advertencia de proceso en segundo plano.', 'warn', 3000);
+            showToast('⚠️ Advertencia de proceso en segundo plano.', 'warn', 3000);
         }
     });
 
-    /* ACTUALIZACIÃ“N DE SERVICE WORKER */
+    /* ACTUALIZACIÓN DE SERVICE WORKER */
     let swUpdateAvailable = false;
 
     function showSWUpdateBanner() {
@@ -6366,8 +6364,8 @@ window.addEventListener('load', function() {
             font-weight: 500;
         `;
         banner.innerHTML = `
-            <span>ðŸ“¦ Hay una actualizaciÃ³n disponible</span>
-            <button type="button" id="btnReloadSW" aria-label="Recargar para aplicar la actualizaciÃ³n">Recargar</button>
+            <span>📦 Hay una actualización disponible</span>
+            <button type="button" id="btnReloadSW" aria-label="Recargar para aplicar la actualización">Recargar</button>
         `;
         document.body.appendChild(banner);
 
@@ -6376,9 +6374,9 @@ window.addEventListener('load', function() {
         };
     }
 
-    // Escuchar cambios en el Service Worker (nueva versiÃ³n disponible)
-    // Solo se muestra el banner si YA existÃ­a un controlador antes de cargar
-    // la pÃ¡gina: asÃ­ la primera instalaciÃ³n de la PWA no da un falso positivo.
+    // Escuchar cambios en el Service Worker (nueva versión disponible)
+    // Solo se muestra el banner si YA existía un controlador antes de cargar
+    // la página: así la primera instalación de la PWA no da un falso positivo.
     if ('serviceWorker' in navigator) {
         let hadController = !!navigator.serviceWorker.controller;
         navigator.serviceWorker.addEventListener('controllerchange', function() {
@@ -6411,13 +6409,13 @@ window.addEventListener('load', function() {
         if (navigator.storage && navigator.storage.estimate) {
             try {
                 const estimate = await navigator.storage.estimate();
-                // Si hay estimaciÃ³n vÃ¡lida y cuota mayor a 0
+                // Si hay estimación válida y cuota mayor a 0
                 if (estimate.usage && estimate.quota) {
                     const percentUsed = (estimate.usage / estimate.quota) * 100;
                     if (percentUsed > 85) {
                         const usageMB = (estimate.usage / (1024 * 1024)).toFixed(1);
                         const quotaMB = (estimate.quota / (1024 * 1024)).toFixed(1);
-                        showToast(`âš ï¸ Almacenamiento casi lleno (${usageMB}MB / ${quotaMB}MB). Exporta tu sesiÃ³n en formato JSON.`, 'warn', 6000);
+                        showToast(`⚠️ Almacenamiento casi lleno (${usageMB}MB / ${quotaMB}MB). Exporta tu sesión en formato JSON.`, 'warn', 6000);
                     }
                 }
             } catch (e) {
@@ -6429,9 +6427,9 @@ window.addEventListener('load', function() {
     async function doAutoSave(silent) {
       try {
         const json = serializeProject();
-        // Comprimir si es grande (solo base64 de imÃ¡genes puede ser enorme)
+        // Comprimir si es grande (solo base64 de imágenes puede ser enorme)
         if (json.length > 4_000_000) {
-          if (!silent) showToast('âš  SesiÃ³n muy grande para autoguardado', 'warn'); return;
+          if (!silent) showToast('⚠ Sesión muy grande para autoguardado', 'warn'); return;
         }
 
         // Guardar en IndexedDB
@@ -6446,11 +6444,11 @@ window.addEventListener('load', function() {
           timestamp: Date.now()
         });
 
-        if (!silent) showToast('ðŸ’¾ Guardado automÃ¡ticamente', 'info', 1800);
+        if (!silent) showToast('💾 Guardado automáticamente', 'info', 1800);
         checkStorageQuota(); // Verificar espacio de dispositivo tras guardar
       } catch(e) {
         console.error('Error en autoguardado:', e);
-        if (!silent) showToast('Autoguardado fallÃ³ (almacenamiento lleno?)', 'warn');
+        if (!silent) showToast('Autoguardado falló (almacenamiento lleno?)', 'warn');
       }
     }
 
@@ -6466,7 +6464,7 @@ window.addEventListener('load', function() {
     });
     window.addEventListener('pagehide', function() { clearTimeout(autoSaveTimer); doAutoSave(true); });
 
-    // Esperar a que el canvas estÃ© completamente inicializado
+    // Esperar a que el canvas esté completamente inicializado
     async function setupRecoveryBar() {
       try {
         // Obtener datos de IndexedDB
@@ -6478,9 +6476,9 @@ window.addEventListener('load', function() {
 
         if (!saved || !ts) return;
 
-        // Verificar que el canvas estÃ© listo
+        // Verificar que el canvas esté listo
         if (!canvas || !canvas.toJSON) {
-          console.error('Canvas no estÃ¡ listo para recuperar sesiÃ³n');
+          console.error('Canvas no está listo para recuperar sesión');
           return;
         }
 
@@ -6493,7 +6491,7 @@ window.addEventListener('load', function() {
         const recoverDate = document.getElementById('recoverDate');
 
         if (!recoverBar || !recoverDate) {
-          console.error('Elementos de recuperaciÃ³n no encontrados');
+          console.error('Elementos de recuperación no encontrados');
           return;
         }
 
@@ -6509,9 +6507,9 @@ window.addEventListener('load', function() {
           btnRecover.onclick = async function() {
             try {
               recoverBar.style.display = 'none';
-              loadProject(saved, function() { showToast('âœ… SesiÃ³n recuperada', 'ok'); });
+              loadProject(saved, function() { showToast('✅ Sesión recuperada', 'ok'); });
             } catch (e) {
-              showToast('âŒ Error al recuperar la sesiÃ³n.', 'err');
+              showToast('❌ Error al recuperar la sesión.', 'err');
               console.error(e);
             }
           };
@@ -6523,21 +6521,21 @@ window.addEventListener('load', function() {
               await db.autosave.delete(AS_KEY);
               await db.autosave.delete(AS_TS);
               recoverBar.style.display = 'none';
-              showToast('SesiÃ³n descartada', 'info');
+              showToast('Sesión descartada', 'info');
             } catch (e) {
-              showToast('âŒ Error al descartar la sesiÃ³n.', 'err');
+              showToast('❌ Error al descartar la sesión.', 'err');
               console.error(e);
             }
           };
         }
 
-        console.log('Barra de recuperaciÃ³n configurada correctamente');
+        console.log('Barra de recuperación configurada correctamente');
     } catch (e) {
       console.error("Error setting up recovery bar:", e);
     }
   }
 
-  // Iniciar recuperaciÃ³n despuÃ©s de 500ms
+  // Iniciar recuperación después de 500ms
   setTimeout(setupRecoveryBar, 500);
 });
 

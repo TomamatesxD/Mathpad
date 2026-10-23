@@ -12,9 +12,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
       - name: Validate HTML
         run: |
           npm init -y
-          npm install --no-save html-validate
+          npm install --no-save html-validate@11
           npx html-validate index.html
