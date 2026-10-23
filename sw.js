@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v41: Limpieza de backlog (badge, escapeHtml)
-const CACHE_NAME = 'mathpad-v41'; // Versión de caché v41: Limpieza de backlog (badge, escapeHtml)
+// Versión de caché v42: Fix fuentes Linux y eje Y matemático
+const CACHE_NAME = 'mathpad-v42'; // Versión de caché v42: Fix fuentes Linux y eje Y matemático
 const urlsToCache = [
   './',
   './index.html',
