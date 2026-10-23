@@ -1396,6 +1396,14 @@
         .plot-onlyline-wrap { padding-top: 16px; }
         .plot-check { color: #e0e0e0; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .plot-checkbox { width: 16px; height: 16px; accent-color: #bb86fc; }
+        .plot-tangent-wrap { margin: 10px 0; padding-top: 8px; border-top: 1px dashed var(--border-color); }
+        .plot-tangent-toggle-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: var(--text-main); margin-bottom: 8px; }
+        .plot-tangent-controls { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; background: rgba(0,0,0,0.15); border-radius: 8px; }
+        :root.light-mode .plot-tangent-controls { background: rgba(0,0,0,0.04); }
+        .plot-tangent-label { font-size: 13px; color: var(--accent); font-weight: 600; }
+        #plotTangentSlider { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        .plot-tangent-info { font-size: 12px; font-family: 'Courier New', monospace; color: var(--text-main); word-break: break-word; }
+        .plot-tangent-info strong { color: var(--accent); }
         .plot-section { margin-bottom: 14px; }
         .plot-list { background: #121212; border: 1px solid #555; border-radius: 8px; padding: 8px; min-height: 40px; max-height: 120px; overflow-y: auto; font-size: 13px; color: #888; }
         .plot-empty { font-style: italic; }
@@ -1785,6 +1793,20 @@
         </div>
 
 "
+
+        <div id="plotTangentWrap" class="plot-tangent-wrap">
+          <label class="plot-tangent-toggle-label">
+            <input type="checkbox" id="plotTangentToggle" aria-label="Mostrar recta tangente">
+            Mostrar recta tangente
+          </label>
+          <div id="plotTangentControls" class="plot-tangent-controls" hidden>
+            <label class="plot-tangent-label">
+              x₀ = <span id="plotTangentX0Value">0</span>
+            </label>
+            <input type="range" id="plotTangentSlider" min="-10" max="10" step="0.05" value="0" aria-label="Posición x0 de la tangente">
+            <div id="plotTangentInfo" class="plot-tangent-info"></div>
+          </div>
+        </div>
 
         <div class="plot-section">
           <label class="plot-label">Funciones graficadas:</label>
@@ -3502,6 +3524,7 @@ window.addEventListener('load', function() {
     var activePlotFunctions = [];
     var plotFramePending = false;
     var plotResizeTimer = null;
+    var tangentState = { active: false, x0: 0, fObj: null, y0: NaN, m: NaN };
     window.plotView = plotView;
     window.activePlotFunctions = activePlotFunctions;
 
@@ -3946,6 +3969,73 @@ window.addEventListener('load', function() {
     });
 
 
+    function updateTangentUI() {
+      var toggle = document.getElementById('plotTangentToggle');
+      var controls = document.getElementById('plotTangentControls');
+      if (!toggle || !controls) return;
+      if (toggle.checked && activePlotFunctions.length > 0) {
+        controls.hidden = false;
+        var sel = document.getElementById('plotAnalysisFnSelect');
+        var idx = 0;
+        if (sel && sel.value !== '') idx = parseInt(sel.value, 10);
+        if (!isFinite(idx) || idx < 0 || idx >= activePlotFunctions.length) idx = 0;
+        tangentState.fObj = activePlotFunctions[idx];
+        tangentState.active = true;
+        var slider = document.getElementById('plotTangentSlider');
+        if (slider && tangentState.fObj) {
+          slider.min = String(tangentState.fObj.xMin);
+          slider.max = String(tangentState.fObj.xMax);
+          var cur = parseFloat(slider.value);
+          if (!isFinite(cur) || cur < tangentState.fObj.xMin || cur > tangentState.fObj.xMax) {
+            slider.value = String((tangentState.fObj.xMin + tangentState.fObj.xMax) / 2);
+          }
+        }
+        recomputeTangent();
+      } else {
+        controls.hidden = true;
+        tangentState.active = false;
+        tangentState.fObj = null;
+        tangentState.y0 = NaN;
+        tangentState.m = NaN;
+        requestDrawPlot();
+      }
+    }
+    function recomputeTangent() {
+      if (!tangentState || !tangentState.active || !tangentState.fObj) return;
+      var fObj = tangentState.fObj;
+      var slider = document.getElementById('plotTangentSlider');
+      var x0 = slider ? parseFloat(slider.value) : tangentState.x0;
+      if (!isFinite(x0)) x0 = 0;
+      tangentState.x0 = x0;
+      var x0El = document.getElementById('plotTangentX0Value');
+      if (x0El) x0El.textContent = formatNum(x0);
+      var y0 = safeEvaluate(fObj.compiled, x0);
+      var info = document.getElementById('plotTangentInfo');
+      if (!isFinite(y0)) {
+        tangentState.y0 = NaN;
+        tangentState.m = NaN;
+        if (info) info.textContent = 'No definida en x0';
+        requestDrawPlot();
+        return;
+      }
+      var fn = function(x) { return safeEvaluate(fObj.compiled, x); };
+      var m = fprime(fn, x0, 1e-4);
+      tangentState.y0 = y0;
+      tangentState.m = m;
+      var b = y0 - m * x0;
+      var infoText = 'y = ' + formatNum(m) + 'x';
+      if (Math.abs(b) >= 1e-9) {
+        var sign = b > 0 ? ' + ' : ' - ';
+        infoText += sign + formatNum(Math.abs(b));
+      }
+      if (info) info.textContent = infoText;
+      requestDrawPlot();
+    }
+    var _tgToggle = document.getElementById('plotTangentToggle');
+    if (_tgToggle) _tgToggle.addEventListener('change', updateTangentUI);
+    var _tgSlider = document.getElementById('plotTangentSlider');
+    if (_tgSlider) _tgSlider.addEventListener('input', recomputeTangent);
+
     function updateAnalysisSelectors() {
       var sel = document.getElementById('plotAnalysisFnSelect');
       var f1 = document.getElementById('plotAnalysisF1');
@@ -3971,6 +4061,7 @@ window.addEventListener('load', function() {
       var insertBtn = document.getElementById('plotAnalysisInsertBtn');
       if (insertBtn) insertBtn.disabled = (activePlotFunctions.length === 0);
       if (panel && !panel.hidden) recomputeAnalysis();
+      if (typeof updateTangentUI === 'function') updateTangentUI();
     }
     function recomputeAnalysis() {
       var sel = document.getElementById('plotAnalysisFnSelect');
@@ -4162,6 +4253,33 @@ window.addEventListener('load', function() {
         }
         ctx.stroke();
       });
+      // Tangente
+      if (typeof tangentState !== 'undefined' && tangentState.active && tangentState.fObj && isFinite(tangentState.y0) && isFinite(tangentState.m)) {
+        var x0 = tangentState.x0;
+        var y0 = tangentState.y0;
+        var m = tangentState.m;
+        var tMinX = plotView.xMin, tMaxX = plotView.xMax;
+        var yMinTan = m * (tMinX - x0) + y0;
+        var yMaxTan = m * (tMaxX - x0) + y0;
+        ctx.beginPath();
+        ctx.strokeStyle = isLight ? '#e67e22' : '#f39c12';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.moveTo(v.xToPixel(tMinX), v.yToPixel(yMinTan));
+        ctx.lineTo(v.xToPixel(tMaxX), v.yToPixel(yMaxTan));
+        ctx.stroke();
+        ctx.setLineDash([]);
+        var px0 = v.xToPixel(x0), py0 = v.yToPixel(y0);
+        if (py0 >= -50 && py0 <= cssHeight + 50) {
+          ctx.beginPath();
+          ctx.fillStyle = isLight ? '#c0392b' : '#e74c3c';
+          ctx.arc(px0, py0, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
     }
     var activePointers = new Map();
     var lastPanPos = null;
