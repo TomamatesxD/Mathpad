@@ -3886,6 +3886,7 @@ window.addEventListener('load', function() {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'latex-chip'; b.title = 'Usar este ejemplo';
         b.textContent = tex;
+        b.setAttribute('aria-label', 'Usar ejemplo: ' + tex);
         b.onclick = function() { latexInputEl.value = tex; latexUpdatePreview(); latexInputEl.focus(); };
         wrap.appendChild(b);
       });
