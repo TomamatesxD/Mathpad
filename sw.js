@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v31: Paso 5: PWA y manifest
-const CACHE_NAME = 'mathpad-v31';
+// Versión de caché v32: Paso 7 — graficador interactivo con canvas nativo
+const CACHE_NAME = 'mathpad-v32';
 const urlsToCache = [
   './',
   './index.html',
