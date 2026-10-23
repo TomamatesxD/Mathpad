@@ -4,7 +4,7 @@
 
 
 // Versión de caché v42: Fix fuentes Linux y eje Y matemático
-const CACHE_NAME = 'mathpad-v45'; // Versión de caché v45: valores regla Y
+const CACHE_NAME = 'mathpad-v46'; // Versión de caché v46: barra acciones graficador compacta
 const urlsToCache = [
   './',
   './index.html',

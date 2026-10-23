@@ -1498,6 +1498,11 @@
           .plot-side { flex: 1 1 auto; padding: 8px; }
           .plot-dialog { width: calc(100vw - 12px); }
         }
+        @media (max-width: 699px) and (orientation: portrait) {
+          .plot-actions { flex-wrap: nowrap; gap: 6px; }
+          #plotBtnAdd, #plotBtnInsert { flex: 1 1 0; min-width: 0; }
+          #plotBtnReset, #plotBtnClear, #plotBtnClose { flex: 0 0 40px; width: 40px; height: 40px; min-width: 40px; min-height: 40px; padding: 0; font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+        }
         @media (max-height: 500px) {
           .plot-dialog { max-height: 100dvh; margin: 0; border-radius: 10px; }
           .plot-body { flex-direction: row; }
@@ -1946,11 +1951,11 @@
           </div>
         </div>
         <div class="plot-actions" role="group" aria-label="Acciones del graficador">
-          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">+ Agregar</button>
-          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar en el lienzo</button>
-          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico">Reset vista</button>
-          <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas">Limpiar</button>
-          <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador">Cerrar</button>
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">Agregar</button>
+          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar</button>
+          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico" title="Restablecer vista del gráfico">↺</button>
+          <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas" title="Limpiar todas las funciones graficadas">🗑</button>
+          <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador" title="Cerrar el graficador">✕</button>
         </div>
         <p id="plotError" class="plot-error"></p>
       </div>
