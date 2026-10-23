@@ -3648,7 +3648,7 @@ function closeConfirmModal() {
     if (focusables.length === 0) return;
     var idx = focusables.indexOf(document.activeElement);
     e.preventDefault();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
     if (e.shiftKey) {
       var prev = (idx <= 0) ? focusables.length - 1 : idx - 1;
       focusables[prev].focus();
@@ -5269,35 +5269,6 @@ document.getElementById('btnPlot').onclick = () => {
         if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); document.getElementById('btnUndo').click(); }
         if (e.ctrlKey && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) { e.preventDefault(); document.getElementById('btnRedo').click(); }
     });
-// Focus Trap en fase de captura: Impedir que Tab/Shift+Tab salgan de los modales abiertos
-    document.addEventListener('keydown', function(e) {
-        if (e.key !== 'Tab') return;
-        var confirmEl = document.getElementById('mpConfirm');
-        var plotEl = document.getElementById('plotModal');
-        var latexEl = document.getElementById('latexModal');
-        var activeModal = (confirmEl && confirmEl.style.display === 'flex') ? confirmEl :
-                          (plotEl && plotEl.style.display === 'flex') ? plotEl :
-                          (latexEl && latexEl.classList.contains('open')) ? latexEl : null;
-        if (!activeModal) return;
-        var focusables = Array.from(activeModal.querySelectorAll(
-            'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )).filter(function(el) { return el.offsetParent !== null; });
-        if (!focusables.length) return;
-        var first = focusables[0];
-        var last = focusables[focusables.length - 1];
-        if (e.shiftKey) {
-            if (document.activeElement === first || !activeModal.contains(document.activeElement)) {
-                e.preventDefault();
-                last.focus();
-            }
-        } else {
-            if (document.activeElement === last || !activeModal.contains(document.activeElement)) {
-                e.preventDefault();
-                first.focus();
-            }
-        }
-    }, true);
-
     window.addEventListener('keyup', function(e) {
         if (e.code === 'Space') {
             isSpaceDown = false;
