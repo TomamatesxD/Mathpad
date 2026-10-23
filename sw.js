@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v36: Paso 8.3.1 — correcciones finales (window.canvas, recompute, tabla alineada)
-const CACHE_NAME = 'mathpad-v36'; // Versión de caché v36: Paso 8.3.1 — correcciones finales (window.canvas, recompute, tabla alineada)
+// Versión de caché v37: Paso 8.2.1 — corrección monotonía/concavidad con puntos críticos exactos
+const CACHE_NAME = 'mathpad-v37'; // Versión de caché v37: Paso 8.2.1 — corrección monotonía/concavidad con puntos críticos exactos
 const urlsToCache = [
   './',
   './index.html',

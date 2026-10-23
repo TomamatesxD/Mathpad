@@ -3643,43 +3643,80 @@ window.addEventListener('load', function() {
     }
     function computeMonotony(fn, a, b, samples, h, yMaxAbs) {
       var dfn = function(x) { return fprime(fn, x, h); };
-      var inc = [], dec = [], curSign = null, segStart = a;
-      for (var i = 0; i <= 200; i++) {
-        var x = a + (b - a) * (i / 200);
-        var d = dfn(x);
-        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
-        var s = d > 0 ? 1 : -1;
-        if (curSign === null) { curSign = s; segStart = x; }
-        else if (s !== curSign) {
-          var segment = [segStart, x];
-          if (curSign > 0) inc.push(segment); else dec.push(segment);
-          curSign = s; segStart = x;
+      var inc = [], dec = [];
+      // Puntos críticos exactos: raíces de f' (mismo método de bisección que findExtrema),
+      // en lugar de muestrear a ciegas. Solo se dividen los intervalos donde f' cambia de signo.
+      var changes = findSignChanges(dfn, a, b, samples, yMaxAbs);
+      var crits = [a];
+      for (var i = 0; i < changes.length; i++) {
+        var c = changes[i];
+        var xStar;
+        if (c.a === c.b) {
+          // cero exacto en un nodo de muestreo: solo cuenta si hay cambio de signo real
+          var delta = (b - a) / (samples > 0 ? samples : 1000) * 0.5;
+          var left = dfn(c.a - delta);
+          var right = dfn(c.a + delta);
+          var sl = (!isFinite(left) || Math.abs(left) < 1e-6) ? 0 : (left > 0 ? 1 : -1);
+          var sr = (!isFinite(right) || Math.abs(right) < 1e-6) ? 0 : (right > 0 ? 1 : -1);
+          if (sl === 0 || sr === 0 || sl === sr) continue;
+          xStar = c.a;
+        } else {
+          xStar = bisect(dfn, c.a, c.b, 40);
         }
+        if (isFinite(xStar) && xStar > a + 1e-9 && xStar < b - 1e-9) crits.push(xStar);
       }
-      if (curSign !== null) {
-        var seg = [segStart, b];
-        if (curSign > 0) inc.push(seg); else dec.push(seg);
+      crits.push(b);
+      crits.sort(function(u, v) { return u - v; });
+      var uniq = [];
+      for (var k = 0; k < crits.length; k++) {
+        if (!uniq.length || Math.abs(crits[k] - uniq[uniq.length - 1]) > 1e-6) uniq.push(crits[k]);
+      }
+      for (var j = 0; j < uniq.length - 1; j++) {
+        var x0 = uniq[j], x1 = uniq[j + 1];
+        if (x1 - x0 < 1e-9) continue;
+        var xm = (x0 + x1) / 2;
+        var d = dfn(xm);
+        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
+        if (yMaxAbs && Math.abs(d) > yMaxAbs) continue;
+        if (d > 0) inc.push([x0, x1]); else dec.push([x0, x1]);
       }
       return { inc: inc, dec: dec };
     }
     function computeConcavity(fn, a, b, samples, h, yMaxAbs) {
       var d2fn = function(x) { return fsecond(fn, x, h); };
-      var up = [], down = [], curSign = null, segStart = a;
-      for (var i = 0; i <= 200; i++) {
-        var x = a + (b - a) * (i / 200);
-        var d = d2fn(x);
-        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
-        var s = d > 0 ? 1 : -1;
-        if (curSign === null) { curSign = s; segStart = x; }
-        else if (s !== curSign) {
-          var segment = [segStart, x];
-          if (curSign > 0) up.push(segment); else down.push(segment);
-          curSign = s; segStart = x;
+      var up = [], down = [];
+      var changes = findSignChanges(d2fn, a, b, samples, yMaxAbs);
+      var crits = [a];
+      for (var i = 0; i < changes.length; i++) {
+        var c = changes[i];
+        var xStar;
+        if (c.a === c.b) {
+          var delta = (b - a) / (samples > 0 ? samples : 1000) * 0.5;
+          var left = d2fn(c.a - delta);
+          var right = d2fn(c.a + delta);
+          var sl = (!isFinite(left) || Math.abs(left) < 1e-6) ? 0 : (left > 0 ? 1 : -1);
+          var sr = (!isFinite(right) || Math.abs(right) < 1e-6) ? 0 : (right > 0 ? 1 : -1);
+          if (sl === 0 || sr === 0 || sl === sr) continue;
+          xStar = c.a;
+        } else {
+          xStar = bisect(d2fn, c.a, c.b, 40);
         }
+        if (isFinite(xStar) && xStar > a + 1e-9 && xStar < b - 1e-9) crits.push(xStar);
       }
-      if (curSign !== null) {
-        var seg2 = [segStart, b];
-        if (curSign > 0) up.push(seg2); else down.push(seg2);
+      crits.push(b);
+      crits.sort(function(u, v) { return u - v; });
+      var uniq = [];
+      for (var k = 0; k < crits.length; k++) {
+        if (!uniq.length || Math.abs(crits[k] - uniq[uniq.length - 1]) > 1e-6) uniq.push(crits[k]);
+      }
+      for (var j = 0; j < uniq.length - 1; j++) {
+        var x0 = uniq[j], x1 = uniq[j + 1];
+        if (x1 - x0 < 1e-9) continue;
+        var xm = (x0 + x1) / 2;
+        var d = d2fn(xm);
+        if (!isFinite(d) || Math.abs(d) < 1e-6) continue;
+        if (yMaxAbs && Math.abs(d) > yMaxAbs) continue;
+        if (d > 0) up.push([x0, x1]); else down.push([x0, x1]);
       }
       return { up: up, down: down };
     }
