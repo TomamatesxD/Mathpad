@@ -4116,7 +4116,8 @@ window.addEventListener('load', function() {
                 calcMemory: calcMemory,
                 angleMode: angleMode,
                 calcHistory: calcHistory,
-                toggleSci: !!document.getElementById('toggleSci').checked
+                toggleSci: !!document.getElementById('toggleSci').checked,
+                resDisplay: document.getElementById('calcResult').textContent
             };
             localStorage.setItem('mathpad_calc', JSON.stringify(data));
         } catch (e) {
@@ -4216,6 +4217,14 @@ window.addEventListener('load', function() {
                 if (sciInput) {
                     sciInput.checked = state.toggleSci;
                     sciInput.dispatchEvent(new Event('change'));
+                }
+            }
+            // Restaurar resultado visible (no se restauran errores)
+            if (typeof state.resDisplay === 'string') {
+                var rd = state.resDisplay;
+                if (rd !== 'Math ERROR' && rd !== 'Syntax ERROR') {
+                    var resEl = document.getElementById('calcResult');
+                    if (resEl) resEl.textContent = rd;
                 }
             }
             // Nunca se restaura calcError
