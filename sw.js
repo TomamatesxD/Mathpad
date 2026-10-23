@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v38: Paso 8.3.2 — recta tangente interactiva
-const CACHE_NAME = 'mathpad-v39'; // Versión de caché v39: Paso 8.3.3 — área bajo la curva
+// Versión de caché v41: Limpieza de backlog (badge, escapeHtml)
+const CACHE_NAME = 'mathpad-v41'; // Versión de caché v41: Limpieza de backlog (badge, escapeHtml)
 const urlsToCache = [
   './',
   './index.html',
