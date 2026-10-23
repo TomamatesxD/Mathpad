@@ -1645,7 +1645,7 @@
             </div>
             <div class="calc-display">
                 <div class="calc-status-bar">
-                    <span id="calcShiftBadge" class="calc-shift-badge" aria-live="polite">S</span>
+                    <span id="calcShiftBadge" class="calc-shift-badge" aria-live="polite" aria-label="Shift desactivado"></span>
                     <span id="calcAngleBadge" class="calc-angle-badge">DEG</span>
                     <span id="calcMemBadge" class="calc-mem-badge hidden">M</span>
                 </div>
@@ -4148,6 +4148,11 @@ document.getElementById('btnPlot').onclick = () => {
         if (btn) {
             btn.setAttribute('aria-pressed', shiftActive ? 'true' : 'false');
             btn.setAttribute('aria-label', shiftActive ? 'Segunda función activada' : 'Activar segunda función');
+        }
+        var badge = document.getElementById('calcShiftBadge');
+        if (badge) {
+          badge.textContent = on ? 'S' : '';
+          badge.setAttribute('aria-label', on ? 'Shift activado' : 'Shift desactivado');
         }
     }
 
