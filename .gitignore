@@ -4,3 +4,5 @@ package-lock.json
 verify_*.js
 dbg_*.js
 p4.js
+test_*.js
+debug_*.js
