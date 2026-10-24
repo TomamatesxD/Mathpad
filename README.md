@@ -1,14 +1,30 @@
-# Mathpad — Proyecto
+# MathPad
 
-Repositorio mínimo con una página estática (index.html).
+Pizarra matemática offline (PWA). Funciona sin conexión, sin IA ni backend:
+todo corre en el navegador.
 
-CI: Se añadió un workflow en .github/workflows/ci.yml que instala html-validate y valida `index.html` en pushes y PRs a `main`.
+## Funciones principales
 
-Validación local:
+- Lienzo de dibujo con herramientas: lápiz, formas, texto, selección, borrador, regla y ejes.
+- Calculadora científica con historial.
+- Graficador de funciones con tangente, área y análisis.
+- Inserción de LaTeX en el lienzo.
+- Exportar a imagen/PDF y guardar/cargar proyectos.
+- Funciona sin conexión (Service Worker).
 
-  npm init -y
-  npm install --no-save html-validate
-  npx html-validate index.html
+## Cómo correrlo en local
 
-MathPad es un proyecto independiente, no afiliado a Casio.
-Si deseas que el workflow apunte a otra rama o agregar linters/tests, dime qué prefieres.
+```bash
+python -m http.server 8000
+```
+
+Abrí http://localhost:8000 en el navegador.
+
+## Atajos principales
+
+- A: mostrar/ocultar regla y ejes.
+- H: herramienta mano (paneo). P: lápiz. E: borrador. V: selección.
+- F: relleno. I: insertar imagen. G: graficador. C: calculadora.
+- Z: modo concentración. Ctrl+S: guardar. Ctrl+Z: deshacer. Ctrl+Y: rehacer.
+
+Inspirada en las calculadoras científicas escolares; no está afiliada a Casio.
