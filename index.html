@@ -3014,9 +3014,11 @@ window.addEventListener('load', function() {
             var removed = historyStack.shift();
             historyChars -= removed.length;
         }
-        if (localStorage.getItem('mathpad_debug_history') === '1') {
-            console.info('[MathPad historial]', historyStack.length, historyChars);
-        }
+        try {
+            if (localStorage.getItem('mathpad_debug_history') === '1') {
+                console.info('[MathPad historial]', historyStack.length, historyChars);
+            }
+        } catch (e) { /* almacenamiento bloqueado: no loguea */ }
     }
 
     // #BUGFIX texto: entrada de historial INDEPENDIENTE al terminar de editar.
@@ -3183,6 +3185,15 @@ window.addEventListener('load', function() {
         t.style.border = `1px solid ${borders[type] || borders.info}`;
         t.style.color = '#e0e0e0';
         t.textContent = msg;
+        const plotModalEl = document.getElementById('plotModal');
+        const plotVisible = !!(plotModalEl && plotModalEl.style.display && plotModalEl.style.display !== 'none');
+        if (plotVisible) {
+            t.style.top = '12px';
+            t.style.bottom = 'auto';
+        } else {
+            t.style.top = 'auto';
+            t.style.bottom = '24px';
+        }
         t.style.opacity = '1';
         clearTimeout(t._tid);
         t._tid = setTimeout(() => t.style.opacity = '0', duration);
@@ -3432,7 +3443,8 @@ window.addEventListener('load', function() {
     };
 
         // Cargar tema guardado
-    const savedTheme = localStorage.getItem('mathpad_theme');
+    let savedTheme = null;
+    try { savedTheme = localStorage.getItem('mathpad_theme'); } catch (e) { savedTheme = null; }
     if (savedTheme === 'light') {
         document.documentElement.classList.add('light-mode');
         if (bgColorPicker) bgColorPicker.value = '#ffffff';
@@ -4998,7 +5010,7 @@ window.addEventListener('load', function() {
       latexModalEl.classList.add('open');
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       latexInputEl.focus();
-      loadMathJax().then(function() { latexUpdatePreview(); }).catch(function() {
+      function showLatexLoadError() {
         latexPreviewEl.innerHTML = '';
         var msg = document.createElement('div');
         msg.textContent = 'No se pudo cargar el motor LaTeX';
@@ -5008,20 +5020,12 @@ window.addEventListener('load', function() {
         btn.textContent = 'Reintentar';
         btn.onclick = function() {
           latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
-          loadMathJax().then(function() { latexUpdatePreview(); }).catch(function() {
-            latexPreviewEl.innerHTML = '';
-            var m = document.createElement('div');
-            m.textContent = 'No se pudo cargar el motor LaTeX';
-            latexPreviewEl.appendChild(m);
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.textContent = 'Reintentar';
-            b.onclick = btn.onclick;
-            latexPreviewEl.appendChild(b);
-          });
+          loadMathJax().then(function() { latexUpdatePreview(); }).catch(showLatexLoadError);
         };
         latexPreviewEl.appendChild(btn);
-      });
+      }
+
+      loadMathJax().then(function() { latexUpdatePreview(); }).catch(showLatexLoadError);
     }
     function closeLatexModal() {
       latexModalEl.classList.remove('open');
