@@ -390,7 +390,6 @@
             transition: width 0.25s ease, opacity 0.25s ease;
             max-width: 95vw;
             max-height: 90vh;
-            overflow-y: auto;
         }
 
         .calculator-panel.hidden {
@@ -1436,19 +1435,19 @@
 
         /* Entradas y botones auxiliares ocultos */
         .hidden-file-input, .hidden-helper { display: none; }
-        /* Graficador rediseño (FASE B) */
+                /* Graficador rediseño (FASE B) - Simétrico 1:1 */
         #plotModal { padding: 6px; overflow: hidden; }
         .plot-dialog { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 14px; width: min(980px, calc(100vw - 12px)); max-height: 92dvh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; margin: 0 auto; padding: 0; }
         .plot-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .plot-title { color: var(--accent); margin: 0; font-size: 16px; }
         .plot-close { background: transparent; border: none; color: var(--text-main); font-size: 20px; line-height: 1; cursor: pointer; min-width: 36px; min-height: 36px; border-radius: 8px; }
         .plot-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
-        .plot-canvas-col { flex: 0 0 60%; min-width: 0; padding: 10px; display: flex; flex-direction: column; min-height: 0; }
-        .plot-canvas-wrap { position: relative; flex: 1; min-height: 0; width: 100%; margin: 0; border-radius: 10px; overflow: hidden; background: var(--bg-dark, #121212); border: 1px solid var(--border-color); touch-action: none; }
-        #plotCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; aspect-ratio: auto; }
+        .plot-canvas-col { flex: 0 0 54%; min-width: 0; padding: 12px; display: flex; align-items: center; justify-content: center; min-height: 0; }
+        .plot-canvas-wrap { position: relative; flex: 0 0 auto; width: 100%; max-width: min(100%, 62dvh); aspect-ratio: 1 / 1; margin: auto; border-radius: 10px; overflow: hidden; background: var(--bg-dark, #121212); border: 1px solid var(--border-color); touch-action: none; }
+        #plotCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; aspect-ratio: 1 / 1; }
         .plot-hud { position: absolute; bottom: 6px; right: 8px; font-size: 13px; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.55); color: #e0e0e0; pointer-events: none; font-family: system-ui, sans-serif; }
         :root.light-mode .plot-hud { background: rgba(255,255,255,0.85); color: #212121; }
-        .plot-side { flex: 0 0 40%; min-width: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        .plot-side { flex: 0 0 46%; min-width: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
         .plot-label { font-size: 13px; color: var(--text-main); }
         .plot-label-sm { font-size: 12px; color: var(--text-main); }
         .plot-hint { color: var(--text-main); opacity: .7; }
@@ -1490,23 +1489,31 @@
         .plot-btn-primary { flex: 1; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 10px 12px; font-weight: 700; cursor: pointer; font-size: 13px; min-height: 36px; }
         .plot-btn-danger { background: transparent; color: #cf6679; border: 1px solid #cf6679; border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
         .plot-btn-ghost { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
+        .plot-btn-icon .btn-icon, .plot-btn-primary .label-short { display: none; }
+        .plot-btn-primary .label-full, .plot-btn-icon .label-full { display: inline; }
         .plot-error { color: #f87171; font-size: 12px; margin: 8px 12px; display: none; }
         @media (max-width: 699px) {
-          .plot-body { flex-direction: column; }
-          .plot-canvas-col { flex: 0 0 auto; height: 40dvh; min-height: 220px; padding: 8px; }
-          .plot-side { flex: 1 1 auto; padding: 8px; }
+          .plot-body { flex-direction: column; overflow-y: auto; }
+          .plot-canvas-col { flex: 0 0 auto; height: auto; min-height: 0; padding: 8px; }
+          .plot-canvas-wrap { max-width: min(100%, 44dvh); aspect-ratio: 1 / 1; }
+          .plot-side { flex: 1 1 auto; padding: 8px; overflow-y: visible; }
           .plot-dialog { width: calc(100vw - 12px); }
         }
         @media (max-width: 699px) and (orientation: portrait) {
-          .plot-actions { flex-wrap: nowrap; gap: 6px; }
-          #plotBtnAdd, #plotBtnInsert { flex: 1 1 0; min-width: 0; }
-          #plotBtnReset, #plotBtnClear, #plotBtnClose { flex: 0 0 40px; width: 40px; height: 40px; min-width: 40px; min-height: 40px; padding: 0; font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+          .plot-actions { flex-wrap: nowrap; gap: 6px; padding: 8px 10px; align-items: stretch; }
+          .plot-btn-primary { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: 13px; min-height: 40px; }
+          .plot-btn-icon { flex: 0 0 40px; width: 40px; height: 40px; padding: 0; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; }
+          .plot-btn-primary .label-full { display: none; }
+          .plot-btn-primary .label-short { display: inline; }
+          .plot-btn-icon .label-full { display: none; }
+          .plot-btn-icon .btn-icon { display: inline; }
         }
         @media (max-height: 500px) {
           .plot-dialog { max-height: 100dvh; margin: 0; border-radius: 10px; }
           .plot-body { flex-direction: row; }
-          .plot-canvas-col { flex: 0 0 55%; height: auto; padding: 6px; }
-          .plot-side { flex: 0 0 45%; padding: 6px; font-size: 13px; }
+          .plot-canvas-col { flex: 0 0 48%; height: auto; padding: 6px; }
+          .plot-canvas-wrap { max-width: min(100%, 72dvh); aspect-ratio: 1 / 1; }
+          .plot-side { flex: 0 0 52%; padding: 6px; font-size: 13px; }
           .plot-title { font-size: 14px; }
           .plot-btn-primary, .plot-btn-danger, .plot-btn-ghost, .plot-close { min-height: 36px; padding: 8px 10px; font-size: 12px; }
           .plot-tab { min-height: 32px; padding: 6px 8px; font-size: 12px; }
@@ -1514,12 +1521,10 @@
         @media (min-width: 700px) {
           .plot-dialog { max-width: 980px; }
         }
-
 </style>
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
     <script src="./jspdf.umd.min.js"></script>
-    <script src="./tex-svg.js"></script>
     <script src="./dexie.min.js"></script>
     <!-- iOS/iPadOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1751,6 +1756,21 @@
                 <line x1="9" y1="15" x2="15" y2="15"/>
             </svg>
         </button>
+        <button type="button" id="btnDupPage" title="Duplicar página" aria-label="Duplicar página">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+        </button>
+        <button type="button" id="btnDeletePage" title="Eliminar página" aria-label="Eliminar página">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11v6"></path>
+                <path d="M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
+        </button>
     </nav>
 
     <!-- MAIN CONTENT -->
@@ -1793,17 +1813,17 @@
             <button type="button" class="sci-btn operator" data-tok="^2" data-shift="^3" data-shift-label="x3" aria-label="x al cuadrado">x²</button>
             <button type="button" class="sci-btn operator" data-tok="^(" data-shift="root" data-shift-label="y-raiz" aria-label="x a la y">xʸ</button>
             <button type="button" class="sci-btn operator" data-tok="sqrt(" data-shift="cbrt(" data-shift-label="cubica" aria-label="Raíz cuadrada">√</button>
-            <button type="button" class="sci-btn operator" data-tok="pi" aria-label="Pi">π</button>
-            <button type="button" class="sci-btn operator" data-tok="e" aria-label="Número e">e</button>
+            <button type="button" class="sci-btn operator" data-tok="pi" data-shift="gcd(" data-shift-label="MCD" aria-label="Pi">π</button>
+            <button type="button" class="sci-btn operator" data-tok="e" data-shift="lcm(" data-shift-label="mcm" aria-label="Número e">e</button>
             <button type="button" class="sci-btn operator" data-tok="sin(" data-shift="asin(" data-shift-label="sin-1" aria-label="Seno">sin</button>
             <button type="button" class="sci-btn operator" data-tok="cos(" data-shift="acos(" data-shift-label="cos-1" aria-label="Coseno">cos</button>
             <button type="button" class="sci-btn operator" data-tok="tan(" data-shift="atan(" data-shift-label="tan-1" aria-label="Tangente">tan</button>
             <button type="button" class="sci-btn operator" data-tok="log10(" data-shift="10^(" data-shift-label="10x" aria-label="Logaritmo base 10">log</button>
             <button type="button" class="sci-btn operator" data-tok="ln(" data-shift="e^(" data-shift-label="ex" aria-label="Logaritmo natural">ln</button>
             <button type="button" class="sci-btn operator" data-tok="(" data-shift="abs(" data-shift-label="Abs" aria-label="Paréntesis abierto">(</button>
-            <button type="button" class="sci-btn operator" data-tok=")" aria-label="Paréntesis cerrado">)</button>
+            <button type="button" class="sci-btn operator" data-tok=")" data-shift="," data-shift-label="," aria-label="Paréntesis cerrado">)</button>
             <button type="button" class="sci-btn operator" data-tok="^(-1)" data-shift="!" data-shift-label="!" aria-label="Uno sobre x">1/x</button>
-            <button type="button" class="sci-btn operator" data-tok="%" aria-label="Porcentaje">%</button>
+            <button type="button" class="sci-btn operator" data-tok="%" data-shift="mod(" data-shift-label="Resto" aria-label="Porcentaje">%</button>
             <button type="button" class="sci-btn operator" id="btnSDKey" aria-label="Alternar fracción y decimal">S⇔D</button>
         </div>
         <div class="calc-num-keys" id="calcNumKeys">
@@ -1824,7 +1844,7 @@
             <button type="button" class="operator" data-tok="-" aria-label="Restar">−</button>
             <button type="button" data-tok="0">0</button>
             <button type="button" data-tok=".">.</button>
-            <button type="button" data-tok="Ans" aria-label="Último resultado">Ans</button>
+            <button type="button" data-tok="Ans" data-shift="rnd(" data-shift-label="Rnd" aria-label="Último resultado">Ans</button>
             <button type="button" data-tok="EXP" aria-label="Multiplicar por diez elevado a">EXP</button>
             <button type="button" data-tok="+/-" aria-label="Cambiar signo">±</button>
         </div>
@@ -1950,11 +1970,11 @@
           </div>
         </div>
         <div class="plot-actions" role="group" aria-label="Acciones del graficador">
-          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">Agregar</button>
-          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar</button>
-          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico" title="Restablecer vista del gráfico">↺</button>
-          <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas" title="Limpiar todas las funciones graficadas">🗑</button>
-          <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador" title="Cerrar el graficador">✕</button>
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico"><span class="label-full">+ Agregar</span><span class="label-short">Agregar</span></button>
+          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo"><span class="label-full">Insertar en el lienzo</span><span class="label-short">Insertar</span></button>
+          <button type="button" id="plotBtnReset" class="plot-btn-ghost plot-btn-icon" aria-label="Restablecer vista del gráfico" title="Restablecer vista del gráfico"><span class="label-full">Reset vista</span><span class="btn-icon" aria-hidden="true">↺</span></button>
+          <button type="button" id="plotBtnClear" class="plot-btn-danger plot-btn-icon" aria-label="Limpiar todas las funciones graficadas" title="Limpiar todas las funciones graficadas"><span class="label-full">Limpiar</span><span class="btn-icon" aria-hidden="true">🗑</span></button>
+          <button type="button" id="plotBtnClose" class="plot-btn-ghost plot-btn-icon" aria-label="Cerrar el graficador" title="Cerrar el graficador"><span class="label-full">Cerrar</span><span class="btn-icon" aria-hidden="true">✕</span></button>
         </div>
         <p id="plotError" class="plot-error"></p>
       </div>
@@ -2069,6 +2089,7 @@ window.addEventListener('load', function() {
     let isSpaceDown     = false;
     let lastPosX = 0, lastPosY = 0;
     let isHistoryAction = false, historyStack = [], redoStack = [];
+    var historyChars = 0; // total acumulado de caracteres en historyStack
     let calcVisible = false;
     let focusMode = false;
     let focusResizeTimer = null;
@@ -2948,9 +2969,9 @@ window.addEventListener('load', function() {
             ctx.rotate(-Math.PI / 2);
             ctx.textAlign = 'center';
             var mathY = -(y / GRID_BASE);
-            var labelY = parseFloat(mathY.toPrecision(12));
-            if (labelY === 0) labelY = 0;
-            ctx.fillText(labelY.toString(), 0, 0);
+            var mathYStr = parseFloat(mathY.toPrecision(12)).toString();
+            if (mathYStr === "-0") mathYStr = "0";
+            ctx.fillText(mathYStr, 0, 0);
             ctx.restore();
         }
 
@@ -2959,6 +2980,17 @@ window.addEventListener('load', function() {
         ctx.fillRect(0, 0, RULER_SIZE, RULER_SIZE);
         ctx.strokeStyle = lineCol;
         ctx.strokeRect(0, 0, RULER_SIZE, RULER_SIZE);
+
+// 5. "0" del origen (0,0) — dibujado EXACTAMENTE UNA VEZ.
+        var originInCornerX = (panX >= 0 && panX < RULER_SIZE);
+        var originInCornerY = (panY >= 0 && panY < RULER_SIZE);
+        if (originInCornerX && originInCornerY) {
+            ctx.fillStyle = fg;
+            ctx.font = fontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('0', RULER_SIZE / 2, RULER_SIZE / 2);
+        }
 
         ctx.restore();
     });
@@ -2990,8 +3022,8 @@ window.addEventListener('load', function() {
 
 
     // Límite prácticamente ilimitado de pasos (#undo/redo)
-    const MAX_HISTORY = 1000;
-    const MAX_HISTORY_CHARS = 60000000;
+    const MAX_HISTORY_STEPS = 300;
+    const MAX_HISTORY_CHARS = 24000000;  // ~48 MB de RAM en strings
 
     function withoutHistory(fn) { var prev = isHistoryAction; isHistoryAction = true; try { fn(); } finally { isHistoryAction = prev; } }
 
@@ -3003,15 +3035,16 @@ window.addEventListener('load', function() {
         if (historyStack.length && historyStack[historyStack.length - 1] === snap) return;
         redoStack = [];
         historyStack.push(snap);
-        if (historyStack.length > MAX_HISTORY) {
-            historyStack.splice(0, historyStack.length - MAX_HISTORY);
+        historyChars += snap.length;
+        while (historyStack.length > 2 && (historyStack.length > MAX_HISTORY_STEPS || historyChars > MAX_HISTORY_CHARS)) {
+            var removed = historyStack.shift();
+            historyChars -= removed.length;
         }
-        var totalChars = 0, k;
-        for (k = 0; k < historyStack.length; k++) totalChars += historyStack[k].length;
-        while (historyStack.length > 2 && totalChars > MAX_HISTORY_CHARS) {
-            totalChars -= historyStack[0].length;
-            historyStack.shift();
-        }
+        try {
+            if (localStorage.getItem('mathpad_debug_history') === '1') {
+                console.info('[MathPad historial]', historyStack.length, historyChars);
+            }
+        } catch (e) { /* almacenamiento bloqueado: no loguea */ }
     }
 
     // #BUGFIX texto: entrada de historial INDEPENDIENTE al terminar de editar.
@@ -3113,6 +3146,7 @@ window.addEventListener('load', function() {
         }
         renderPageInfo();
         historyStack = [pages[currentPage]]; redoStack = [];
+        historyChars = pages[currentPage] ? pages[currentPage].length : 0;
         restorePlots(pagePlots[currentPage] || []);
         applyPlotView(pagePlotViews[currentPage]);
         updatePlotFunctionsList();
@@ -3121,6 +3155,34 @@ window.addEventListener('load', function() {
             if (typeof onDone === 'function') onDone();
         });
     }
+
+    document.getElementById('btnDupPage').onclick = () => {
+        saveCurrentPage();
+        var srcJson = pages[currentPage];
+        var srcPlots = [];
+        try { srcPlots = JSON.parse(JSON.stringify(pagePlots[currentPage] || [])); } catch (e) { srcPlots = []; }
+        var srcView = null;
+        try { srcView = JSON.parse(JSON.stringify(pagePlotViews[currentPage] || { xMin: -5, xMax: 5, yMin: -5, yMax: 5 })); } catch (e) { srcView = { xMin: -5, xMax: 5, yMin: -5, yMax: 5 }; }
+        pages.splice(currentPage + 1, 0, srcJson);
+        pagePlots.splice(currentPage + 1, 0, srcPlots);
+        pagePlotViews.splice(currentPage + 1, 0, srcView);
+        loadPageAt(currentPage + 1, false);
+        if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+    };
+
+    document.getElementById('btnDeletePage').onclick = () => {
+        if (pages.length <= 1) {
+            if (typeof showToast === 'function') showToast('No se puede eliminar la única página', 'warn');
+            return;
+        }
+        saveCurrentPage();
+        pages.splice(currentPage, 1);
+        pagePlots.splice(currentPage, 1);
+        pagePlotViews.splice(currentPage, 1);
+        var newIndex = Math.min(currentPage, pages.length - 1);
+        loadPageAt(newIndex, false);
+        if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+    };
 
     document.getElementById('btnAddPage').onclick = () => {
         saveCurrentPage();
@@ -3136,21 +3198,30 @@ window.addEventListener('load', function() {
         updatePlotFunctionsList();
         requestDrawPlot();
         renderPageInfo();
-        historyStack = []; redoStack = []; saveHistory();
+        historyStack = []; redoStack = []; historyChars = 0; saveHistory();
     };
+
+    function loadPageAt(index, saveCurrent = true, onDone = null) {
+        if (index < 0 || index >= pages.length) return;
+        if (saveCurrent && index !== currentPage) saveCurrentPage();
+        currentPage = index;
+        restorePlots(pagePlots[currentPage] || []);
+        applyPlotView(pagePlotViews[currentPage] || { xMin: -5, xMax: 5, yMin: -5, yMax: 5 });
+        updatePlotFunctionsList();
+        loadState(pages[currentPage], function() {
+            canvas.renderAll();
+            requestDrawPlot();
+            renderPageInfo();
+            historyStack = [pages[currentPage]];
+            redoStack = [];
+            historyChars = pages[currentPage] ? pages[currentPage].length : 0;
+            if (typeof onDone === 'function') onDone();
+        });
+    }
 
     function goToPage(newIndex) {
         if (newIndex < 0 || newIndex >= pages.length || newIndex === currentPage) return;
-        saveCurrentPage();
-        currentPage = newIndex;
-        loadState(pages[currentPage]);
-        restorePlots(pagePlots[currentPage] || []);
-        applyPlotView(pagePlotViews[currentPage]);
-        updatePlotFunctionsList();
-        requestDrawPlot();
-        renderPageInfo();
-        historyStack = [pages[currentPage]];
-        redoStack = [];
+        loadPageAt(newIndex, true);
     }
 
     document.getElementById('btnPrevPage').onclick = () => { if (currentPage > 0) goToPage(currentPage - 1); };
@@ -3176,6 +3247,15 @@ window.addEventListener('load', function() {
         t.style.border = `1px solid ${borders[type] || borders.info}`;
         t.style.color = '#e0e0e0';
         t.textContent = msg;
+        const plotModalEl = document.getElementById('plotModal');
+        const plotVisible = !!(plotModalEl && plotModalEl.style.display && plotModalEl.style.display !== 'none');
+        if (plotVisible) {
+            t.style.top = '12px';
+            t.style.bottom = 'auto';
+        } else {
+            t.style.top = 'auto';
+            t.style.bottom = '24px';
+        }
         t.style.opacity = '1';
         clearTimeout(t._tid);
         t._tid = setTimeout(() => t.style.opacity = '0', duration);
@@ -3358,6 +3438,27 @@ window.addEventListener('load', function() {
     document.getElementById('btnToggleAxes').onclick = function() {
         showAxes = !showAxes;
         this.classList.toggle('active', showAxes);
+
+        // Al abrir las reglas por primera vez (lienzo vacío y vista por
+        // defecto), centramos el origen (0,0) para que el "0" de cada
+        // regla quede en el centro de la pantalla, como en las pizarras
+        // matemáticas. No lo hacemos si ya hay trazos, para no desplazar
+        // el trabajo del usuario; ni si la vista ya fue paneada/zoomeada.
+        if (showAxes) {
+            var vpt = canvas.viewportTransform;
+            var onlyBackgrounds = canvas.getObjects().every(function (o) {
+                return o.isBackground || o.isEraserMask === true;
+            });
+            if (onlyBackgrounds && vpt[4] === 0 && vpt[5] === 0) {
+                canvas.setViewportTransform([
+                    vpt[0], 0, 0, vpt[3],
+                    canvas.getWidth() / 2,
+                    canvas.getHeight() / 2
+                ]);
+                syncBackground();
+            }
+        }
+
         canvas.requestRenderAll();
     };
 
@@ -3425,7 +3526,8 @@ window.addEventListener('load', function() {
     };
 
         // Cargar tema guardado
-    const savedTheme = localStorage.getItem('mathpad_theme');
+    let savedTheme = null;
+    try { savedTheme = localStorage.getItem('mathpad_theme'); } catch (e) { savedTheme = null; }
     if (savedTheme === 'light') {
         document.documentElement.classList.add('light-mode');
         if (bgColorPicker) bgColorPicker.value = '#ffffff';
@@ -3515,14 +3617,19 @@ window.addEventListener('load', function() {
         var vpt = canvas.viewportTransform.slice(0); canvas.setViewportTransform([1,0,0,1,0,0]);
         var exportBg = getExportBgColor();
         canvas.setBackgroundColor(exportBg, function() {
-            var bounds = getCanvasBounds(canvas);
-            var link = document.createElement('a'); link.download = 'pizarra.png';
-            link.href = canvas.toDataURL({
-                format: 'png', quality: 1,
-                left: bounds.left, top: bounds.top,
-                width: bounds.width, height: bounds.height
-            }); link.click();
-            canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); canvas.setViewportTransform(vpt);
+            try {
+                var bounds = getCanvasBounds(canvas);
+                var link = document.createElement('a'); link.download = 'pizarra.png';
+                link.href = canvas.toDataURL({
+                    format: 'png', quality: 1,
+                    left: bounds.left, top: bounds.top,
+                    width: bounds.width, height: bounds.height
+                }); link.click();
+            } catch (e) {
+                console.error('Error al exportar PNG:', e);
+            } finally {
+                canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); canvas.setViewportTransform(vpt);
+            }
         });
     };
 
@@ -3641,18 +3748,25 @@ window.addEventListener('load', function() {
     window.activePlotFunctions = activePlotFunctions;
     window.areaState = areaState;
 
-    function niceStep(range, targetTicks) {
-      if (!(range > 0)) return 1;
-      var raw = range / targetTicks;
+    function niceStep(range, cssPixels) {
+      if (!(range > 0) || !(cssPixels > 0)) return 1;
+      var maxTicks = Math.max(2, Math.floor(cssPixels / 16));
+      var raw = range / maxTicks;
       var p = Math.pow(10, Math.floor(Math.log10(raw)));
       var mul = [1, 2, 5, 10];
-      for (var i = 0; i < mul.length; i++) if (raw <= mul[i] * p) return mul[i] * p;
+      for (var i = 0; i < mul.length; i++) {
+        if (raw <= mul[i] * p + 1e-12) return mul[i] * p;
+      }
       return 10 * p;
     }
-    var fmtTick = function(v) {
-      return Math.abs(v) < 1e-10 ? '0' :
-        (Math.abs(v - Math.round(v)) < 1e-10 ? String(Math.round(v)) :
-         (Math.abs(v) >= 100 ? String(Math.round(v)) : v.toFixed(1)));
+
+    var fmtTick = function(v, step) {
+      if (Math.abs(v) < 1e-10) return '0';
+      var decimals = 0;
+      if (step && step < 1) {
+        decimals = Math.max(0, Math.min(6, Math.ceil(-Math.log10(step) - 1e-9)));
+      }
+      return String(Number(v.toFixed(decimals)));
     };
 
     function compilePlotFn(exprStr) {
@@ -3866,14 +3980,31 @@ window.addEventListener('load', function() {
       }
       return { up: up, down: down };
     }
-    function buildValueTable(fn, a, b, rows) {
-      var result = [];
-      for (var i = 0; i < rows; i++) {
-        var x = a + (b - a) * (i / (rows - 1));
-        var y = fn(x);
-        result.push({ x: x, y: isFinite(y) ? y : null });
+    function niceStep(a, b, maxIntervals) {
+      var span = b - a; if (!(span > 0)) return 1;
+      var mags = [1, 2, 5], e = Math.floor(Math.log10(span / maxIntervals)) - 1, step = 1;
+      for (var k = 0; k < 40; k++) {
+        step = mags[k % 3] * Math.pow(10, e + Math.floor(k / 3));
+        if (span / step <= maxIntervals) break;
       }
-      return result;
+      return step;
+    }
+    function tableDecimals(step) { var s = String(step), i = s.indexOf('.'); return i < 0 ? 0 : s.length - i - 1; }
+    function fmtTable(v, d) {
+      if (v === null || !isFinite(v)) return '—';
+      var r = v.toFixed(d); if (/^-0(\.0+)?$/.test(r)) r = r.slice(1);
+      return r.indexOf('.') >= 0 ? r.replace(/0+$/, '').replace(/\.$/, '') : r;
+    }
+
+    function buildValueTable(fn, a, b, rows) {
+      var step = niceStep(a, b, (rows || 7) - 1), out = [];
+      var first = Math.ceil(a / step - 1e-9), last = Math.floor(b / step + 1e-9);
+      for (var i = first; i <= last; i++) {
+        var x = Math.round(i * step * 1e9) / 1e9;
+        var y = fn(x);
+        out.push({ x: x, y: isFinite(y) ? y : null });
+      }
+      return out;
     }
     function findIntersections(f1, f2, a, b, samples) {
       var diff = function(x) {
@@ -3908,7 +4039,8 @@ window.addEventListener('load', function() {
         monotony: computeMonotony(fn, a, b, samples, h, yMaxAbs),
         concavity: computeConcavity(fn, a, b, samples, h, yMaxAbs),
         inflections: findInflections(fn, a, b, samples, h, yMaxAbs),
-        table: buildValueTable(fn, a, b, 10)
+        table: buildValueTable(fn, a, b, 7),
+        tableStep: niceStep(a, b, 6)
       };
     }
     function makeAnalysisRow(label, value) {
@@ -3966,10 +4098,25 @@ window.addEventListener('load', function() {
       trh.appendChild(th1); trh.appendChild(th2);
       thead.appendChild(trh); table.appendChild(thead);
       var tbody = document.createElement('tbody');
+      var stepX = data.tableStep || 1;
+      var dx = tableDecimals(stepX);
+      var nonNullYs = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
+      var roundedYs = nonNullYs.map(function(v) { return Math.round(v * 10) / 10; });
+      var allRoundedEqual = nonNullYs.length > 0 && roundedYs.every(function(v) { return v === roundedYs[0]; });
+      var realDistinct = nonNullYs.some(function(v) { return v !== nonNullYs[0]; });
+      var useFormatY = allRoundedEqual && realDistinct;
       data.table.forEach(function(row) {
         var tr = document.createElement('tr');
-        var td1 = document.createElement('td'); td1.textContent = formatNum(row.x);
-        var td2 = document.createElement('td'); td2.textContent = row.y !== null ? formatNum(row.y) : '—';
+        var td1 = document.createElement('td');
+        td1.textContent = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx);
+        var td2 = document.createElement('td');
+        if (row.y === null) {
+          td2.textContent = '—';
+        } else if (Math.abs(row.y) >= 1e5 || useFormatY) {
+          td2.textContent = formatNum(row.y);
+        } else {
+          td2.textContent = fmtTable(row.y, 1);
+        }
         tr.appendChild(td1); tr.appendChild(td2);
         tbody.appendChild(tr);
       });
@@ -4013,9 +4160,20 @@ window.addEventListener('load', function() {
       lines.push('');
       lines.push('Tabla de valores:');
       lines.push('  ' + 'x'.padStart(10) + ' | ' + 'f(x)'.padStart(10));
+      var stepX2 = data.tableStep || 1;
+      var dx2 = tableDecimals(stepX2);
+      var nonNullYs2 = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
+      var roundedYs2 = nonNullYs2.map(function(v) { return Math.round(v * 10) / 10; });
+      var allRoundedEqual2 = nonNullYs2.length > 0 && roundedYs2.every(function(v) { return v === roundedYs2[0]; });
+      var realDistinct2 = nonNullYs2.some(function(v) { return v !== nonNullYs2[0]; });
+      var useFormatY2 = allRoundedEqual2 && realDistinct2;
       data.table.forEach(function(row) {
-        var xStr = formatNum(row.x);
-        var yStr = row.y !== null ? formatNum(row.y) : '—';
+        var xStr = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx2);
+        var yStr = '—';
+        if (row.y !== null) {
+          if (Math.abs(row.y) >= 1e5 || useFormatY2) yStr = formatNum(row.y);
+          else yStr = fmtTable(row.y, 1);
+        }
         lines.push('  ' + xStr.padStart(10) + ' | ' + yStr.padStart(10));
       });
       if (intersections && intersections.length) {
@@ -4126,6 +4284,7 @@ window.addEventListener('load', function() {
         if (slider && tangentState.fObj) {
           slider.min = String(tangentState.fObj.xMin);
           slider.max = String(tangentState.fObj.xMax);
+          slider.step = String(Math.max((tangentState.fObj.xMax - tangentState.fObj.xMin) / 100, 1e-6));
           var cur = parseFloat(slider.value);
           if (!isFinite(cur) || cur < tangentState.fObj.xMin || cur > tangentState.fObj.xMax) {
             slider.value = String((tangentState.fObj.xMin + tangentState.fObj.xMax) / 2);
@@ -4419,16 +4578,18 @@ window.addEventListener('load', function() {
         ctx.fillRect(0, 0, cssWidth, cssHeight);
         var view = createView(plotCanvasEl, plotView);
 
-        var stepX = niceStep(plotView.xMax - plotView.xMin, 8);
-        var stepY = niceStep(plotView.yMax - plotView.yMin, 6);
+        var stepX = niceStep(plotView.xMax - plotView.xMin, cssWidth);
+        var stepY = niceStep(plotView.yMax - plotView.yMin, cssHeight);
 
-        ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)';
+        ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
         ctx.lineWidth = 1;
-        for (var gx = Math.ceil(plotView.xMin / stepX) * stepX; gx <= plotView.xMax; gx += stepX) {
+        var firstGx = Math.ceil(plotView.xMin / stepX - 1e-9) * stepX;
+        for (var gx = firstGx; gx <= plotView.xMax + 1e-9; gx += stepX) {
           var pxG = view.xToPixel(gx);
           ctx.beginPath(); ctx.moveTo(pxG, 0); ctx.lineTo(pxG, cssHeight); ctx.stroke();
         }
-        for (var gy = Math.ceil(plotView.yMin / stepY) * stepY; gy <= plotView.yMax; gy += stepY) {
+        var firstGy = Math.ceil(plotView.yMin / stepY - 1e-9) * stepY;
+        for (var gy = firstGy; gy <= plotView.yMax + 1e-9; gy += stepY) {
           var pyG = view.yToPixel(gy);
           ctx.beginPath(); ctx.moveTo(0, pyG); ctx.lineTo(cssWidth, pyG); ctx.stroke();
         }
@@ -4445,28 +4606,39 @@ window.addEventListener('load', function() {
         }
 
         ctx.fillStyle = isLight ? '#333' : '#e0e0e0';
-        ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+        ctx.font = '10px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        for (var tx = Math.ceil(plotView.xMin / stepX) * stepX; tx <= plotView.xMax; tx += stepX) {
+        var lastLabelRight = -Infinity;
+        for (var tx = firstGx; tx <= plotView.xMax + 1e-9; tx += stepX) {
           if (Math.abs(tx) < 1e-9) continue;
           var pxT = view.xToPixel(tx);
+          if (pxT < 8 || pxT > cssWidth - 8) continue;
           var pyAxis = view.yToPixel(Math.max(Math.min(0, plotView.yMax), plotView.yMin));
+          pyAxis = Math.min(Math.max(pyAxis, 4), cssHeight - 16);
           ctx.beginPath(); ctx.moveTo(pxT, pyAxis - 3); ctx.lineTo(pxT, pyAxis + 3); ctx.stroke();
-          ctx.fillText(fmtTick(tx), pxT, pyAxis + 5);
+          var lblX = fmtTick(tx, stepX);
+          var halfW = ctx.measureText(lblX).width / 2;
+          if (pxT - halfW >= lastLabelRight + 2) {
+            ctx.fillText(lblX, pxT, pyAxis + 4);
+            lastLabelRight = pxT + halfW;
+          }
         }
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        for (var ty = Math.ceil(plotView.yMin / stepY) * stepY; ty <= plotView.yMax; ty += stepY) {
+        for (var ty = firstGy; ty <= plotView.yMax + 1e-9; ty += stepY) {
           if (Math.abs(ty) < 1e-9) continue;
           var pyT = view.yToPixel(ty);
+          if (pyT < 8 || pyT > cssHeight - 8) continue;
           var pxAxis = view.xToPixel(Math.max(Math.min(0, plotView.xMax), plotView.xMin));
+          pxAxis = Math.min(Math.max(pxAxis, 22), cssWidth - 4);
           ctx.beginPath(); ctx.moveTo(pxAxis - 3, pyT); ctx.lineTo(pxAxis + 3, pyT); ctx.stroke();
-          ctx.fillText(fmtTick(ty), pxAxis - 6, pyT);
+          ctx.fillText(fmtTick(ty, stepY), pxAxis - 5, pyT);
         }
         if (plotView.xMin < 0 && plotView.xMax > 0 && plotView.yMin < 0 && plotView.yMax > 0) {
           ctx.textAlign = 'right'; ctx.textBaseline = 'top';
           ctx.fillText('0', view.xToPixel(0) - 4, view.yToPixel(0) + 4);
         }
       }
+
 
       var v = createView(plotCanvasEl, plotView);
       // Área bajo la curva
@@ -4641,28 +4813,53 @@ window.addEventListener('load', function() {
         requestDrawPlot();
       }, { passive: false });
     }
+    function getRangeFromInputs() {
+      var inMin = parseFloat(document.getElementById('plotXMin').value);
+      var inMax = parseFloat(document.getElementById('plotXMax').value);
+      if (!isNaN(inMin) && !isNaN(inMax) && inMin < inMax) {
+        return { min: inMin, max: inMax };
+      }
+      return { min: -5, max: 5 };
+    }
+
     function calculateAutoView() {
+      var r = getRangeFromInputs();
       var visible = activePlotFunctions.filter(function(f) { return f.visible; });
-      if (!visible.length) return { xMin: -5, xMax: 5, yMin: -5, yMax: 5 };
+      if (!visible.length) {
+        return { xMin: r.min, xMax: r.max, yMin: r.min, yMax: r.max };
+      }
       var xMin = Math.min.apply(null, visible.map(function(f) { return f.xMin; }));
       var xMax = Math.max.apply(null, visible.map(function(f) { return f.xMax; }));
-      var values = [];
-      visible.forEach(function(f) {
-        for (var i = 0; i <= 400; i++) {
-          var x = f.xMin + (f.xMax - f.xMin) * (i / 400);
-          var y = safeEvaluate(f.compiled, x);
-          if (Number.isFinite(y)) values.push(y);
-        }
-      });
-      if (!values.length) return { xMin: xMin, xMax: xMax, yMin: -5, yMax: 5 };
-      values.sort(function(a, b) { return a - b; });
-      var yMin = values[Math.floor(values.length * 0.02)];
-      var yMax = values[Math.ceil(values.length * 0.98) - 1];
-      if (!isFinite(yMin) || !isFinite(yMax)) { yMin = -5; yMax = 5; }
-      if (yMin === yMax) { yMin -= 1; yMax += 1; }
-      var m = (yMax - yMin) * 0.1;
-      return { xMin: xMin, xMax: xMax, yMin: yMin - m, yMax: yMax + m };
+      var span = xMax - xMin;
+      return {
+        xMin: xMin,
+        xMax: xMax,
+        yMin: -span / 2,
+        yMax: span / 2
+      };
     }
+
+    function syncRangeInputsToView() {
+      var xMin = parseFloat(document.getElementById('plotXMin').value);
+      var xMax = parseFloat(document.getElementById('plotXMax').value);
+      if (isNaN(xMin) || isNaN(xMax) || xMin >= xMax) return;
+      var span = xMax - xMin;
+      plotView.xMin = xMin;
+      plotView.xMax = xMax;
+      plotView.yMin = -span / 2;
+      plotView.yMax = span / 2;
+      activePlotFunctions.forEach(function(f) {
+        f.xMin = xMin;
+        f.xMax = xMax;
+      });
+      if (typeof updateTangentUI === 'function') updateTangentUI();
+      if (typeof updateAreaUI === 'function') updateAreaUI();
+      var panel = document.getElementById('plotAnalysisPanel');
+      if (panel && !panel.hidden && typeof recomputeAnalysis === 'function') recomputeAnalysis();
+      requestDrawPlot();
+    }
+    document.getElementById('plotXMin').addEventListener('input', syncRangeInputsToView);
+    document.getElementById('plotXMax').addEventListener('input', syncRangeInputsToView);
 
     function updatePlotFunctionsList() {
       var listEl = document.getElementById('plotFunctionsList');
@@ -4740,22 +4937,29 @@ window.addEventListener('load', function() {
 
     document.getElementById('plotBtnClear').onclick = function() {
       activePlotFunctions.length = 0;
-      plotView.xMin = -5; plotView.xMax = 5; plotView.yMin = -5; plotView.yMax = 5;
+      var r = getRangeFromInputs();
+      var span = r.max - r.min;
+      plotView.xMin = r.min; plotView.xMax = r.max;
+      plotView.yMin = -span / 2; plotView.yMax = span / 2;
       updatePlotFunctionsList();
       requestDrawPlot();
     };
 
     document.getElementById('plotBtnInsert').onclick = function() {
       var errEl = document.getElementById('plotError');
-      if (!activePlotFunctions.length) {
-        errEl.textContent = 'Agregá al menos una función antes de insertar.';
-        errEl.style.display = 'block'; return;
+      errEl.style.display = 'none';
+      var onlyLineEl = document.getElementById('plotOnlyLine');
+      var prevOnlyLine = onlyLineEl.checked;
+      if (!activePlotFunctions.length && prevOnlyLine) {
+        onlyLineEl.checked = false;
       }
       drawPlot();
+      onlyLineEl.checked = prevOnlyLine;
+
       var dataURL = plotCanvasEl.toDataURL('image/png');
       fabric.Image.fromURL(dataURL, function(img) {
         var vpt = canvas.viewportTransform;
-        var maxW = 600;
+        var maxW = 500 / (canvas.getZoom() || 1);
         if (img.width > maxW) img.scaleToWidth(maxW);
         img.set({
           left: (canvas.getWidth() / 2 - vpt[4]) / vpt[0] - img.getScaledWidth() / 2,
@@ -4768,12 +4972,13 @@ window.addEventListener('load', function() {
         canvas.requestRenderAll();
         saveHistory();
         document.getElementById('plotModal').style.display = 'none';
-        showToast('📈 Gráfico insertado', 'ok');
+        showToast(activePlotFunctions.length ? '📈 Gráfico insertado' : '📐 Ejes cartesianos insertados', 'ok');
       }, function() {
         errEl.textContent = 'No se pudo generar la imagen del gráfico.';
         errEl.style.display = 'block';
       });
     };
+
 
     function closePlotModal() {
       document.getElementById('plotModal').style.display = 'none';
@@ -4864,10 +5069,16 @@ window.addEventListener('load', function() {
       document.getElementById('plotModal').style.display = 'flex';
       document.getElementById('plotExpr').focus();
       document.getElementById('plotError').style.display = 'none';
+      if (!activePlotFunctions.length) {
+        var auto = calculateAutoView();
+        plotView.xMin = auto.xMin; plotView.xMax = auto.xMax;
+        plotView.yMin = auto.yMin; plotView.yMax = auto.yMax;
+      }
       updatePlotFunctionsList();
       requestDrawPlot();
       if (typeof activatePlotTab === 'function') activatePlotTab(0);
     };
+
 
     window.addEventListener('resize', requestPlotResizeDraw);
     window.addEventListener('orientationchange', requestPlotResizeDraw);
@@ -4892,6 +5103,7 @@ window.addEventListener('load', function() {
     var latexInputEl   = document.getElementById('latexInput');
     var latexPreviewEl = document.getElementById('latexPreview');
     var latexErrorEl   = document.getElementById('latexError');
+    var mathJaxPromise = null;
     var LATEX_EXAMPLES = [
       '\\frac{a}{b}', 'x^2 + y^2 = r^2', '\\sqrt{x}',
       '\\int_{a}^{b} f(x)\\,dx', '\\sum_{i=1}^{n} i', 'e^{i\\pi} + 1 = 0'
@@ -4905,8 +5117,59 @@ window.addEventListener('load', function() {
       latexErrorEl.textContent = 'Sintaxis LaTeX inválida: revisa llaves { }, ^, _ y los comandos con \\.';
     }
 
+    function loadMathJax() {
+      if (window.MathJax && typeof MathJax.tex2svg === 'function') {
+        return Promise.resolve();
+      }
+      if (mathJaxPromise) return mathJaxPromise;
+      mathJaxPromise = new Promise(function(resolve, reject) {
+        var script = document.createElement('script');
+        script.src = './tex-svg.js';
+        script.async = true;
+        var settled = false;
+        var timeoutId = setTimeout(function() {
+          if (settled) return;
+          settled = true;
+          if (script.parentNode) script.parentNode.removeChild(script);
+          mathJaxPromise = null;
+          reject(new Error('mathjax-timeout'));
+        }, 15000);
+        function finishOk() {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          resolve();
+        }
+        function finishErr(err) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          if (script.parentNode) script.parentNode.removeChild(script);
+          mathJaxPromise = null;
+          reject(err || new Error('mathjax-load-error'));
+        }
+        script.onload = function() {
+          var mj = window.MathJax;
+          if (mj && mj.startup && typeof mj.startup.promise === 'object' && mj.startup.promise && typeof mj.startup.promise.then === 'function') {
+            mj.startup.promise.then(function() {
+              if (window.MathJax && typeof MathJax.tex2svg === 'function') finishOk();
+              else finishErr(new Error('mathjax-no-listo'));
+            }).catch(function(e) { finishErr(e); });
+          } else if (window.MathJax && typeof MathJax.tex2svg === 'function') {
+            finishOk();
+          } else {
+            finishErr(new Error('mathjax-no-listo'));
+          }
+        };
+        script.onerror = function() { finishErr(new Error('mathjax-load-error')); };
+        document.head.appendChild(script);
+      });
+      return mathJaxPromise;
+    }
+
     // Renderiza y valida (lanza error si MathJax detecta merror/sintaxis inválida)
     function latexRenderInto(container, tex) {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') throw new Error('mathjax-no-listo');
       var holder = MathJax.tex2svg(tex);
       if (!holder || !holder.querySelector || !holder.querySelector('svg')) throw new Error('sin-svg');
       if (holder.querySelector('[data-mjx-error], .merror')) throw new Error('sintaxis');
@@ -4915,6 +5178,10 @@ window.addEventListener('load', function() {
     }
 
     function latexUpdatePreview() {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') {
+        latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
+        return;
+      }
       var tex = latexInputEl.value.trim();
       latexErrorEl.textContent = '';
       latexPreviewEl.style.color = latexActiveColor(); // WYSIWYG: color activo real
@@ -4931,10 +5198,26 @@ window.addEventListener('load', function() {
 
     function openLatexModal() {
       latexInputEl.value = '';
-      latexUpdatePreview();
+      latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
       latexModalEl.classList.add('open');
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       latexInputEl.focus();
+      function showLatexLoadError() {
+        latexPreviewEl.innerHTML = '';
+        var msg = document.createElement('div');
+        msg.textContent = 'No se pudo cargar el motor LaTeX';
+        latexPreviewEl.appendChild(msg);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Reintentar';
+        btn.onclick = function() {
+          latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
+          loadMathJax().then(function() { latexUpdatePreview(); }).catch(showLatexLoadError);
+        };
+        latexPreviewEl.appendChild(btn);
+      }
+
+      loadMathJax().then(function() { latexUpdatePreview(); }).catch(showLatexLoadError);
     }
     function closeLatexModal() {
       latexModalEl.classList.remove('open');
@@ -4975,6 +5258,10 @@ window.addEventListener('load', function() {
     })();
 
     document.getElementById('latexInsertBtn').onclick = function() {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') {
+        showToast('Espera: el motor LaTeX está cargando','warn');
+        return;
+      }
       var ecuacion = latexInputEl.value.trim();
       if (!ecuacion) return;
       try {
@@ -5159,6 +5446,11 @@ window.addEventListener('load', function() {
         'ln(': { show: 'ln(', js: 'ln(', kind: 'func' },
         'e^(': { show: 'e^(', js: 'e^(', kind: 'func' },
         'abs(': { show: 'Abs(', js: 'abs(', kind: 'func' },
+     ',': { show: ',', js: ',', kind: 'op' },
+     'gcd(': { show: 'MCD(', js: 'calcgcd(', kind: 'func' },
+     'lcm(': { show: 'mcm(', js: 'calclcm(', kind: 'func' },
+     'mod(': { show: 'Resto(', js: 'calcmod(', kind: 'func' },
+     'rnd(': { show: 'Rnd(', js: 'calcrnd(', kind: 'func' },
         '(': { show: '(', js: '(', kind: 'open' },
         ')': { show: ')', js: ')', kind: 'close' },
         'pi': { show: '\u03C0', js: 'pi', kind: 'const' },
@@ -5595,7 +5887,7 @@ window.addEventListener('load', function() {
     function calcTokenizePaste(text) {
         var out = [];
         var s = String(text || '');
-        var names = ['asin(', 'acos(', 'atan(', 'log10(', 'sin(', 'cos(', 'tan(', 'sqrt(', 'abs(', 'log(', 'ln(', 'Ans', 'pi', 'e'];
+        var names = ['asin(', 'acos(', 'atan(', 'log10(', 'sin(', 'cos(', 'tan(', 'sqrt(', 'abs(', 'gcd(', 'mcd(', 'lcm(', 'mcm(', 'mod(', 'resto(', 'rnd(', 'round(', 'log(', 'ln(', 'Ans', 'pi', 'e'];
         function isWordChar(c) {
             return !!c && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_');
         }
@@ -5614,6 +5906,8 @@ window.addEventListener('load', function() {
             if (matched) {
                 var key = matched;
                 if (key.toLowerCase() === 'log(') key = 'log10(';
+var alias = { 'mcd(': 'gcd(', 'mcm(': 'lcm(', 'resto(': 'mod(', 'round(': 'rnd(' };
+if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
                 if (key.toLowerCase() === 'ans') key = 'Ans';
                 if (key.toLowerCase() === 'pi') key = 'pi';
                 if (key.toLowerCase() === 'e') key = 'e';
@@ -5631,7 +5925,7 @@ window.addEventListener('load', function() {
                 continue;
             }
             if (ch >= '0' && ch <= '9') { out.push(tokenFromKey(ch)); i++; continue; }
-            if (ch === '.' || ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '^' || ch === '(' || ch === ')' || ch === '!' || ch === '%') {
+            if (ch === '.' || ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '^' || ch === '(' || ch === ')' || ch === '!' || ch === '%' || ch === ',') {
                 if (ch === '^' && s[i + 1] === '(') { out.push(tokenFromKey('^(')); i += 2; continue; }
                 var tk2 = tokenFromKey(ch);
                 if (tk2) out.push(tk2);
@@ -5832,7 +6126,38 @@ window.addEventListener('load', function() {
                 if (!isCalcInt(n) || !isCalcInt(r) || n < 0 || r < 0 || r > n) throw new CalcMathError('nPr');
                 return Math.round(calcFact(n) / calcFact(n - r));
             },
-            factorial: function(n) {
+            calcgcd: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('gcd');
+         a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+         while (b) { var t = b; b = a % b; a = t; }
+         return a;
+     },
+     calclcm: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('lcm');
+         a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+         if (a === 0 || b === 0) return 0;
+         var x = a, y = b;
+         while (y) { var t2 = y; y = x % y; x = t2; }
+         var r = (a / x) * b;
+         if (!isFinite(r) || r > 9007199254740991) throw new CalcMathError('lcm');
+         return r;
+     },
+     calcmod: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('mod');
+         a = Math.round(a); b = Math.abs(Math.round(b));
+         if (b === 0) throw new CalcMathError('mod');
+         return ((a % b) + b) % b;
+     },
+     calcrnd: function(x, n) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (typeof x !== 'number' || !isFinite(x) || !isCalcInt(n) || n < 0 || n > 15) throw new CalcMathError('rnd');
+         var f = Math.pow(10, Math.round(n));
+         return (x < 0 ? -1 : 1) * Math.round(Math.abs(x) * f) / f;
+     },
+     factorial: function(n) {
                 if (!isCalcInt(n) || n < 0 || n > 170) throw new CalcMathError('fact');
                 return calcFact(n);
             }
@@ -6333,8 +6658,8 @@ window.addEventListener('load', function() {
 /* ═══════════════════════════════════════════════════════════════
    ATAJOS DE TECLADO (KEYDOWN / KEYUP)
 ═══════════════════════════════════════════════════════════════ */
-    document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { redoStack.push(historyStack.pop()); loadState(historyStack[historyStack.length - 1]); } };
-    document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
+    document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { var _popped = historyStack.pop(); historyChars -= _popped.length; redoStack.push(_popped); loadState(historyStack[historyStack.length - 1]); } };
+    document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); historyChars += state.length; loadState(state); } };
     document.getElementById('btnClear').onclick = function() {
         showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => {
             withoutHistory(function() { canvas.clear(); });
@@ -6364,9 +6689,10 @@ window.addEventListener('load', function() {
     }
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+        var inCalc = false;
         if (calcVisible) {
             var calcPanelEl = document.getElementById('calcPanel');
-            var inCalc = calcPanelEl && e.target && calcPanelEl.contains(e.target);
+            inCalc = calcPanelEl && e.target && calcPanelEl.contains(e.target);
             if (inCalc) {
                 var ckey = e.key;
                 if ((e.ctrlKey || e.metaKey) && (ckey === 'c' || ckey === 'C')) {
@@ -6388,7 +6714,7 @@ window.addEventListener('load', function() {
                 }
                 if (!e.ctrlKey && !e.metaKey && !e.altKey) {
                     if (ckey && ckey.length === 1 && ckey >= '0' && ckey <= '9') { e.preventDefault(); calcInsertKeyAsToken(ckey); return; }
-                    if (ckey === '.' || ckey === '+' || ckey === '-' || ckey === '*' || ckey === '/' || ckey === '(' || ckey === ')' || ckey === '^' || ckey === '!' || ckey === '%') {
+                    if (ckey === '.' || ckey === '+' || ckey === '-' || ckey === '*' || ckey === '/' || ckey === '(' || ckey === ')' || ckey === '^' || ckey === '!' || ckey === '%' || ckey === ',') {
                         e.preventDefault();
                         if (ckey === '^') calcPushToken(tokenFromKey('^('));
                         else calcInsertKeyAsToken(ckey);
@@ -6415,6 +6741,8 @@ window.addEventListener('load', function() {
                 }
             }
         }
+
+        if (calcVisible && inCalc && !e.ctrlKey && !e.metaKey && !e.altKey) return;
 
         if (e.key === 'Escape') {
             closeContextMenu();
