@@ -2074,6 +2074,7 @@ window.addEventListener('load', function() {
     let isSpaceDown     = false;
     let lastPosX = 0, lastPosY = 0;
     let isHistoryAction = false, historyStack = [], redoStack = [];
+    var historyChars = 0; // total acumulado de caracteres en historyStack
     let calcVisible = false;
     let focusMode = false;
     let focusResizeTimer = null;
@@ -2995,8 +2996,8 @@ window.addEventListener('load', function() {
 
 
     // Límite prácticamente ilimitado de pasos (#undo/redo)
-    const MAX_HISTORY = 1000;
-    const MAX_HISTORY_CHARS = 60000000;
+    const MAX_HISTORY_STEPS = 300;
+    const MAX_HISTORY_CHARS = 24000000;  // ~48 MB de RAM en strings
 
     function withoutHistory(fn) { var prev = isHistoryAction; isHistoryAction = true; try { fn(); } finally { isHistoryAction = prev; } }
 
@@ -3008,14 +3009,13 @@ window.addEventListener('load', function() {
         if (historyStack.length && historyStack[historyStack.length - 1] === snap) return;
         redoStack = [];
         historyStack.push(snap);
-        if (historyStack.length > MAX_HISTORY) {
-            historyStack.splice(0, historyStack.length - MAX_HISTORY);
+        historyChars += snap.length;
+        while (historyStack.length > 2 && (historyStack.length > MAX_HISTORY_STEPS || historyChars > MAX_HISTORY_CHARS)) {
+            var removed = historyStack.shift();
+            historyChars -= removed.length;
         }
-        var totalChars = 0, k;
-        for (k = 0; k < historyStack.length; k++) totalChars += historyStack[k].length;
-        while (historyStack.length > 2 && totalChars > MAX_HISTORY_CHARS) {
-            totalChars -= historyStack[0].length;
-            historyStack.shift();
+        if (localStorage.getItem('mathpad_debug_history') === '1') {
+            console.info('[MathPad historial]', historyStack.length, historyChars);
         }
     }
 
@@ -3118,6 +3118,7 @@ window.addEventListener('load', function() {
         }
         renderPageInfo();
         historyStack = [pages[currentPage]]; redoStack = [];
+        historyChars = pages[currentPage] ? pages[currentPage].length : 0;
         restorePlots(pagePlots[currentPage] || []);
         applyPlotView(pagePlotViews[currentPage]);
         updatePlotFunctionsList();
@@ -3141,7 +3142,7 @@ window.addEventListener('load', function() {
         updatePlotFunctionsList();
         requestDrawPlot();
         renderPageInfo();
-        historyStack = []; redoStack = []; saveHistory();
+        historyStack = []; redoStack = []; historyChars = 0; saveHistory();
     };
 
     function goToPage(newIndex) {
@@ -3156,6 +3157,7 @@ window.addEventListener('load', function() {
         renderPageInfo();
         historyStack = [pages[currentPage]];
         redoStack = [];
+        historyChars = pages[currentPage] ? pages[currentPage].length : 0;
     }
 
     document.getElementById('btnPrevPage').onclick = () => { if (currentPage > 0) goToPage(currentPage - 1); };
@@ -6422,8 +6424,8 @@ window.addEventListener('load', function() {
 /* ═══════════════════════════════════════════════════════════════
    ATAJOS DE TECLADO (KEYDOWN / KEYUP)
 ═══════════════════════════════════════════════════════════════ */
-    document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { redoStack.push(historyStack.pop()); loadState(historyStack[historyStack.length - 1]); } };
-    document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); loadState(state); } };
+    document.getElementById('btnUndo').onclick = function() { if (historyStack.length > 1) { var _popped = historyStack.pop(); historyChars -= _popped.length; redoStack.push(_popped); loadState(historyStack[historyStack.length - 1]); } };
+    document.getElementById('btnRedo').onclick = function() { if (redoStack.length > 0) { var state = redoStack.pop(); historyStack.push(state); historyChars += state.length; loadState(state); } };
     document.getElementById('btnClear').onclick = function() {
         showConfirm('¿Limpiar todo el lienzo? Esta acción no se puede deshacer.', () => {
             withoutHistory(function() { canvas.clear(); });
