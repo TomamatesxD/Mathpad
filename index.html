@@ -1435,19 +1435,19 @@
 
         /* Entradas y botones auxiliares ocultos */
         .hidden-file-input, .hidden-helper { display: none; }
-        /* Graficador rediseño (FASE B) */
+                /* Graficador rediseño (FASE B) - Simétrico 1:1 */
         #plotModal { padding: 6px; overflow: hidden; }
         .plot-dialog { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 14px; width: min(980px, calc(100vw - 12px)); max-height: 92dvh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; margin: 0 auto; padding: 0; }
         .plot-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .plot-title { color: var(--accent); margin: 0; font-size: 16px; }
         .plot-close { background: transparent; border: none; color: var(--text-main); font-size: 20px; line-height: 1; cursor: pointer; min-width: 36px; min-height: 36px; border-radius: 8px; }
         .plot-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
-        .plot-canvas-col { flex: 0 0 60%; min-width: 0; padding: 10px; display: flex; flex-direction: column; min-height: 0; }
-        .plot-canvas-wrap { position: relative; flex: 1; min-height: 0; width: 100%; margin: 0; border-radius: 10px; overflow: hidden; background: var(--bg-dark, #121212); border: 1px solid var(--border-color); touch-action: none; }
-        #plotCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; aspect-ratio: auto; }
+        .plot-canvas-col { flex: 0 0 54%; min-width: 0; padding: 12px; display: flex; align-items: center; justify-content: center; min-height: 0; }
+        .plot-canvas-wrap { position: relative; flex: 0 0 auto; width: 100%; max-width: min(100%, 62dvh); aspect-ratio: 1 / 1; margin: auto; border-radius: 10px; overflow: hidden; background: var(--bg-dark, #121212); border: 1px solid var(--border-color); touch-action: none; }
+        #plotCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; aspect-ratio: 1 / 1; }
         .plot-hud { position: absolute; bottom: 6px; right: 8px; font-size: 13px; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.55); color: #e0e0e0; pointer-events: none; font-family: system-ui, sans-serif; }
         :root.light-mode .plot-hud { background: rgba(255,255,255,0.85); color: #212121; }
-        .plot-side { flex: 0 0 40%; min-width: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        .plot-side { flex: 0 0 46%; min-width: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
         .plot-label { font-size: 13px; color: var(--text-main); }
         .plot-label-sm { font-size: 12px; color: var(--text-main); }
         .plot-hint { color: var(--text-main); opacity: .7; }
@@ -1493,9 +1493,10 @@
         .plot-btn-primary .label-full, .plot-btn-icon .label-full { display: inline; }
         .plot-error { color: #f87171; font-size: 12px; margin: 8px 12px; display: none; }
         @media (max-width: 699px) {
-          .plot-body { flex-direction: column; }
-          .plot-canvas-col { flex: 0 0 auto; height: 40dvh; min-height: 220px; padding: 8px; }
-          .plot-side { flex: 1 1 auto; padding: 8px; }
+          .plot-body { flex-direction: column; overflow-y: auto; }
+          .plot-canvas-col { flex: 0 0 auto; height: auto; min-height: 0; padding: 8px; }
+          .plot-canvas-wrap { max-width: min(100%, 44dvh); aspect-ratio: 1 / 1; }
+          .plot-side { flex: 1 1 auto; padding: 8px; overflow-y: visible; }
           .plot-dialog { width: calc(100vw - 12px); }
         }
         @media (max-width: 699px) and (orientation: portrait) {
@@ -1510,8 +1511,9 @@
         @media (max-height: 500px) {
           .plot-dialog { max-height: 100dvh; margin: 0; border-radius: 10px; }
           .plot-body { flex-direction: row; }
-          .plot-canvas-col { flex: 0 0 55%; height: auto; padding: 6px; }
-          .plot-side { flex: 0 0 45%; padding: 6px; font-size: 13px; }
+          .plot-canvas-col { flex: 0 0 48%; height: auto; padding: 6px; }
+          .plot-canvas-wrap { max-width: min(100%, 72dvh); aspect-ratio: 1 / 1; }
+          .plot-side { flex: 0 0 52%; padding: 6px; font-size: 13px; }
           .plot-title { font-size: 14px; }
           .plot-btn-primary, .plot-btn-danger, .plot-btn-ghost, .plot-close { min-height: 36px; padding: 8px 10px; font-size: 12px; }
           .plot-tab { min-height: 32px; padding: 6px 8px; font-size: 12px; }
@@ -1519,7 +1521,6 @@
         @media (min-width: 700px) {
           .plot-dialog { max-width: 980px; }
         }
-
 </style>
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
@@ -3747,18 +3748,25 @@ window.addEventListener('load', function() {
     window.activePlotFunctions = activePlotFunctions;
     window.areaState = areaState;
 
-    function niceStep(range, targetTicks) {
-      if (!(range > 0)) return 1;
-      var raw = range / targetTicks;
+    function niceStep(range, cssPixels) {
+      if (!(range > 0) || !(cssPixels > 0)) return 1;
+      var maxTicks = Math.max(2, Math.floor(cssPixels / 16));
+      var raw = range / maxTicks;
       var p = Math.pow(10, Math.floor(Math.log10(raw)));
       var mul = [1, 2, 5, 10];
-      for (var i = 0; i < mul.length; i++) if (raw <= mul[i] * p) return mul[i] * p;
+      for (var i = 0; i < mul.length; i++) {
+        if (raw <= mul[i] * p + 1e-12) return mul[i] * p;
+      }
       return 10 * p;
     }
-    var fmtTick = function(v) {
-      return Math.abs(v) < 1e-10 ? '0' :
-        (Math.abs(v - Math.round(v)) < 1e-10 ? String(Math.round(v)) :
-         (Math.abs(v) >= 100 ? String(Math.round(v)) : v.toFixed(1)));
+
+    var fmtTick = function(v, step) {
+      if (Math.abs(v) < 1e-10) return '0';
+      var decimals = 0;
+      if (step && step < 1) {
+        decimals = Math.max(0, Math.min(6, Math.ceil(-Math.log10(step) - 1e-9)));
+      }
+      return String(Number(v.toFixed(decimals)));
     };
 
     function compilePlotFn(exprStr) {
@@ -4570,16 +4578,18 @@ window.addEventListener('load', function() {
         ctx.fillRect(0, 0, cssWidth, cssHeight);
         var view = createView(plotCanvasEl, plotView);
 
-        var stepX = niceStep(plotView.xMax - plotView.xMin, 8);
-        var stepY = niceStep(plotView.yMax - plotView.yMin, 6);
+        var stepX = niceStep(plotView.xMax - plotView.xMin, cssWidth);
+        var stepY = niceStep(plotView.yMax - plotView.yMin, cssHeight);
 
-        ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)';
+        ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
         ctx.lineWidth = 1;
-        for (var gx = Math.ceil(plotView.xMin / stepX) * stepX; gx <= plotView.xMax; gx += stepX) {
+        var firstGx = Math.ceil(plotView.xMin / stepX - 1e-9) * stepX;
+        for (var gx = firstGx; gx <= plotView.xMax + 1e-9; gx += stepX) {
           var pxG = view.xToPixel(gx);
           ctx.beginPath(); ctx.moveTo(pxG, 0); ctx.lineTo(pxG, cssHeight); ctx.stroke();
         }
-        for (var gy = Math.ceil(plotView.yMin / stepY) * stepY; gy <= plotView.yMax; gy += stepY) {
+        var firstGy = Math.ceil(plotView.yMin / stepY - 1e-9) * stepY;
+        for (var gy = firstGy; gy <= plotView.yMax + 1e-9; gy += stepY) {
           var pyG = view.yToPixel(gy);
           ctx.beginPath(); ctx.moveTo(0, pyG); ctx.lineTo(cssWidth, pyG); ctx.stroke();
         }
@@ -4596,28 +4606,39 @@ window.addEventListener('load', function() {
         }
 
         ctx.fillStyle = isLight ? '#333' : '#e0e0e0';
-        ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+        ctx.font = '10px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        for (var tx = Math.ceil(plotView.xMin / stepX) * stepX; tx <= plotView.xMax; tx += stepX) {
+        var lastLabelRight = -Infinity;
+        for (var tx = firstGx; tx <= plotView.xMax + 1e-9; tx += stepX) {
           if (Math.abs(tx) < 1e-9) continue;
           var pxT = view.xToPixel(tx);
+          if (pxT < 8 || pxT > cssWidth - 8) continue;
           var pyAxis = view.yToPixel(Math.max(Math.min(0, plotView.yMax), plotView.yMin));
+          pyAxis = Math.min(Math.max(pyAxis, 4), cssHeight - 16);
           ctx.beginPath(); ctx.moveTo(pxT, pyAxis - 3); ctx.lineTo(pxT, pyAxis + 3); ctx.stroke();
-          ctx.fillText(fmtTick(tx), pxT, pyAxis + 5);
+          var lblX = fmtTick(tx, stepX);
+          var halfW = ctx.measureText(lblX).width / 2;
+          if (pxT - halfW >= lastLabelRight + 2) {
+            ctx.fillText(lblX, pxT, pyAxis + 4);
+            lastLabelRight = pxT + halfW;
+          }
         }
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        for (var ty = Math.ceil(plotView.yMin / stepY) * stepY; ty <= plotView.yMax; ty += stepY) {
+        for (var ty = firstGy; ty <= plotView.yMax + 1e-9; ty += stepY) {
           if (Math.abs(ty) < 1e-9) continue;
           var pyT = view.yToPixel(ty);
+          if (pyT < 8 || pyT > cssHeight - 8) continue;
           var pxAxis = view.xToPixel(Math.max(Math.min(0, plotView.xMax), plotView.xMin));
+          pxAxis = Math.min(Math.max(pxAxis, 22), cssWidth - 4);
           ctx.beginPath(); ctx.moveTo(pxAxis - 3, pyT); ctx.lineTo(pxAxis + 3, pyT); ctx.stroke();
-          ctx.fillText(fmtTick(ty), pxAxis - 6, pyT);
+          ctx.fillText(fmtTick(ty, stepY), pxAxis - 5, pyT);
         }
         if (plotView.xMin < 0 && plotView.xMax > 0 && plotView.yMin < 0 && plotView.yMax > 0) {
           ctx.textAlign = 'right'; ctx.textBaseline = 'top';
           ctx.fillText('0', view.xToPixel(0) - 4, view.yToPixel(0) + 4);
         }
       }
+
 
       var v = createView(plotCanvasEl, plotView);
       // Área bajo la curva
@@ -4792,28 +4813,53 @@ window.addEventListener('load', function() {
         requestDrawPlot();
       }, { passive: false });
     }
+    function getRangeFromInputs() {
+      var inMin = parseFloat(document.getElementById('plotXMin').value);
+      var inMax = parseFloat(document.getElementById('plotXMax').value);
+      if (!isNaN(inMin) && !isNaN(inMax) && inMin < inMax) {
+        return { min: inMin, max: inMax };
+      }
+      return { min: -5, max: 5 };
+    }
+
     function calculateAutoView() {
+      var r = getRangeFromInputs();
       var visible = activePlotFunctions.filter(function(f) { return f.visible; });
-      if (!visible.length) return { xMin: -5, xMax: 5, yMin: -5, yMax: 5 };
+      if (!visible.length) {
+        return { xMin: r.min, xMax: r.max, yMin: r.min, yMax: r.max };
+      }
       var xMin = Math.min.apply(null, visible.map(function(f) { return f.xMin; }));
       var xMax = Math.max.apply(null, visible.map(function(f) { return f.xMax; }));
-      var values = [];
-      visible.forEach(function(f) {
-        for (var i = 0; i <= 400; i++) {
-          var x = f.xMin + (f.xMax - f.xMin) * (i / 400);
-          var y = safeEvaluate(f.compiled, x);
-          if (Number.isFinite(y)) values.push(y);
-        }
-      });
-      if (!values.length) return { xMin: xMin, xMax: xMax, yMin: -5, yMax: 5 };
-      values.sort(function(a, b) { return a - b; });
-      var yMin = values[Math.floor(values.length * 0.02)];
-      var yMax = values[Math.ceil(values.length * 0.98) - 1];
-      if (!isFinite(yMin) || !isFinite(yMax)) { yMin = -5; yMax = 5; }
-      if (yMin === yMax) { yMin -= 1; yMax += 1; }
-      var m = (yMax - yMin) * 0.1;
-      return { xMin: xMin, xMax: xMax, yMin: yMin - m, yMax: yMax + m };
+      var span = xMax - xMin;
+      return {
+        xMin: xMin,
+        xMax: xMax,
+        yMin: -span / 2,
+        yMax: span / 2
+      };
     }
+
+    function syncRangeInputsToView() {
+      var xMin = parseFloat(document.getElementById('plotXMin').value);
+      var xMax = parseFloat(document.getElementById('plotXMax').value);
+      if (isNaN(xMin) || isNaN(xMax) || xMin >= xMax) return;
+      var span = xMax - xMin;
+      plotView.xMin = xMin;
+      plotView.xMax = xMax;
+      plotView.yMin = -span / 2;
+      plotView.yMax = span / 2;
+      activePlotFunctions.forEach(function(f) {
+        f.xMin = xMin;
+        f.xMax = xMax;
+      });
+      if (typeof updateTangentUI === 'function') updateTangentUI();
+      if (typeof updateAreaUI === 'function') updateAreaUI();
+      var panel = document.getElementById('plotAnalysisPanel');
+      if (panel && !panel.hidden && typeof recomputeAnalysis === 'function') recomputeAnalysis();
+      requestDrawPlot();
+    }
+    document.getElementById('plotXMin').addEventListener('input', syncRangeInputsToView);
+    document.getElementById('plotXMax').addEventListener('input', syncRangeInputsToView);
 
     function updatePlotFunctionsList() {
       var listEl = document.getElementById('plotFunctionsList');
@@ -4891,22 +4937,29 @@ window.addEventListener('load', function() {
 
     document.getElementById('plotBtnClear').onclick = function() {
       activePlotFunctions.length = 0;
-      plotView.xMin = -5; plotView.xMax = 5; plotView.yMin = -5; plotView.yMax = 5;
+      var r = getRangeFromInputs();
+      var span = r.max - r.min;
+      plotView.xMin = r.min; plotView.xMax = r.max;
+      plotView.yMin = -span / 2; plotView.yMax = span / 2;
       updatePlotFunctionsList();
       requestDrawPlot();
     };
 
     document.getElementById('plotBtnInsert').onclick = function() {
       var errEl = document.getElementById('plotError');
-      if (!activePlotFunctions.length) {
-        errEl.textContent = 'Agregá al menos una función antes de insertar.';
-        errEl.style.display = 'block'; return;
+      errEl.style.display = 'none';
+      var onlyLineEl = document.getElementById('plotOnlyLine');
+      var prevOnlyLine = onlyLineEl.checked;
+      if (!activePlotFunctions.length && prevOnlyLine) {
+        onlyLineEl.checked = false;
       }
       drawPlot();
+      onlyLineEl.checked = prevOnlyLine;
+
       var dataURL = plotCanvasEl.toDataURL('image/png');
       fabric.Image.fromURL(dataURL, function(img) {
         var vpt = canvas.viewportTransform;
-        var maxW = 600 / (canvas.getZoom() || 1);
+        var maxW = 500 / (canvas.getZoom() || 1);
         if (img.width > maxW) img.scaleToWidth(maxW);
         img.set({
           left: (canvas.getWidth() / 2 - vpt[4]) / vpt[0] - img.getScaledWidth() / 2,
@@ -4919,12 +4972,13 @@ window.addEventListener('load', function() {
         canvas.requestRenderAll();
         saveHistory();
         document.getElementById('plotModal').style.display = 'none';
-        showToast('📈 Gráfico insertado', 'ok');
+        showToast(activePlotFunctions.length ? '📈 Gráfico insertado' : '📐 Ejes cartesianos insertados', 'ok');
       }, function() {
         errEl.textContent = 'No se pudo generar la imagen del gráfico.';
         errEl.style.display = 'block';
       });
     };
+
 
     function closePlotModal() {
       document.getElementById('plotModal').style.display = 'none';
@@ -5015,10 +5069,16 @@ window.addEventListener('load', function() {
       document.getElementById('plotModal').style.display = 'flex';
       document.getElementById('plotExpr').focus();
       document.getElementById('plotError').style.display = 'none';
+      if (!activePlotFunctions.length) {
+        var auto = calculateAutoView();
+        plotView.xMin = auto.xMin; plotView.xMax = auto.xMax;
+        plotView.yMin = auto.yMin; plotView.yMax = auto.yMax;
+      }
       updatePlotFunctionsList();
       requestDrawPlot();
       if (typeof activatePlotTab === 'function') activatePlotTab(0);
     };
+
 
     window.addEventListener('resize', requestPlotResizeDraw);
     window.addEventListener('orientationchange', requestPlotResizeDraw);
