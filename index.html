@@ -1798,17 +1798,17 @@
             <button type="button" class="sci-btn operator" data-tok="^2" data-shift="^3" data-shift-label="x3" aria-label="x al cuadrado">x²</button>
             <button type="button" class="sci-btn operator" data-tok="^(" data-shift="root" data-shift-label="y-raiz" aria-label="x a la y">xʸ</button>
             <button type="button" class="sci-btn operator" data-tok="sqrt(" data-shift="cbrt(" data-shift-label="cubica" aria-label="Raíz cuadrada">√</button>
-            <button type="button" class="sci-btn operator" data-tok="pi" aria-label="Pi">π</button>
-            <button type="button" class="sci-btn operator" data-tok="e" aria-label="Número e">e</button>
+            <button type="button" class="sci-btn operator" data-tok="pi" data-shift="gcd(" data-shift-label="MCD" aria-label="Pi">π</button>
+            <button type="button" class="sci-btn operator" data-tok="e" data-shift="lcm(" data-shift-label="mcm" aria-label="Número e">e</button>
             <button type="button" class="sci-btn operator" data-tok="sin(" data-shift="asin(" data-shift-label="sin-1" aria-label="Seno">sin</button>
             <button type="button" class="sci-btn operator" data-tok="cos(" data-shift="acos(" data-shift-label="cos-1" aria-label="Coseno">cos</button>
             <button type="button" class="sci-btn operator" data-tok="tan(" data-shift="atan(" data-shift-label="tan-1" aria-label="Tangente">tan</button>
             <button type="button" class="sci-btn operator" data-tok="log10(" data-shift="10^(" data-shift-label="10x" aria-label="Logaritmo base 10">log</button>
             <button type="button" class="sci-btn operator" data-tok="ln(" data-shift="e^(" data-shift-label="ex" aria-label="Logaritmo natural">ln</button>
             <button type="button" class="sci-btn operator" data-tok="(" data-shift="abs(" data-shift-label="Abs" aria-label="Paréntesis abierto">(</button>
-            <button type="button" class="sci-btn operator" data-tok=")" aria-label="Paréntesis cerrado">)</button>
+            <button type="button" class="sci-btn operator" data-tok=")" data-shift="," data-shift-label="," aria-label="Paréntesis cerrado">)</button>
             <button type="button" class="sci-btn operator" data-tok="^(-1)" data-shift="!" data-shift-label="!" aria-label="Uno sobre x">1/x</button>
-            <button type="button" class="sci-btn operator" data-tok="%" aria-label="Porcentaje">%</button>
+            <button type="button" class="sci-btn operator" data-tok="%" data-shift="mod(" data-shift-label="Resto" aria-label="Porcentaje">%</button>
             <button type="button" class="sci-btn operator" id="btnSDKey" aria-label="Alternar fracción y decimal">S⇔D</button>
         </div>
         <div class="calc-num-keys" id="calcNumKeys">
@@ -1829,7 +1829,7 @@
             <button type="button" class="operator" data-tok="-" aria-label="Restar">−</button>
             <button type="button" data-tok="0">0</button>
             <button type="button" data-tok=".">.</button>
-            <button type="button" data-tok="Ans" aria-label="Último resultado">Ans</button>
+            <button type="button" data-tok="Ans" data-shift="rnd(" data-shift-label="Rnd" aria-label="Último resultado">Ans</button>
             <button type="button" data-tok="EXP" aria-label="Multiplicar por diez elevado a">EXP</button>
             <button type="button" data-tok="+/-" aria-label="Cambiar signo">±</button>
         </div>
@@ -5254,6 +5254,11 @@ window.addEventListener('load', function() {
         'ln(': { show: 'ln(', js: 'ln(', kind: 'func' },
         'e^(': { show: 'e^(', js: 'e^(', kind: 'func' },
         'abs(': { show: 'Abs(', js: 'abs(', kind: 'func' },
+     ',': { show: ',', js: ',', kind: 'op' },
+     'gcd(': { show: 'MCD(', js: 'calcgcd(', kind: 'func' },
+     'lcm(': { show: 'mcm(', js: 'calclcm(', kind: 'func' },
+     'mod(': { show: 'Resto(', js: 'calcmod(', kind: 'func' },
+     'rnd(': { show: 'Rnd(', js: 'calcrnd(', kind: 'func' },
         '(': { show: '(', js: '(', kind: 'open' },
         ')': { show: ')', js: ')', kind: 'close' },
         'pi': { show: '\u03C0', js: 'pi', kind: 'const' },
@@ -5690,7 +5695,7 @@ window.addEventListener('load', function() {
     function calcTokenizePaste(text) {
         var out = [];
         var s = String(text || '');
-        var names = ['asin(', 'acos(', 'atan(', 'log10(', 'sin(', 'cos(', 'tan(', 'sqrt(', 'abs(', 'log(', 'ln(', 'Ans', 'pi', 'e'];
+        var names = ['asin(', 'acos(', 'atan(', 'log10(', 'sin(', 'cos(', 'tan(', 'sqrt(', 'abs(', 'gcd(', 'mcd(', 'lcm(', 'mcm(', 'mod(', 'resto(', 'rnd(', 'round(', 'log(', 'ln(', 'Ans', 'pi', 'e'];
         function isWordChar(c) {
             return !!c && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_');
         }
@@ -5709,6 +5714,8 @@ window.addEventListener('load', function() {
             if (matched) {
                 var key = matched;
                 if (key.toLowerCase() === 'log(') key = 'log10(';
+var alias = { 'mcd(': 'gcd(', 'mcm(': 'lcm(', 'resto(': 'mod(', 'round(': 'rnd(' };
+if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
                 if (key.toLowerCase() === 'ans') key = 'Ans';
                 if (key.toLowerCase() === 'pi') key = 'pi';
                 if (key.toLowerCase() === 'e') key = 'e';
@@ -5726,7 +5733,7 @@ window.addEventListener('load', function() {
                 continue;
             }
             if (ch >= '0' && ch <= '9') { out.push(tokenFromKey(ch)); i++; continue; }
-            if (ch === '.' || ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '^' || ch === '(' || ch === ')' || ch === '!' || ch === '%') {
+            if (ch === '.' || ch === '+' || ch === '-' || ch === '*' || ch === '/' || ch === '^' || ch === '(' || ch === ')' || ch === '!' || ch === '%' || ch === ',') {
                 if (ch === '^' && s[i + 1] === '(') { out.push(tokenFromKey('^(')); i += 2; continue; }
                 var tk2 = tokenFromKey(ch);
                 if (tk2) out.push(tk2);
@@ -5927,7 +5934,38 @@ window.addEventListener('load', function() {
                 if (!isCalcInt(n) || !isCalcInt(r) || n < 0 || r < 0 || r > n) throw new CalcMathError('nPr');
                 return Math.round(calcFact(n) / calcFact(n - r));
             },
-            factorial: function(n) {
+            calcgcd: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('gcd');
+         a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+         while (b) { var t = b; b = a % b; a = t; }
+         return a;
+     },
+     calclcm: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('lcm');
+         a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+         if (a === 0 || b === 0) return 0;
+         var x = a, y = b;
+         while (y) { var t2 = y; y = x % y; x = t2; }
+         var r = (a / x) * b;
+         if (!isFinite(r) || r > 9007199254740991) throw new CalcMathError('lcm');
+         return r;
+     },
+     calcmod: function(a, b) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (!isCalcInt(a) || !isCalcInt(b)) throw new CalcMathError('mod');
+         a = Math.round(a); b = Math.abs(Math.round(b));
+         if (b === 0) throw new CalcMathError('mod');
+         return ((a % b) + b) % b;
+     },
+     calcrnd: function(x, n) {
+         if (arguments.length !== 2) throw new CalcSyntaxError('args');
+         if (typeof x !== 'number' || !isFinite(x) || !isCalcInt(n) || n < 0 || n > 15) throw new CalcMathError('rnd');
+         var f = Math.pow(10, Math.round(n));
+         return (x < 0 ? -1 : 1) * Math.round(Math.abs(x) * f) / f;
+     },
+     factorial: function(n) {
                 if (!isCalcInt(n) || n < 0 || n > 170) throw new CalcMathError('fact');
                 return calcFact(n);
             }
@@ -6483,7 +6521,7 @@ window.addEventListener('load', function() {
                 }
                 if (!e.ctrlKey && !e.metaKey && !e.altKey) {
                     if (ckey && ckey.length === 1 && ckey >= '0' && ckey <= '9') { e.preventDefault(); calcInsertKeyAsToken(ckey); return; }
-                    if (ckey === '.' || ckey === '+' || ckey === '-' || ckey === '*' || ckey === '/' || ckey === '(' || ckey === ')' || ckey === '^' || ckey === '!' || ckey === '%') {
+                    if (ckey === '.' || ckey === '+' || ckey === '-' || ckey === '*' || ckey === '/' || ckey === '(' || ckey === ')' || ckey === '^' || ckey === '!' || ckey === '%' || ckey === ',') {
                         e.preventDefault();
                         if (ckey === '^') calcPushToken(tokenFromKey('^('));
                         else calcInsertKeyAsToken(ckey);

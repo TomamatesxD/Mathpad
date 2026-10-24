@@ -4,7 +4,7 @@
 
 
 // Versión de caché v42: Fix fuentes Linux y eje Y matemático
-const CACHE_NAME = 'mathpad-v50'; // Versión de caché v50: Fix limpieza menor
+const CACHE_NAME = 'mathpad-v51'; // Versión de caché v51: MCD, mcm, Resto y Rnd
 const urlsToCache = [
   './',
   './index.html',
