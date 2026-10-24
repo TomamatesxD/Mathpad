@@ -2980,6 +2980,17 @@ window.addEventListener('load', function() {
         ctx.strokeStyle = lineCol;
         ctx.strokeRect(0, 0, RULER_SIZE, RULER_SIZE);
 
+// 5. "0" del origen (0,0) — dibujado EXACTAMENTE UNA VEZ.
+        var originInCornerX = (panX >= 0 && panX < RULER_SIZE);
+        var originInCornerY = (panY >= 0 && panY < RULER_SIZE);
+        if (originInCornerX && originInCornerY) {
+            ctx.fillStyle = fg;
+            ctx.font = fontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('0', RULER_SIZE / 2, RULER_SIZE / 2);
+        }
+
         ctx.restore();
     });
 
@@ -3426,6 +3437,27 @@ window.addEventListener('load', function() {
     document.getElementById('btnToggleAxes').onclick = function() {
         showAxes = !showAxes;
         this.classList.toggle('active', showAxes);
+
+        // Al abrir las reglas por primera vez (lienzo vacío y vista por
+        // defecto), centramos el origen (0,0) para que el "0" de cada
+        // regla quede en el centro de la pantalla, como en las pizarras
+        // matemáticas. No lo hacemos si ya hay trazos, para no desplazar
+        // el trabajo del usuario; ni si la vista ya fue paneada/zoomeada.
+        if (showAxes) {
+            var vpt = canvas.viewportTransform;
+            var onlyBackgrounds = canvas.getObjects().every(function (o) {
+                return o.isBackground || o.isEraserMask === true;
+            });
+            if (onlyBackgrounds && vpt[4] === 0 && vpt[5] === 0) {
+                canvas.setViewportTransform([
+                    vpt[0], 0, 0, vpt[3],
+                    canvas.getWidth() / 2,
+                    canvas.getHeight() / 2
+                ]);
+                syncBackground();
+            }
+        }
+
         canvas.requestRenderAll();
     };
 
