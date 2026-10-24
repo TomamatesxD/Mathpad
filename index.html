@@ -1491,12 +1491,23 @@
         .plot-btn-primary { flex: 1; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 10px 12px; font-weight: 700; cursor: pointer; font-size: 13px; min-height: 36px; }
         .plot-btn-danger { background: transparent; color: #cf6679; border: 1px solid #cf6679; border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
         .plot-btn-ghost { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; cursor: pointer; font-size: 13px; min-height: 36px; }
+        .plot-btn-icon .btn-icon, .plot-btn-primary .label-short { display: none; }
+        .plot-btn-primary .label-full, .plot-btn-icon .label-full { display: inline; }
         .plot-error { color: #f87171; font-size: 12px; margin: 8px 12px; display: none; }
         @media (max-width: 699px) {
           .plot-body { flex-direction: column; }
           .plot-canvas-col { flex: 0 0 auto; height: 40dvh; min-height: 220px; padding: 8px; }
           .plot-side { flex: 1 1 auto; padding: 8px; }
           .plot-dialog { width: calc(100vw - 12px); }
+        }
+        @media (max-width: 699px) and (orientation: portrait) {
+          .plot-actions { flex-wrap: nowrap; gap: 6px; padding: 8px 10px; align-items: stretch; }
+          .plot-btn-primary { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: 13px; min-height: 40px; }
+          .plot-btn-icon { flex: 0 0 40px; width: 40px; height: 40px; padding: 0; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; }
+          .plot-btn-primary .label-full { display: none; }
+          .plot-btn-primary .label-short { display: inline; }
+          .plot-btn-icon .label-full { display: none; }
+          .plot-btn-icon .btn-icon { display: inline; }
         }
         @media (max-height: 500px) {
           .plot-dialog { max-height: 100dvh; margin: 0; border-radius: 10px; }
@@ -1946,11 +1957,11 @@
           </div>
         </div>
         <div class="plot-actions" role="group" aria-label="Acciones del graficador">
-          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico">+ Agregar</button>
-          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo">Insertar en el lienzo</button>
-          <button type="button" id="plotBtnReset" class="plot-btn-ghost" aria-label="Restablecer vista del gráfico">Reset vista</button>
-          <button type="button" id="plotBtnClear" class="plot-btn-danger" aria-label="Limpiar todas las funciones graficadas">Limpiar</button>
-          <button type="button" id="plotBtnClose" class="plot-btn-ghost" aria-label="Cerrar el graficador">Cerrar</button>
+          <button type="button" id="plotBtnAdd" class="plot-btn-primary" aria-label="Agregar función al gráfico"><span class="label-full">+ Agregar</span><span class="label-short">Agregar</span></button>
+          <button type="button" id="plotBtnInsert" class="plot-btn-primary" aria-label="Insertar gráfico en el lienzo"><span class="label-full">Insertar en el lienzo</span><span class="label-short">Insertar</span></button>
+          <button type="button" id="plotBtnReset" class="plot-btn-ghost plot-btn-icon" aria-label="Restablecer vista del gráfico" title="Restablecer vista del gráfico"><span class="label-full">Reset vista</span><span class="btn-icon" aria-hidden="true">↺</span></button>
+          <button type="button" id="plotBtnClear" class="plot-btn-danger plot-btn-icon" aria-label="Limpiar todas las funciones graficadas" title="Limpiar todas las funciones graficadas"><span class="label-full">Limpiar</span><span class="btn-icon" aria-hidden="true">🗑</span></button>
+          <button type="button" id="plotBtnClose" class="plot-btn-ghost plot-btn-icon" aria-label="Cerrar el graficador" title="Cerrar el graficador"><span class="label-full">Cerrar</span><span class="btn-icon" aria-hidden="true">✕</span></button>
         </div>
         <p id="plotError" class="plot-error"></p>
       </div>
