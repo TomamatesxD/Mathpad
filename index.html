@@ -390,7 +390,6 @@
             transition: width 0.25s ease, opacity 0.25s ease;
             max-width: 95vw;
             max-height: 90vh;
-            overflow-y: auto;
         }
 
         .calculator-panel.hidden {
@@ -1754,6 +1753,21 @@
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="12" y1="18" x2="12" y2="12"/>
                 <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+        </button>
+        <button type="button" id="btnDupPage" title="Duplicar página" aria-label="Duplicar página">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+        </button>
+        <button type="button" id="btnDeletePage" title="Eliminar página" aria-label="Eliminar página">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                <path d="M10 11v6"></path>
+                <path d="M14 11v6"></path>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
             </svg>
         </button>
     </nav>
@@ -3130,6 +3144,34 @@ window.addEventListener('load', function() {
         });
     }
 
+    document.getElementById('btnDupPage').onclick = () => {
+        saveCurrentPage();
+        var srcJson = pages[currentPage];
+        var srcPlots = [];
+        try { srcPlots = JSON.parse(JSON.stringify(pagePlots[currentPage] || [])); } catch (e) { srcPlots = []; }
+        var srcView = null;
+        try { srcView = JSON.parse(JSON.stringify(pagePlotViews[currentPage] || { xMin: -5, xMax: 5, yMin: -5, yMax: 5 })); } catch (e) { srcView = { xMin: -5, xMax: 5, yMin: -5, yMax: 5 }; }
+        pages.splice(currentPage + 1, 0, srcJson);
+        pagePlots.splice(currentPage + 1, 0, srcPlots);
+        pagePlotViews.splice(currentPage + 1, 0, srcView);
+        loadPageAt(currentPage + 1, false);
+        if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+    };
+
+    document.getElementById('btnDeletePage').onclick = () => {
+        if (pages.length <= 1) {
+            if (typeof showToast === 'function') showToast('No se puede eliminar la única página', 'warn');
+            return;
+        }
+        saveCurrentPage();
+        pages.splice(currentPage, 1);
+        pagePlots.splice(currentPage, 1);
+        pagePlotViews.splice(currentPage, 1);
+        var newIndex = Math.min(currentPage, pages.length - 1);
+        loadPageAt(newIndex, false);
+        if (typeof scheduleAutoSave === 'function') scheduleAutoSave();
+    };
+
     document.getElementById('btnAddPage').onclick = () => {
         saveCurrentPage();
         canvas.clear();
@@ -3147,19 +3189,27 @@ window.addEventListener('load', function() {
         historyStack = []; redoStack = []; historyChars = 0; saveHistory();
     };
 
+    function loadPageAt(index, saveCurrent = true, onDone = null) {
+        if (index < 0 || index >= pages.length) return;
+        if (saveCurrent && index !== currentPage) saveCurrentPage();
+        currentPage = index;
+        restorePlots(pagePlots[currentPage] || []);
+        applyPlotView(pagePlotViews[currentPage] || { xMin: -5, xMax: 5, yMin: -5, yMax: 5 });
+        updatePlotFunctionsList();
+        loadState(pages[currentPage], function() {
+            canvas.renderAll();
+            requestDrawPlot();
+            renderPageInfo();
+            historyStack = [pages[currentPage]];
+            redoStack = [];
+            historyChars = pages[currentPage] ? pages[currentPage].length : 0;
+            if (typeof onDone === 'function') onDone();
+        });
+    }
+
     function goToPage(newIndex) {
         if (newIndex < 0 || newIndex >= pages.length || newIndex === currentPage) return;
-        saveCurrentPage();
-        currentPage = newIndex;
-        loadState(pages[currentPage]);
-        restorePlots(pagePlots[currentPage] || []);
-        applyPlotView(pagePlotViews[currentPage]);
-        updatePlotFunctionsList();
-        requestDrawPlot();
-        renderPageInfo();
-        historyStack = [pages[currentPage]];
-        redoStack = [];
-        historyChars = pages[currentPage] ? pages[currentPage].length : 0;
+        loadPageAt(newIndex, true);
     }
 
     document.getElementById('btnPrevPage').onclick = () => { if (currentPage > 0) goToPage(currentPage - 1); };
@@ -3534,14 +3584,19 @@ window.addEventListener('load', function() {
         var vpt = canvas.viewportTransform.slice(0); canvas.setViewportTransform([1,0,0,1,0,0]);
         var exportBg = getExportBgColor();
         canvas.setBackgroundColor(exportBg, function() {
-            var bounds = getCanvasBounds(canvas);
-            var link = document.createElement('a'); link.download = 'pizarra.png';
-            link.href = canvas.toDataURL({
-                format: 'png', quality: 1,
-                left: bounds.left, top: bounds.top,
-                width: bounds.width, height: bounds.height
-            }); link.click();
-            canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); canvas.setViewportTransform(vpt);
+            try {
+                var bounds = getCanvasBounds(canvas);
+                var link = document.createElement('a'); link.download = 'pizarra.png';
+                link.href = canvas.toDataURL({
+                    format: 'png', quality: 1,
+                    left: bounds.left, top: bounds.top,
+                    width: bounds.width, height: bounds.height
+                }); link.click();
+            } catch (e) {
+                console.error('Error al exportar PNG:', e);
+            } finally {
+                canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); canvas.setViewportTransform(vpt);
+            }
         });
     };
 
@@ -3885,14 +3940,31 @@ window.addEventListener('load', function() {
       }
       return { up: up, down: down };
     }
-    function buildValueTable(fn, a, b, rows) {
-      var result = [];
-      for (var i = 0; i < rows; i++) {
-        var x = a + (b - a) * (i / (rows - 1));
-        var y = fn(x);
-        result.push({ x: x, y: isFinite(y) ? y : null });
+    function niceStep(a, b, maxIntervals) {
+      var span = b - a; if (!(span > 0)) return 1;
+      var mags = [1, 2, 5], e = Math.floor(Math.log10(span / maxIntervals)) - 1, step = 1;
+      for (var k = 0; k < 40; k++) {
+        step = mags[k % 3] * Math.pow(10, e + Math.floor(k / 3));
+        if (span / step <= maxIntervals) break;
       }
-      return result;
+      return step;
+    }
+    function tableDecimals(step) { var s = String(step), i = s.indexOf('.'); return i < 0 ? 0 : s.length - i - 1; }
+    function fmtTable(v, d) {
+      if (v === null || !isFinite(v)) return '—';
+      var r = v.toFixed(d); if (/^-0(\.0+)?$/.test(r)) r = r.slice(1);
+      return r.indexOf('.') >= 0 ? r.replace(/0+$/, '').replace(/\.$/, '') : r;
+    }
+
+    function buildValueTable(fn, a, b, rows) {
+      var step = niceStep(a, b, (rows || 7) - 1), out = [];
+      var first = Math.ceil(a / step - 1e-9), last = Math.floor(b / step + 1e-9);
+      for (var i = first; i <= last; i++) {
+        var x = Math.round(i * step * 1e9) / 1e9;
+        var y = fn(x);
+        out.push({ x: x, y: isFinite(y) ? y : null });
+      }
+      return out;
     }
     function findIntersections(f1, f2, a, b, samples) {
       var diff = function(x) {
@@ -3927,7 +3999,8 @@ window.addEventListener('load', function() {
         monotony: computeMonotony(fn, a, b, samples, h, yMaxAbs),
         concavity: computeConcavity(fn, a, b, samples, h, yMaxAbs),
         inflections: findInflections(fn, a, b, samples, h, yMaxAbs),
-        table: buildValueTable(fn, a, b, 10)
+        table: buildValueTable(fn, a, b, 7),
+        tableStep: niceStep(a, b, 6)
       };
     }
     function makeAnalysisRow(label, value) {
@@ -3985,10 +4058,25 @@ window.addEventListener('load', function() {
       trh.appendChild(th1); trh.appendChild(th2);
       thead.appendChild(trh); table.appendChild(thead);
       var tbody = document.createElement('tbody');
+      var stepX = data.tableStep || 1;
+      var dx = tableDecimals(stepX);
+      var nonNullYs = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
+      var roundedYs = nonNullYs.map(function(v) { return Math.round(v * 10) / 10; });
+      var allRoundedEqual = nonNullYs.length > 0 && roundedYs.every(function(v) { return v === roundedYs[0]; });
+      var realDistinct = nonNullYs.some(function(v) { return v !== nonNullYs[0]; });
+      var useFormatY = allRoundedEqual && realDistinct;
       data.table.forEach(function(row) {
         var tr = document.createElement('tr');
-        var td1 = document.createElement('td'); td1.textContent = formatNum(row.x);
-        var td2 = document.createElement('td'); td2.textContent = row.y !== null ? formatNum(row.y) : '—';
+        var td1 = document.createElement('td');
+        td1.textContent = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx);
+        var td2 = document.createElement('td');
+        if (row.y === null) {
+          td2.textContent = '—';
+        } else if (Math.abs(row.y) >= 1e5 || useFormatY) {
+          td2.textContent = formatNum(row.y);
+        } else {
+          td2.textContent = fmtTable(row.y, 1);
+        }
         tr.appendChild(td1); tr.appendChild(td2);
         tbody.appendChild(tr);
       });
@@ -4032,9 +4120,20 @@ window.addEventListener('load', function() {
       lines.push('');
       lines.push('Tabla de valores:');
       lines.push('  ' + 'x'.padStart(10) + ' | ' + 'f(x)'.padStart(10));
+      var stepX2 = data.tableStep || 1;
+      var dx2 = tableDecimals(stepX2);
+      var nonNullYs2 = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
+      var roundedYs2 = nonNullYs2.map(function(v) { return Math.round(v * 10) / 10; });
+      var allRoundedEqual2 = nonNullYs2.length > 0 && roundedYs2.every(function(v) { return v === roundedYs2[0]; });
+      var realDistinct2 = nonNullYs2.some(function(v) { return v !== nonNullYs2[0]; });
+      var useFormatY2 = allRoundedEqual2 && realDistinct2;
       data.table.forEach(function(row) {
-        var xStr = formatNum(row.x);
-        var yStr = row.y !== null ? formatNum(row.y) : '—';
+        var xStr = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx2);
+        var yStr = '—';
+        if (row.y !== null) {
+          if (Math.abs(row.y) >= 1e5 || useFormatY2) yStr = formatNum(row.y);
+          else yStr = fmtTable(row.y, 1);
+        }
         lines.push('  ' + xStr.padStart(10) + ' | ' + yStr.padStart(10));
       });
       if (intersections && intersections.length) {
@@ -4145,6 +4244,7 @@ window.addEventListener('load', function() {
         if (slider && tangentState.fObj) {
           slider.min = String(tangentState.fObj.xMin);
           slider.max = String(tangentState.fObj.xMax);
+          slider.step = String(Math.max((tangentState.fObj.xMax - tangentState.fObj.xMin) / 100, 1e-6));
           var cur = parseFloat(slider.value);
           if (!isFinite(cur) || cur < tangentState.fObj.xMin || cur > tangentState.fObj.xMax) {
             slider.value = String((tangentState.fObj.xMin + tangentState.fObj.xMax) / 2);
@@ -4774,7 +4874,7 @@ window.addEventListener('load', function() {
       var dataURL = plotCanvasEl.toDataURL('image/png');
       fabric.Image.fromURL(dataURL, function(img) {
         var vpt = canvas.viewportTransform;
-        var maxW = 600;
+        var maxW = 600 / (canvas.getZoom() || 1);
         if (img.width > maxW) img.scaleToWidth(maxW);
         img.set({
           left: (canvas.getWidth() / 2 - vpt[4]) / vpt[0] - img.getScaledWidth() / 2,
@@ -6497,9 +6597,10 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
     }
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+        var inCalc = false;
         if (calcVisible) {
             var calcPanelEl = document.getElementById('calcPanel');
-            var inCalc = calcPanelEl && e.target && calcPanelEl.contains(e.target);
+            inCalc = calcPanelEl && e.target && calcPanelEl.contains(e.target);
             if (inCalc) {
                 var ckey = e.key;
                 if ((e.ctrlKey || e.metaKey) && (ckey === 'c' || ckey === 'C')) {
@@ -6548,6 +6649,8 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
                 }
             }
         }
+
+        if (calcVisible && inCalc && !e.ctrlKey && !e.metaKey && !e.altKey) return;
 
         if (e.key === 'Escape') {
             closeContextMenu();
