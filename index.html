@@ -1525,7 +1525,6 @@
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
     <script src="./jspdf.umd.min.js"></script>
-    <script src="./tex-svg.js"></script>
     <script src="./dexie.min.js"></script>
     <!-- iOS/iPadOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4898,6 +4897,7 @@ window.addEventListener('load', function() {
     var latexInputEl   = document.getElementById('latexInput');
     var latexPreviewEl = document.getElementById('latexPreview');
     var latexErrorEl   = document.getElementById('latexError');
+    var mathJaxPromise = null;
     var LATEX_EXAMPLES = [
       '\\frac{a}{b}', 'x^2 + y^2 = r^2', '\\sqrt{x}',
       '\\int_{a}^{b} f(x)\\,dx', '\\sum_{i=1}^{n} i', 'e^{i\\pi} + 1 = 0'
@@ -4911,8 +4911,59 @@ window.addEventListener('load', function() {
       latexErrorEl.textContent = 'Sintaxis LaTeX inválida: revisa llaves { }, ^, _ y los comandos con \\.';
     }
 
+    function loadMathJax() {
+      if (window.MathJax && typeof MathJax.tex2svg === 'function') {
+        return Promise.resolve();
+      }
+      if (mathJaxPromise) return mathJaxPromise;
+      mathJaxPromise = new Promise(function(resolve, reject) {
+        var script = document.createElement('script');
+        script.src = './tex-svg.js';
+        script.async = true;
+        var settled = false;
+        var timeoutId = setTimeout(function() {
+          if (settled) return;
+          settled = true;
+          if (script.parentNode) script.parentNode.removeChild(script);
+          mathJaxPromise = null;
+          reject(new Error('mathjax-timeout'));
+        }, 15000);
+        function finishOk() {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          resolve();
+        }
+        function finishErr(err) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          if (script.parentNode) script.parentNode.removeChild(script);
+          mathJaxPromise = null;
+          reject(err || new Error('mathjax-load-error'));
+        }
+        script.onload = function() {
+          var mj = window.MathJax;
+          if (mj && mj.startup && typeof mj.startup.promise === 'object' && mj.startup.promise && typeof mj.startup.promise.then === 'function') {
+            mj.startup.promise.then(function() {
+              if (window.MathJax && typeof MathJax.tex2svg === 'function') finishOk();
+              else finishErr(new Error('mathjax-no-listo'));
+            }).catch(function(e) { finishErr(e); });
+          } else if (window.MathJax && typeof MathJax.tex2svg === 'function') {
+            finishOk();
+          } else {
+            finishErr(new Error('mathjax-no-listo'));
+          }
+        };
+        script.onerror = function() { finishErr(new Error('mathjax-load-error')); };
+        document.head.appendChild(script);
+      });
+      return mathJaxPromise;
+    }
+
     // Renderiza y valida (lanza error si MathJax detecta merror/sintaxis inválida)
     function latexRenderInto(container, tex) {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') throw new Error('mathjax-no-listo');
       var holder = MathJax.tex2svg(tex);
       if (!holder || !holder.querySelector || !holder.querySelector('svg')) throw new Error('sin-svg');
       if (holder.querySelector('[data-mjx-error], .merror')) throw new Error('sintaxis');
@@ -4921,6 +4972,10 @@ window.addEventListener('load', function() {
     }
 
     function latexUpdatePreview() {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') {
+        latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
+        return;
+      }
       var tex = latexInputEl.value.trim();
       latexErrorEl.textContent = '';
       latexPreviewEl.style.color = latexActiveColor(); // WYSIWYG: color activo real
@@ -4937,10 +4992,34 @@ window.addEventListener('load', function() {
 
     function openLatexModal() {
       latexInputEl.value = '';
-      latexUpdatePreview();
+      latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
       latexModalEl.classList.add('open');
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
       latexInputEl.focus();
+      loadMathJax().then(function() { latexUpdatePreview(); }).catch(function() {
+        latexPreviewEl.innerHTML = '';
+        var msg = document.createElement('div');
+        msg.textContent = 'No se pudo cargar el motor LaTeX';
+        latexPreviewEl.appendChild(msg);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Reintentar';
+        btn.onclick = function() {
+          latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
+          loadMathJax().then(function() { latexUpdatePreview(); }).catch(function() {
+            latexPreviewEl.innerHTML = '';
+            var m = document.createElement('div');
+            m.textContent = 'No se pudo cargar el motor LaTeX';
+            latexPreviewEl.appendChild(m);
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = 'Reintentar';
+            b.onclick = btn.onclick;
+            latexPreviewEl.appendChild(b);
+          });
+        };
+        latexPreviewEl.appendChild(btn);
+      });
     }
     function closeLatexModal() {
       latexModalEl.classList.remove('open');
@@ -4981,6 +5060,10 @@ window.addEventListener('load', function() {
     })();
 
     document.getElementById('latexInsertBtn').onclick = function() {
+      if (!window.MathJax || typeof MathJax.tex2svg !== 'function') {
+        showToast('Espera: el motor LaTeX está cargando','warn');
+        return;
+      }
       var ecuacion = latexInputEl.value.trim();
       if (!ecuacion) return;
       try {
