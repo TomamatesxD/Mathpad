@@ -1,0 +1,91 @@
+# Genera un APK de Android (Capacitor) con los archivos de la PWA.
+# Uso: pestaña Actions -> "Build APK" -> Run workflow. El APK queda en "Artifacts".
+# Si se empuja una etiqueta (por ejemplo v1.0.0) también se adjunta a un Release.
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Preparar archivos web (www)
+        run: |
+          mkdir www
+          cp index.html manifest.json favicon.svg www/
+          cp ./*.js ./*.png www/
+
+      - name: Crear proyecto Android con Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
+          printf '%s\n' '{' '  "appId": "io.github.tomamatesxd.mathpad",' '  "appName": "MathPad",' '  "webDir": "www"' '}' > capacitor.config.json
+          npx cap add android
+          npx cap sync android
+
+      - name: Íconos y versión
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          res = 'android/app/src/main/res/'
+          fg = Image.open('icono-512-maskable.png').convert('RGBA')
+          ic = Image.open('icono-512.png').convert('RGBA')
+          legacy = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+          adaptive = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+          for d in legacy:
+              ic.resize((legacy[d], legacy[d]), Image.LANCZOS).save(res + 'mipmap-' + d + '/ic_launcher.png')
+              ic.resize((legacy[d], legacy[d]), Image.LANCZOS).save(res + 'mipmap-' + d + '/ic_launcher_round.png')
+              fg.resize((adaptive[d], adaptive[d]), Image.LANCZOS).save(res + 'mipmap-' + d + '/ic_launcher_foreground.png')
+          PY
+          sed -i 's/#FFFFFF/#121212/' android/app/src/main/res/values/ic_launcher_background.xml
+          sed -i 's/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName "1.0"/versionName "1.0.${{ github.run_number }}"/' android/app/build.gradle
+
+      - name: Firma estable (opcional)
+        env:
+          KEYSTORE_B64: ${{ secrets.MATHPAD_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            mkdir -p ~/.android
+            echo "$KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+            echo "Usando la firma guardada en el secreto MATHPAD_KEYSTORE_B64"
+          else
+            echo "Sin secreto de firma: el APK usa una firma nueva en cada ejecución"
+          fi
+
+      - name: Compilar APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Renombrar APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk MathPad.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MathPad-apk
+          path: MathPad.apk
+          retention-days: 30
+
+      - name: Adjuntar al Release (solo con etiqueta)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" MathPad.apk --title "MathPad $GITHUB_REF_NAME" --generate-notes
