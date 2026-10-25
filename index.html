@@ -270,20 +270,18 @@
         .bottom-bar {
             position: fixed;
             right: 12px;
-            bottom: 12px;
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
             left: auto;
             transform: none;
-            height: 36px;
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            height: 40px;
+            max-width: calc(100vw - 24px);
+            background: rgba(30, 30, 30, 0.95);
             border: 1px solid var(--border-color);
             border-radius: 18px;
             display: flex;
             align-items: center;
-            padding: 0 8px;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            gap: 4px;
+            padding: 0 6px;
+            gap: 2px;
             z-index: 100;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
             transition: right 0.25s ease, opacity 0.2s ease;
@@ -308,7 +306,7 @@
             background: transparent;
             color: var(--text-main);
             border: 1px solid transparent;
-            padding: 6px 12px;
+            padding: 0;
             border-radius: 16px;
             cursor: pointer;
             font-size: 16px;
@@ -316,8 +314,9 @@
             align-items: center;
             justify-content: center;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
-            min-width: 36px;
-            height: 32px;
+            min-width: 34px;
+            width: 34px;
+            height: 34px;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
@@ -334,10 +333,19 @@
             color: var(--text-main);
             font-size: 13px;
             font-weight: 600;
-            padding: 0 8px;
-            min-width: 50px;
+            padding: 0 6px;
+            min-width: 46px;
             text-align: center;
+            white-space: nowrap;
         }
+        /* separador entre navegación (‹ 1/1 ›) y acciones (nueva, duplicar, eliminar) */
+        #btnAddPage { margin-left: 6px; position: relative; }
+        #btnAddPage::before {
+            content: ''; position: absolute; left: -5px; top: 8px; bottom: 8px;
+            width: 1px; background: var(--border-color);
+        }
+        .bottom-bar button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        #btnDeletePage:hover { color: var(--danger); }
 
         /* ═══════════════════════════════════════════════════════════════
            MAIN CONTENT - Área del canvas (Docked)
@@ -3029,7 +3037,7 @@ window.addEventListener('load', function() {
 
     function saveHistory() {
         if (isHistoryAction) return;
-        var snap = JSON.stringify(canvas.toJSON(['isEraserMask']));
+        var snap = JSON.stringify(canvas.toJSON(['isEraserMask', 'latexSource']));
         // Anti-duplicados: un estado idéntico al último no ocupa un índice
         // nuevo (evita que un doble guardado haga que un undo "no haga nada")
         if (historyStack.length && historyStack[historyStack.length - 1] === snap) return;
@@ -3074,7 +3082,7 @@ window.addEventListener('load', function() {
    PAGINACIÓN
 ═══════════════════════════════════════════════════════════════ */
     function saveCurrentPage() {
-  pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask']));
+  pages[currentPage] = JSON.stringify(canvas.toJSON(['isEraserMask', 'latexSource']));
   pagePlots[currentPage] = serializePlots();
   capturePlotView();
 }
@@ -3188,7 +3196,7 @@ window.addEventListener('load', function() {
         saveCurrentPage();
         canvas.clear();
         canvas.setBackgroundColor('', canvas.renderAll.bind(canvas));
-        pages.push(JSON.stringify(canvas.toJSON(['isEraserMask'])));
+        pages.push(JSON.stringify(canvas.toJSON(['isEraserMask', 'latexSource'])));
         pagePlots.push([]);
         pagePlotViews.push({ xMin: -5, xMax: 5, yMin: -5, yMax: 5 });
         currentPage = pages.length - 1;
@@ -3980,7 +3988,7 @@ window.addEventListener('load', function() {
       }
       return { up: up, down: down };
     }
-    function niceStep(a, b, maxIntervals) {
+    function tableNiceStep(a, b, maxIntervals) {
       var span = b - a; if (!(span > 0)) return 1;
       var mags = [1, 2, 5], e = Math.floor(Math.log10(span / maxIntervals)) - 1, step = 1;
       for (var k = 0; k < 40; k++) {
@@ -3997,7 +4005,7 @@ window.addEventListener('load', function() {
     }
 
     function buildValueTable(fn, a, b, rows) {
-      var step = niceStep(a, b, (rows || 7) - 1), out = [];
+      var step = tableNiceStep(a, b, (rows || 7) - 1), out = [];
       var first = Math.ceil(a / step - 1e-9), last = Math.floor(b / step + 1e-9);
       for (var i = first; i <= last; i++) {
         var x = Math.round(i * step * 1e9) / 1e9;
@@ -4040,7 +4048,7 @@ window.addEventListener('load', function() {
         concavity: computeConcavity(fn, a, b, samples, h, yMaxAbs),
         inflections: findInflections(fn, a, b, samples, h, yMaxAbs),
         table: buildValueTable(fn, a, b, 7),
-        tableStep: niceStep(a, b, 6)
+        tableStep: tableNiceStep(a, b, 6)
       };
     }
     function makeAnalysisRow(label, value) {
@@ -5109,6 +5117,19 @@ window.addEventListener('load', function() {
       '\\int_{a}^{b} f(x)\\,dx', '\\sum_{i=1}^{n} i', 'e^{i\\pi} + 1 = 0'
     ];
 
+    // Quita delimitadores matemáticos que pegan las IA: $..$, $$..$$, \(..\), \[..\], equation
+    function stripLatexDelimiters(str) {
+      var t = String(str || '').trim();
+      for (var i = 0; i < 3; i++) {
+        var m = t.match(/^\$\$([\s\S]*?)\$\$$/) || t.match(/^\$([\s\S]*?)\$$/) ||
+                t.match(/^\\\[([\s\S]*?)\\\]$/) || t.match(/^\\\(([\s\S]*?)\\\)$/) ||
+                t.match(/^\\begin\{(?:equation|displaymath|math)\*?\}([\s\S]*?)\\end\{(?:equation|displaymath|math)\*?\}$/);
+        if (!m) break;
+        t = m[1].trim();
+      }
+      return t.replace(/^\$+|\$+$/g, '').trim();
+    }
+    var latexEditTarget = null; // objeto fórmula que se está editando (null = insertar nueva)
     function latexActiveColor() {
       var cp = document.getElementById('colorPicker');
       return (cp && cp.value) ? cp.value : '#000000';
@@ -5182,7 +5203,7 @@ window.addEventListener('load', function() {
         latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
         return;
       }
-      var tex = latexInputEl.value.trim();
+      var tex = stripLatexDelimiters(latexInputEl.value);
       latexErrorEl.textContent = '';
       latexPreviewEl.style.color = latexActiveColor(); // WYSIWYG: color activo real
       if (!tex) {
@@ -5196,8 +5217,10 @@ window.addEventListener('load', function() {
       }
     }
 
-    function openLatexModal() {
-      latexInputEl.value = '';
+    function openLatexModal(editObj) {
+      latexEditTarget = (editObj && editObj.latexSource) ? editObj : null;
+      latexInputEl.value = latexEditTarget ? latexEditTarget.latexSource : '';
+      document.getElementById('latexInsertBtn').textContent = latexEditTarget ? 'Actualizar fórmula' : 'Insertar fórmula';
       latexPreviewEl.innerHTML = 'Cargando motor LaTeX…';
       latexModalEl.classList.add('open');
       lastModalTrigger = (document.activeElement && document.activeElement !== document.body && !document.activeElement.classList.contains('hidden-helper')) ? document.activeElement : document.getElementById('menuBtnPlot');
@@ -5220,12 +5243,13 @@ window.addEventListener('load', function() {
       loadMathJax().then(function() { latexUpdatePreview(); }).catch(showLatexLoadError);
     }
     function closeLatexModal() {
+      latexEditTarget = null;
       latexModalEl.classList.remove('open');
       setTool('select');
       if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
     }
 
-    document.getElementById('btnLatex').onclick = openLatexModal;
+    document.getElementById('btnLatex').onclick = function() { openLatexModal(); };
     document.getElementById('latexCancelBtn').onclick = closeLatexModal;
     latexModalEl.addEventListener('click', function(e) {
       if (e.target === latexModalEl) closeLatexModal(); // clic fuera cierra
@@ -5262,56 +5286,79 @@ window.addEventListener('load', function() {
         showToast('Espera: el motor LaTeX está cargando','warn');
         return;
       }
-      var ecuacion = latexInputEl.value.trim();
+      var ecuacion = stripLatexDelimiters(latexInputEl.value);
       if (!ecuacion) return;
+      var editing = latexEditTarget;
       try {
         latexRenderInto(latexPreviewEl, ecuacion); // validación previa
 
         var svgElement = MathJax.tex2svg(ecuacion).querySelector('svg');
+        var vbParts = (svgElement.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
+        var vbH = (vbParts.length === 4 && isFinite(vbParts[3])) ? vbParts[3] : 0;
+        var oldEmCanvas = 0; // tamaño (unidades de lienzo por em) de la fórmula que se reemplaza
+        if (editing && editing.latexSource) {
+          try {
+            var oldSvg = MathJax.tex2svg(editing.latexSource).querySelector('svg');
+            var op = (oldSvg.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number);
+            if (op.length === 4 && op[3] > 0) oldEmCanvas = editing.getScaledHeight() / (op[3] / 1000);
+          } catch (e0) { oldEmCanvas = 0; }
+        }
         fabric.loadSVGFromString(new XMLSerializer().serializeToString(svgElement), function(objects, options) {
           var obj = fabric.util.groupSVGElements(objects, options);
 
-          // COLOR DE TEMA: mismo color activo que usan texto y formas
-          var col = latexActiveColor();
+          var col = (editing && typeof editing.fill === 'string' && editing.fill) ? editing.fill : latexActiveColor();
 
-          // TAMAÑO ARMÓNICO: alto en pantalla ≈ herramienta Texto,
-          // compensando el zoom/paneo actuales del lienzo
           var vpt  = canvas.viewportTransform;
           var zoom = vpt[0] || 1;
           var fsEl = document.getElementById('fontSizePicker');
           var fs   = fsEl ? (parseInt(fsEl.value, 10) || 16) : 16;
-          var targetScreenH = fs * 1.15;             // px visibles deseados
-          var targetCanvasH = targetScreenH / zoom;  // unidades de lienzo equivalentes
+          // 1 em de la fórmula = tamaño de fuente del texto (o el de la fórmula anterior al editar)
+          var emCanvas = oldEmCanvas > 0 ? oldEmCanvas : (fs / zoom);
+          var targetCanvasH = vbH > 0 ? (vbH / 1000) * emCanvas : (fs * 1.15) / zoom;
 
           if (obj.height && obj.width && isFinite(targetCanvasH) && targetCanvasH > 0) {
             obj.set({ scaleX: targetCanvasH / obj.height, scaleY: targetCanvasH / obj.height });
           } else {
-            obj.set({ scaleX: 2, scaleY: 2 }); // respaldo seguro si el SVG mide 0
+            obj.set({ scaleX: 2, scaleY: 2 });
           }
 
-          // Aplica el color al grupo y a cada trazo interno heredado de MathJax
-          obj.set({ fill: col, selectable: true, evented: true });
+          obj.set({ fill: col, selectable: true, evented: true, latexSource: ecuacion });
           if (obj._objects) obj._objects.forEach(function(o) { if (o.set) o.set({ fill: col }); });
 
-          // CENTRADO EXACTO EN EL VIEWPORT VISIBLE:
-          // centro de pantalla convertido a coordenadas de lienzo (compensa pan/zoom)
-          obj.set({
-            left: (canvas.getWidth()  / 2 - vpt[4]) / vpt[0] - obj.getScaledWidth()  / 2,
-            top:  (canvas.getHeight() / 2 - vpt[5]) / vpt[3] - obj.getScaledHeight() / 2
-          });
-          obj.setCoords();
-
-          canvas.add(obj);
+          if (editing) {
+            // Mantiene el centro de la fórmula anterior y la reemplaza en la misma posición de apilado
+            var c = editing.getCenterPoint();
+            var idx = canvas.getObjects().indexOf(editing);
+            obj.set({ left: c.x - obj.getScaledWidth() / 2, top: c.y - obj.getScaledHeight() / 2, angle: editing.angle || 0 });
+            obj.setCoords();
+            withoutHistory(function() { // un solo paso de historial para todo el reemplazo
+              canvas.remove(editing);
+              if (idx >= 0) canvas.insertAt(obj, idx, false); else canvas.add(obj);
+            });
+          } else {
+            obj.set({
+              left: (canvas.getWidth()  / 2 - vpt[4]) / vpt[0] - obj.getScaledWidth()  / 2,
+              top:  (canvas.getHeight() / 2 - vpt[5]) / vpt[3] - obj.getScaledHeight() / 2
+            });
+            obj.setCoords();
+            canvas.add(obj);
+          }
           canvas.setActiveObject(obj);
           setTool('select');
           saveHistory();
           canvas.requestRenderAll();
-          showToast('✔ Fórmula insertada en el centro (tema y escala actuales)', 'ok');
+          showToast(editing ? '✔ Fórmula actualizada' : '✔ Fórmula insertada en el centro (tema y escala actuales)', 'ok');
         });
 
         closeLatexModal();
       } catch (e) { latexShowErr(); }
     };
+
+    // Doble clic / doble toque sobre una fórmula (herramienta Seleccionar) = editarla
+    canvas.on('mouse:dblclick', function(opt) {
+      var t = opt && opt.target;
+      if (t && t.latexSource && currentTool === 'select') openLatexModal(t);
+    });
 
     window.addEventListener('paste', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
