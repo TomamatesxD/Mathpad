@@ -4,7 +4,7 @@
 
 
 // Versión de caché v42: Fix fuentes Linux y eje Y matemático
-const CACHE_NAME = 'mathpad-v54'; // Versión de caché v54: fix graficador, barra páginas, LaTeX editable
+const CACHE_NAME = 'mathpad-v55'; // Versión de caché v55: graficador sin función
 const urlsToCache = [
   './',
   './index.html',

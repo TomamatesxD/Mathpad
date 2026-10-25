@@ -1912,10 +1912,14 @@
                   <label class="plot-label-sm">Color</label>
                   <input id="plotColorPicker" class="plot-color" type="color" value="#bb86fc">
                 </div>
-                <div class="plot-onlyline-wrap">
+                <div class="plot-onlyline-wrap" style="flex-direction:column;align-items:flex-start;gap:6px">
                   <label class="plot-check">
                     <input id="plotOnlyLine" class="plot-checkbox" type="checkbox">
                     Fondo transparente (Solo línea)
+                  </label>
+                  <label class="plot-check">
+                    <input id="plotHideCurves" class="plot-checkbox" type="checkbox">
+                    Sin la función (solo ejes)
                   </label>
                 </div>
               </div>
@@ -4648,6 +4652,10 @@ window.addEventListener('load', function() {
       }
 
 
+      // "Sin la función": se dibujan solo los ejes y la grilla (no curvas, área ni tangente)
+      var hideEl = document.getElementById('plotHideCurves');
+      if (hideEl && hideEl.checked) return;
+
       var v = createView(plotCanvasEl, plotView);
       // Área bajo la curva
       if (typeof areaState !== 'undefined' && areaState.active && areaState.fObj && isFinite(areaState.value) && areaState.a < areaState.b) {
@@ -5092,6 +5100,8 @@ window.addEventListener('load', function() {
     window.addEventListener('orientationchange', requestPlotResizeDraw);
     var plotOnlyLineEl = document.getElementById('plotOnlyLine');
     if (plotOnlyLineEl) plotOnlyLineEl.addEventListener('change', requestDrawPlot);
+    var plotHideCurvesEl = document.getElementById('plotHideCurves');
+    if (plotHideCurvesEl) plotHideCurvesEl.addEventListener('change', requestDrawPlot);
     document.getElementById('plotExpr').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') document.getElementById('plotBtnAdd').click();
     });
