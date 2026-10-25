@@ -4,7 +4,7 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v57'; // Versión de caché v55: graficador sin función
+const CACHE_NAME = 'mathpad-v58'; // Versión de caché v58: actualización
 const urlsToCache = [
   './',
   './index.html',
