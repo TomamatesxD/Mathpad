@@ -3,8 +3,8 @@
 // ============================================
 
 
-// Versión de caché v42: Fix fuentes Linux y eje Y matemático
-const CACHE_NAME = 'mathpad-v55'; // Versión de caché v55: graficador sin función
+// Versión de caché v57: íconos válidos
+const CACHE_NAME = 'mathpad-v57'; // Versión de caché v55: graficador sin función
 const urlsToCache = [
   './',
   './index.html',
@@ -17,8 +17,10 @@ const urlsToCache = [
   './manifest.json',
   './icono-192.png',
   './icono-512.png',
-  './icono-512-maskable.png'
+  './icono-512-maskable.png',
+  './apple-touch-icon.png'
 ];
+
 
 // Instalación: precarga la caché con los recursos del proyecto
 self.addEventListener('install', event => {
@@ -36,6 +38,7 @@ self.addEventListener('install', event => {
   );
 });
 
+
 // Activación: limpia cachés antiguas
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -48,6 +51,7 @@ self.addEventListener('activate', event => {
     }).then(() => self.clients.claim())
   );
 });
+
 
 // Fetch: estrategia cache-first con fallback a red
 self.addEventListener('fetch', event => {

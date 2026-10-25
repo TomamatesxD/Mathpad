@@ -2,7 +2,7 @@
   "name": "MathPad - Pizarra Matemática",
   "short_name": "MathPad",
   "description": "Pizarra matemática offline con trazos, funciones y exportación.",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
