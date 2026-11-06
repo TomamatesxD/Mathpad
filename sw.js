@@ -4,10 +4,12 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v58'; // Versión de caché v58: actualización
+const CACHE_NAME = 'mathpad-v59'; // Versión de caché v59: seguridad (CSP, validación)
 const urlsToCache = [
   './',
   './index.html',
+  './app.js',
+  './registro-sw.js',
   './favicon.svg',
   './fabric.min.js',
   './math.min.js',
