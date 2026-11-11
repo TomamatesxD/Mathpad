@@ -4,11 +4,11 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v59'; // Versión de caché v59: seguridad (CSP, validación)
+const CACHE_NAME = 'mathpad-v60'; // Versión de caché v60: carga diferida de jsPDF y app.js minificado
 const urlsToCache = [
   './',
   './index.html',
-  './app.js',
+  './app.min.js',
   './registro-sw.js',
   './favicon.svg',
   './fabric.min.js',

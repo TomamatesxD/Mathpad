@@ -1569,40 +1569,75 @@ window.addEventListener('load', function() {
         return getComputedStyle(document.documentElement).getPropertyValue('--paper-bg').trim() || '#1a1a1a';
     }
 
+    var jsPdfPromise = null;
+    function loadJsPDF() {
+        if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+        if (jsPdfPromise) return jsPdfPromise;
+        jsPdfPromise = new Promise(function(resolve, reject) {
+            var sc = document.createElement('script');
+            sc.src = './jspdf.umd.min.js';
+            sc.onload = function() { resolve(); };
+            sc.onerror = function() { jsPdfPromise = null; sc.remove(); reject(new Error('no se pudo cargar el exportador (revisa la conexión)')); };
+            document.head.appendChild(sc);
+        });
+        return jsPdfPromise;
+    }
+
+    var pdfBusy = false;
     async function exportPDF() {
-        saveCurrentPage();
-        const { jsPDF } = window.jspdf;
-        var vpt = canvas.viewportTransform.slice(0);
-        var pdf = null;
-        var firstPage = true;
-        var exportBg = getExportBgColor();
-        isHistoryAction = true;
+        if (pdfBusy) return;
+        pdfBusy = true;
+        var vpt = null, restore = false;
         try {
-        for (let i = 0; i < pages.length; i++) {
-            await new Promise(resolve => canvas.loadFromJSON(pages[i], resolve));
-            canvas.setViewportTransform([1,0,0,1,0,0]);
-            await new Promise(resolve => canvas.setBackgroundColor(exportBg, resolve));
-            var bounds = getCanvasBounds(canvas);
-            var maxSide = Math.max(bounds.width, bounds.height, 1);
-            var multiplier = Math.max(1, Math.min(2, 4000 / maxSide));
-            var imgData = canvas.toDataURL({
-                format: 'png', quality: 1,
-                left: bounds.left, top: bounds.top,
-                width: bounds.width, height: bounds.height, multiplier: multiplier
-            });
-            await new Promise(resolve => canvas.setBackgroundColor('', resolve));
-            if (firstPage) {
-                pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [Math.max(bounds.width, 100), Math.max(bounds.height, 100)] });
-                firstPage = false;
-            } else {
-                pdf.addPage([Math.max(bounds.width, 100), Math.max(bounds.height, 100)], "landscape");
+            showToast('Preparando PDF…', 'ok', 2500);
+            await loadJsPDF();
+            saveCurrentPage();
+            const { jsPDF } = window.jspdf;
+            vpt = canvas.viewportTransform.slice(0);
+            var pdf = null;
+            var exportBg = getExportBgColor();
+            isHistoryAction = true;
+            restore = true;
+            for (let i = 0; i < pages.length; i++) {
+                if (pages.length > 1) showToast('Generando PDF… página ' + (i + 1) + ' de ' + pages.length, 'ok', 2500);
+                await new Promise(r => setTimeout(r, 30)); // deja respirar al celular
+                await new Promise(resolve => canvas.loadFromJSON(pages[i], resolve));
+                canvas.setViewportTransform([1,0,0,1,0,0]);
+                await new Promise(resolve => canvas.setBackgroundColor(exportBg, resolve));
+                var bounds = getCanvasBounds(canvas);
+                var bw = Math.max(bounds.width, 1), bh = Math.max(bounds.height, 1);
+                // Límite de píxeles: los celulares fallan con canvas muy grandes
+                var multiplier = Math.min(2, 4096 / Math.max(bw, bh), Math.sqrt(6000000 / (bw * bh)));
+                multiplier = Math.max(0.1, multiplier);
+                var imgData = canvas.toDataURL({
+                    format: 'png', quality: 1,
+                    left: bounds.left, top: bounds.top,
+                    width: bounds.width, height: bounds.height, multiplier: multiplier
+                });
+                await new Promise(resolve => canvas.setBackgroundColor('', resolve));
+                if (!imgData || imgData.indexOf('data:image/png') !== 0) {
+                    throw new Error('el dispositivo no pudo generar la imagen de la página ' + (i + 1));
+                }
+                var pw = Math.max(bounds.width, 100), ph = Math.max(bounds.height, 100);
+                if (!pdf) {
+                    pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [pw, ph] });
+                } else {
+                    pdf.addPage([pw, ph], "landscape");
+                }
+                pdf.addImage(imgData, 'PNG', 0, 0, bounds.width, bounds.height);
             }
-            pdf.addImage(imgData, 'PNG', 0, 0, bounds.width, bounds.height);
-        }
+            if (!pdf) throw new Error('no hay páginas para exportar');
+            pdf.save("Cuaderno_Matematico.pdf");
+            showToast('📄 PDF listo', 'ok', 3000);
+        } catch (err) {
+            console.error('Error al exportar PDF:', err);
+            showToast('No se pudo crear el PDF: ' + (err && err.message ? err.message : 'error desconocido'), 'err', 6000);
         } finally {
-        canvas.loadFromJSON(pages[currentPage], function() { isHistoryAction = false; canvas.setViewportTransform(vpt); canvas.renderAll(); });
+            if (restore) {
+                canvas.loadFromJSON(pages[currentPage], function() { isHistoryAction = false; canvas.setViewportTransform(vpt); canvas.renderAll(); });
+            }
+            pdfBusy = false;
         }
-        pdf.save("Cuaderno_Matematico.pdf");
     }
 
     document.getElementById('btnExportPDF').onclick = exportPDF;

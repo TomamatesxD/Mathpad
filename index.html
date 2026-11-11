@@ -930,6 +930,8 @@
         /* ═══════════════════════════════════════════════════════════════
            MODO CLARO
         ════════════════════════════════════════════════════════════════ */
+        :root { color-scheme: dark; }
+        :root.light-mode { color-scheme: light; }
         :root.light-mode {
             --bg-dark: #f5f5f5;
             --bg-panel: #ffffff;
@@ -1534,7 +1536,6 @@
 </style>
     <script src="./fabric.min.js"></script>
     <script src="./math.min.js"></script>
-    <script src="./jspdf.umd.min.js"></script>
     <script src="./dexie.min.js"></script>
     <!-- iOS/iPadOS PWA Support -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -2044,7 +2045,7 @@
          (Registro vía Blob/URL.createObjectURL eliminado: los navegadores
          modernos lo bloquean por seguridad.) -->
     <script src="./registro-sw.js"></script>
-    <script src="./app.js"></script>
+    <script src="./app.min.js"></script>
 </body>
 </html>
 
