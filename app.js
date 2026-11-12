@@ -244,13 +244,15 @@ window.addEventListener('load', function() {
             // Borrador unificado: SIN pincel fantasma; borra al contacto
             // (incluso en el primer tap) y el historial se guarda en mouse:up.
             evt.preventDefault();
-            instantEraseAt(opt);
+            lastEraseP = null;
+            eraseAt(opt);
             return;
         }
 
 
         // --- INICIO HERRAMIENTA DE RELLENO HÍBRIDO ---
         if (currentTool === 'fill') {
+            canvas.discardActiveObject();
             const target = canvas.findTarget(opt.e, false);
             const color = document.getElementById('colorPicker').value;
 
@@ -421,7 +423,7 @@ window.addEventListener('load', function() {
                         scaleX: 1 / vpt[0] / retina,
                         scaleY: 1 / vpt[3] / retina,
                         perPixelTargetFind: true, // Fundamental para no bloquear clics
-                        selectable: true,
+                        selectable: false, // con el balde solo se pinta: nunca se selecciona ni se mueve
                         evented: true,
                         isFillPatch: true // Etiqueta identificadora
                     });
@@ -547,8 +549,8 @@ window.addEventListener('load', function() {
     var hasErasedObjects = false;      // ¿se borró algo en este trazo?
     var suppressRemoveHistory = false; // silencia object:removed durante el barrido
 
-    function instantEraseAt(opt) {
-        var pointer = canvas.getPointer(opt.e);
+    function instantEraseAt(opt, skipPaths, ptOverride) {
+        var pointer = ptOverride || canvas.getPointer(opt.e);
         var zoom = canvas.getZoom() || 1;
         // Radio de colisión adaptado a la escala visual actual del lienzo
         var baseRadius = (parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6;
@@ -564,6 +566,7 @@ window.addEventListener('load', function() {
             for (var i = objects.length - 1; i >= 0; i--) {
                 var obj = objects[i];
                 if (obj.isBackground || obj.isEraserMask === true) continue;
+                if (skipPaths && obj.type === 'path') continue; // la goma parcial se ocupa de los trazos
 
                 var strokePad = ((obj.strokeWidth || 0) / 2);
                 var hitRadius = radius + strokePad;
@@ -639,6 +642,122 @@ window.addEventListener('load', function() {
             canvas.requestRenderAll();
         }
     }
+
+    // ── Goma parcial: corta solo la parte del trazo que toca el dedo/lápiz ──
+    var eraserMode = 'object';   // 'object' = borra el objeto entero | 'partial' = goma
+    var lastEraseP = null;
+
+    function pathCanvasPoints(obj) {
+        var m = obj.calcTransformMatrix();
+        var po = obj.pathOffset || { x: 0, y: 0 };
+        var pts = [];
+        for (var ci = 0; ci < obj.path.length; ci++) {
+            var cmd = obj.path[ci];
+            for (var j = 1; j < cmd.length - 1; j += 2) {
+                var q = fabric.util.transformPoint({ x: cmd[j] - po.x, y: cmd[j + 1] - po.y }, m);
+                pts.push({ x: q.x, y: q.y });
+            }
+        }
+        return pts;
+    }
+
+    function runToPath(run, src) {
+        if (run.length < 2) return null;
+        var d;
+        try {
+            var fp = run.map(function(p) { return new fabric.Point(p.x, p.y); });
+            d = new fabric.PencilBrush(canvas).convertPointsToSVGPath(fp).join('');
+        } catch (e) { d = null; }
+        if (!d) {
+            d = 'M ' + run[0].x + ' ' + run[0].y;
+            for (var i = 1; i < run.length; i++) d += ' L ' + run[i].x + ' ' + run[i].y;
+        }
+        var sc = src.strokeUniform ? 1 : Math.sqrt(Math.abs((src.scaleX || 1) * (src.scaleY || 1)));
+        return new fabric.Path(d, {
+            fill: src.fill || null,
+            stroke: src.stroke,
+            strokeWidth: (src.strokeWidth || 1) * sc,
+            strokeLineCap: src.strokeLineCap,
+            strokeLineJoin: src.strokeLineJoin,
+            strokeDashArray: src.strokeDashArray,
+            opacity: src.opacity,
+            globalCompositeOperation: src.globalCompositeOperation,
+            selectable: false, evented: true
+        });
+    }
+
+    // Devuelve true si cortó algún trazo en el punto q con radio r
+    function erasePathsAt(q, r) {
+        var changed = false;
+        var objs = canvas.getObjects().slice();
+        for (var oi = objs.length - 1; oi >= 0; oi--) {
+            var obj = objs[oi];
+            if (obj.type !== 'path' || !obj.path || obj.isBackground || obj.isEraserMask === true) continue;
+            var sc = obj.strokeUniform ? 1 : Math.sqrt(Math.abs((obj.scaleX || 1) * (obj.scaleY || 1)));
+            var rad = r + ((obj.strokeWidth || 0) * sc) / 2;
+            var b = obj.getBoundingRect(true);
+            if (q.x < b.left - rad || q.x > b.left + b.width + rad || q.y < b.top - rad || q.y > b.top + b.height + rad) continue;
+            var pts = pathCanvasPoints(obj);
+            if (pts.length < 2) {
+                if (pts.length === 1 && Math.hypot(q.x - pts[0].x, q.y - pts[0].y) <= rad) {
+                    canvas.remove(obj); changed = true;
+                }
+                continue;
+            }
+            var hitSeg = [], any = false;
+            for (var i = 0; i < pts.length - 1; i++) {
+                var h = distToSegment(q, pts[i], pts[i + 1]) <= rad;
+                hitSeg.push(h); if (h) any = true;
+            }
+            if (!any) continue;
+            var runs = [], cur = [pts[0]];
+            for (var k = 0; k < hitSeg.length; k++) {
+                if (!hitSeg[k]) { cur.push(pts[k + 1]); }
+                else { runs.push(cur); cur = [pts[k + 1]]; }
+            }
+            runs.push(cur);
+            var idx = canvas.getObjects().indexOf(obj);
+            canvas.remove(obj);
+            var at = idx;
+            for (var ri = 0; ri < runs.length; ri++) {
+                var np = runToPath(runs[ri], obj);
+                if (np) { canvas.insertAt(np, at++, false); }
+            }
+            changed = true;
+        }
+        return changed;
+    }
+
+    function partialEraseAt(opt) {
+        var p = canvas.getPointer(opt.e);
+        var zoom = canvas.getZoom() || 1;
+        var r = ((parseInt(document.getElementById('widthPicker').value, 10) || 5) / 2 + 6) / zoom;
+        var probes = [p];
+        if (lastEraseP) {
+            var dx = p.x - lastEraseP.x, dy = p.y - lastEraseP.y;
+            var steps = Math.min(60, Math.max(1, Math.ceil(Math.hypot(dx, dy) / (r * 0.6))));
+            probes = [];
+            for (var s = 1; s <= steps; s++) probes.push({ x: lastEraseP.x + dx * s / steps, y: lastEraseP.y + dy * s / steps });
+        }
+        lastEraseP = p;
+        var changed = false;
+        suppressRemoveHistory = true;
+        try {
+            for (var i = 0; i < probes.length; i++) {
+                suppressRemoveHistory = true; // instantEraseAt lo apaga al terminar
+                if (erasePathsAt(probes[i], r)) changed = true;
+                // figuras, líneas, texto e imágenes: se borran enteros al tocarlos
+                var before = canvas.getObjects().length;
+                instantEraseAt(opt, true, probes[i]);
+                if (canvas.getObjects().length !== before) changed = true;
+            }
+        } finally { suppressRemoveHistory = false; }
+        if (changed) { hasErasedObjects = true; canvas.requestRenderAll(); }
+    }
+
+    function eraseAt(opt) {
+        if (eraserMode === 'partial') partialEraseAt(opt); else instantEraseAt(opt);
+    }
     canvas.on('mouse:move', function(opt) {
         var e = opt.e;
 
@@ -692,7 +811,7 @@ window.addEventListener('load', function() {
 
         // Borrador unificado: borrado por contacto con hit-test económico
         if (currentTool === 'eraser' && isDragging) {
-            instantEraseAt(opt);
+            eraseAt(opt);
             return;
         }
 
@@ -1313,6 +1432,11 @@ window.addEventListener('load', function() {
             let btn = document.getElementById(targetBtnId);
             if (btn) btn.classList.add('active'); // Solo agrega la clase si el botón existe en el HTML
         }
+        if (tool === 'eraser') {
+            var bObj = document.getElementById('btnEraserStroke'), bPart = document.getElementById('btnEraserPart');
+            if (bObj) bObj.classList.toggle('active', eraserMode !== 'partial');
+            if (bPart) bPart.classList.toggle('active', eraserMode === 'partial');
+        }
 
         if (tool === 'pen') {
             canvas.isDrawingMode = true; canvas.freeDrawingBrush = standardBrush;
@@ -1414,7 +1538,8 @@ window.addEventListener('load', function() {
     document.getElementById('btnFill').onclick = () => setTool('fill');
     document.getElementById('btnText').onclick = () => setTool('text');
 
-    document.getElementById('btnEraserStroke').onclick = () => setTool('eraser');
+    document.getElementById('btnEraserStroke').onclick = () => { eraserMode = 'object'; setTool('eraser'); };
+    document.getElementById('btnEraserPart').onclick = () => { eraserMode = 'partial'; setTool('eraser'); };
     document.getElementById('btnSelect').onclick = () => setTool('select');
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
@@ -4860,7 +4985,7 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
         if (e.code === 'KeyP' && !e.ctrlKey) setTool('pen');
         if (e.code === 'KeyF' && !e.ctrlKey) setTool('fill');
 
-        if (e.code === 'KeyE' && !e.ctrlKey) setTool('eraser');
+        if (e.code === 'KeyE' && !e.ctrlKey) { eraserMode = e.shiftKey ? 'partial' : 'object'; setTool('eraser'); }
         if (e.code === 'KeyV' && !e.ctrlKey) setTool('select');
         if (e.code === 'KeyH' && !e.ctrlKey) setTool('pan');
         if (e.code === 'KeyI' && !e.ctrlKey) document.getElementById('btnInsertImage').click();

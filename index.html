@@ -217,7 +217,7 @@
             position: fixed;
             top: var(--toolbar-h);
             left: 0;
-            bottom: var(--bottom-bar-h);
+            bottom: 0;
             width: var(--sidebar-w);
             background-color: var(--bg-panel);
             border-right: 1px solid var(--border-color);
@@ -1700,7 +1700,10 @@
         <div class="tool-separator"></div>
 
 
-        <button type="button" id="btnEraserStroke" title="Borrador [E]" aria-label="Borrador [E]">
+        <button type="button" id="btnEraserPart" title="Goma: borra solo lo que tocás [Mayús+E]" aria-label="Goma: borra solo lo que tocás">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H9L4.5 15.5a2 2 0 0 1 0-2.8l8.2-8.2a2 2 0 0 1 2.8 0l5 5a2 2 0 0 1 0 2.8L13 20"/><path d="M8.5 9.5l6 6"/></svg>
+        </button>
+        <button type="button" id="btnEraserStroke" title="Borrar objeto entero [E]" aria-label="Borrar objeto entero [E]">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         </button>
         <button type="button" id="btnRuler" title="Regla/Compás [R]" aria-label="Regla/Compás [R]">

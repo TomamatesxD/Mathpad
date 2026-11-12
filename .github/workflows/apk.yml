@@ -1,6 +1,7 @@
 # Genera un APK de Android (Capacitor) con los archivos de la PWA.
 # Uso: pestaña Actions -> "Build APK" -> Run workflow. El APK queda en "Artifacts".
-# Si se empuja una etiqueta (por ejemplo v1.0.0) también se adjunta a un Release.
+# Además publica el APK en Releases ("MathPad - última compilación") para descargarlo directo, sin zip.
+# Si se empuja una etiqueta (por ejemplo v1.0.0) también se adjunta a un Release propio.
 name: Build APK
 
 on:
@@ -40,6 +41,42 @@ jobs:
           printf '%s\n' '{' '  "appId": "io.github.tomamatesxd.mathpad",' '  "appName": "MathPad",' '  "webDir": "www"' '}' > capacitor.config.json
           npx cap add android
           npx cap sync android
+
+      - name: Ocultar la barra de notificaciones (pantalla completa)
+        run: |
+          F=$(find android/app/src/main/java -name MainActivity.java | head -n 1)
+          test -n "$F" || { echo "No se encontró MainActivity.java"; exit 1; }
+          PKG=$(grep -m1 '^package ' "$F")
+          cat > "$F" <<JAVA
+          $PKG
+
+          import android.os.Bundle;
+          import androidx.core.view.WindowCompat;
+          import androidx.core.view.WindowInsetsCompat;
+          import androidx.core.view.WindowInsetsControllerCompat;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  hideStatusBar();
+              }
+
+              @Override
+              public void onWindowFocusChanged(boolean hasFocus) {
+                  super.onWindowFocusChanged(hasFocus);
+                  if (hasFocus) hideStatusBar();
+              }
+
+              private void hideStatusBar() {
+                  WindowInsetsControllerCompat c = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+                  c.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                  c.hide(WindowInsetsCompat.Type.statusBars());
+              }
+          }
+          JAVA
+          cat "$F"
 
       - name: Íconos y versión
         run: |
@@ -89,3 +126,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" MathPad.apk --title "MathPad $GITHUB_REF_NAME" --generate-notes
+
+      - name: Publicar APK en Releases (descarga directa)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk-latest --cleanup-tag --yes || true
+          gh release create apk-latest MathPad.apk --prerelease --target "$GITHUB_SHA" --title "MathPad - última compilación" --notes "APK de prueba generado automáticamente desde el último código. Descargá MathPad.apk."

@@ -4,7 +4,7 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v60'; // Versión de caché v60: carga diferida de jsPDF y app.js minificado
+const CACHE_NAME = 'mathpad-v61'; // Versión de caché v61: goma parcial, balde sin selección, barra lateral completa
 const urlsToCache = [
   './',
   './index.html',
