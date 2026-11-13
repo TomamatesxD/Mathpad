@@ -1405,9 +1405,8 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
             if (btn) btn.classList.add('active'); // Solo agrega la clase si el botón existe en el HTML
         }
         if (tool === 'eraser') {
-            var bObj = document.getElementById('btnEraserStroke'), bPart = document.getElementById('btnEraserPart');
-            if (bObj) bObj.classList.toggle('active', eraserMode !== 'partial');
-            if (bPart) bPart.classList.toggle('active', eraserMode === 'partial');
+            var bObj = document.getElementById('btnEraserStroke');
+            if (bObj) bObj.classList.toggle('active', eraserMode === 'object');
         }
 
         if (tool === 'pen') {
@@ -1512,7 +1511,6 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
     document.getElementById('btnText').onclick = () => setTool('text');
 
     document.getElementById('btnEraserStroke').onclick = () => { eraserMode = 'object'; setTool('eraser'); };
-    document.getElementById('btnEraserPart').onclick = () => { eraserMode = 'partial'; setTool('eraser'); };
     document.getElementById('btnSelect').onclick = () => setTool('select');
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
