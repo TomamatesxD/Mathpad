@@ -651,18 +651,37 @@ window.addEventListener('load', function() {
     var eraserMode = 'object';   // 'object' = borra el objeto entero | 'partial' = goma
     var lastEraseP = null;
 
-    function pathCanvasPoints(obj) {
+    function pathCanvasPoints(obj, maxLen) {
         var m = obj.calcTransformMatrix();
         var po = obj.pathOffset || { x: 0, y: 0 };
         var pts = [];
-        for (var ci = 0; ci < obj.path.length; ci++) {
-            var cmd = obj.path[ci];
-            for (var j = 1; j < cmd.length - 1; j += 2) {
-                var q = fabric.util.transformPoint({ x: cmd[j] - po.x, y: cmd[j + 1] - po.y }, m);
-                pts.push({ x: q.x, y: q.y });
+        function add(x, y) {
+            var q = fabric.util.transformPoint({ x: x - po.x, y: y - po.y }, m);
+            pts.push({ x: q.x, y: q.y });
+        }
+        var n = obj.path.length;
+        for (var ci = 0; ci < n; ci++) {
+            var cmd = obj.path[ci], op = cmd[0];
+            if (op === 'M' || op === 'L') add(cmd[1], cmd[2]);
+            else if (op === 'Q') {
+                add(cmd[1], cmd[2]);
+                if (ci === n - 1) add(cmd[3], cmd[4]);
+            } else if (op === 'C') {
+                add(cmd[5], cmd[6]);
             }
         }
-        return pts;
+        // quita duplicados consecutivos y subdivide tramos largos para poder cortarlos por la mitad
+        var out = [];
+        for (var i = 0; i < pts.length; i++) {
+            var P = pts[i], L = out[out.length - 1];
+            if (L && Math.hypot(P.x - L.x, P.y - L.y) < 0.01) continue;
+            if (L && maxLen > 0) {
+                var d = Math.hypot(P.x - L.x, P.y - L.y), k = Math.ceil(d / maxLen);
+                for (var s = 1; s < k; s++) out.push({ x: L.x + (P.x - L.x) * s / k, y: L.y + (P.y - L.y) * s / k });
+            }
+            out.push(P);
+        }
+        return out;
     }
 
     function runToPath(run, src) {
@@ -702,7 +721,7 @@ window.addEventListener('load', function() {
             var rad = r + ((obj.strokeWidth || 0) * sc) / 2;
             var b = obj.getBoundingRect(true);
             if (q.x < b.left - rad || q.x > b.left + b.width + rad || q.y < b.top - rad || q.y > b.top + b.height + rad) continue;
-            var pts = pathCanvasPoints(obj);
+            var pts = pathCanvasPoints(obj, r * 0.5);
             if (pts.length < 2) {
                 if (pts.length === 1 && Math.hypot(q.x - pts[0].x, q.y - pts[0].y) <= rad) {
                     canvas.remove(obj); processedThisMove.add(obj); changed = true;
@@ -752,16 +771,69 @@ window.addEventListener('load', function() {
         var changed = false;
         suppressRemoveHistory = true;
         try {
+            // Procesa todos los probes del movimiento en una sola pasada por cada path
+            if (erasePathsAlong(probes, r)) changed = true;
+            // figuras, líneas, texto e imágenes: se borran enteros al tocarlos
+            var before = canvas.getObjects().length;
             for (var i = 0; i < probes.length; i++) {
-                suppressRemoveHistory = true; // instantEraseAt lo apaga al terminar
-                if (erasePathsAt(probes[i], r)) changed = true;
-                // figuras, líneas, texto e imágenes: se borran enteros al tocarlos
-                var before = canvas.getObjects().length;
                 instantEraseAt(opt, true, probes[i]);
                 if (canvas.getObjects().length !== before) changed = true;
             }
         } finally { suppressRemoveHistory = false; }
         if (changed) { hasErasedObjects = true; canvas.requestRenderAll(); }
+    }
+
+    function erasePathsAlong(probes, r) {
+        var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (var pi = 0; pi < probes.length; pi++) {
+            if (probes[pi].x < minX) minX = probes[pi].x;
+            if (probes[pi].x > maxX) maxX = probes[pi].x;
+            if (probes[pi].y < minY) minY = probes[pi].y;
+            if (probes[pi].y > maxY) maxY = probes[pi].y;
+        }
+        var changed = false;
+        var objs = canvas.getObjects().slice();
+        for (var oi = objs.length - 1; oi >= 0; oi--) {
+            var obj = objs[oi];
+            if (obj.isBackground || obj.isEraserMask === true) continue;
+            if (processedThisMove && processedThisMove.has(obj)) continue;
+            if (obj.type !== 'path' && obj.type !== 'line') continue;
+            var b = obj.getBoundingRect(true);
+            if (b.left > maxX + r || b.left + b.width < minX - r ||
+                b.top > maxY + r || b.top + b.height < minY - r) continue;
+
+            var pts = pathCanvasPoints(obj, r * 0.5);
+            if (pts.length < 2) continue;
+
+            var hits = [];
+            for (var k = 0; k < pts.length; k++) {
+                var hit = false;
+                for (var q = 0; q < probes.length; q++) {
+                    if (Math.hypot(pts[k].x - probes[q].x, pts[k].y - probes[q].y) <= r) { hit = true; break; }
+                }
+                hits.push(hit);
+            }
+            if (hits.indexOf(true) === -1) continue;
+
+            // separar en tramos contiguos NO cortados
+            var runs = [], cur = [];
+            for (var k2 = 0; k2 < pts.length; k2++) {
+                if (hits[k2]) { if (cur.length) { runs.push(cur); cur = []; } }
+                else cur.push(pts[k2]);
+            }
+            if (cur.length) runs.push(cur);
+
+            canvas.remove(obj);
+            processedThisMove.add(obj);
+            var at = oi;
+            for (var ri = 0; ri < runs.length; ri++) {
+                if (runs[ri].length < 2) continue;
+                var np = runToPath(runs[ri], obj);
+                if (np) { canvas.insertAt(np, at++, false); processedThisMove.add(np); }
+            }
+            changed = true;
+        }
+        return changed;
     }
 
     function eraseAt(opt) {
