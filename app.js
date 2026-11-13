@@ -779,6 +779,11 @@ window.addEventListener('load', function() {
             hasErasedObjects = false;
         }
 
+        // PressureBrush no dispara 'path:created'; guardar historial al soltar
+        if (currentTool === 'pen' && canvas.freeDrawingBrush && canvas.freeDrawingBrush.type === 'PressureBrush') {
+            if (typeof saveHistory === 'function') saveHistory();
+        }
+
         if (isPanning) {
             canvas.setViewportTransform(canvas.viewportTransform);
             isPanning = false; canvasWrapper.classList.remove('cursor-panning');
@@ -1285,6 +1290,91 @@ window.addEventListener('load', function() {
     // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
     let contextMenuOpen = false;
 
+function PressureBrush(canvas) {
+    fabric.BaseBrush.call(this, canvas);
+    this._segments = [];
+    this._lastPoint = null;
+}
+PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
+    type: 'PressureBrush',
+    
+    _getPressure: function(options) {
+        var nativeEvent = options && options.e ? options.e : options;
+        if (!nativeEvent) return 0.5;
+        // Android / PC / Pointer Events
+        if (nativeEvent.pressure !== undefined && nativeEvent.pressure > 0) {
+            return nativeEvent.pressure;
+        }
+        // iOS / Safari (Touch Events)
+        if (nativeEvent.touches && nativeEvent.touches.length > 0 && nativeEvent.touches[0].force !== undefined) {
+            var f = nativeEvent.touches[0].force;
+            if (f > 0) return f;
+        }
+        return 0.5; // Fallback: mouse o touch sin presión
+    },
+    
+    onMouseDown: function(pointer, options) {
+        this._segments = [];
+        this._lastPoint = pointer;
+        var pressure = this._getPressure(options);
+        var w = this.width * (0.3 + (0.7 * pressure)); // Mínimo 30% del grosor
+        this._addSegment(pointer, pointer, w);
+    },
+    
+    onMouseMove: function(pointer, options) {
+        if (!this._lastPoint) return;
+        
+        var pressure = this._getPressure(options);
+        var newWidth = this.width * (0.3 + (0.7 * pressure));
+        
+        var dist = Math.hypot(pointer.x - this._lastPoint.x, pointer.y - this._lastPoint.y);
+        if (dist > 2) {
+            this._addSegment(this._lastPoint, pointer, newWidth);
+            this._lastPoint = pointer;
+        }
+    },
+    
+    onMouseUp: function(pointer, options) {
+        if (this._segments.length > 0) {
+            // Fabric remueve automáticamente las líneas del canvas al agruparlas.
+            // Pero por seguridad, las removemos primero:
+            var _this = this;
+            this._segments.forEach(function(seg) {
+                if (seg.canvas) seg.canvas.remove(seg);
+            });
+
+            var group = new fabric.Group(this._segments, {
+                selectable: false,
+                evented: true,
+                strokeUniform: true,
+                perPixelTargetFind: false, // CRÍTICO: acelera el borrador
+                objectCaching: false,      // CRÍTICO: no cachear imágenes grandes en RAM
+                noScaleCache: true
+            });
+            this.canvas.add(group);
+            this.canvas.requestRenderAll();
+        }
+        this._segments = [];
+        this._lastPoint = null;
+    },
+    
+    _addSegment: function(from, to, width) {
+        var segment = new fabric.Line([from.x, from.y, to.x, to.y], {
+            stroke: this.color,
+            strokeWidth: width,
+            strokeLineCap: 'round',
+            strokeLineJoin: 'round',
+            selectable: false,
+            evented: false,
+            strokeUniform: true,
+            objectCaching: false
+        });
+        this._segments.push(segment);
+        this.canvas.add(segment);
+        this.canvas.requestRenderAll();
+    }
+});
+
     function setTool(tool) {
         var prevTool = currentTool;
         currentTool = tool;
@@ -1321,12 +1411,13 @@ window.addEventListener('load', function() {
         }
 
         if (tool === 'pen') {
-            canvas.isDrawingMode = true; canvas.freeDrawingBrush = standardBrush;
-            canvas.freeDrawingBrush.color = document.getElementById('colorPicker').value;
-            canvas.freeDrawingBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
-            canvasWrapper.classList.add('cursor-pen');
-            // Forzar reinicio del estado interno de dibujo de Fabric.js
-            canvas.renderAll();
+            canvas.isDrawingMode = false; 
+            var pressureBrush = new PressureBrush(canvas);
+            pressureBrush.color = document.getElementById('colorPicker') ? document.getElementById('colorPicker').value : '#e0e0e0';
+            pressureBrush.width = parseInt(document.getElementById('widthPicker') ? document.getElementById('widthPicker').value : 3, 10);
+            canvas.freeDrawingBrush = pressureBrush;
+            canvas.isDrawingMode = true; 
+            if(canvasWrapper) canvasWrapper.classList.add('cursor-pen');
         }
         else if (tool === 'highlight') {
             canvas.isDrawingMode = true; canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
