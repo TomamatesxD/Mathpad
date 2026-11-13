@@ -78,6 +78,9 @@ window.addEventListener('load', function() {
     let pagePlots = [[]];
     let pagePlotViews = [{ xMin: -5, xMax: 5, yMin: -5, yMax: 5 }];
 
+    // Variables para herramienta de borrador de precisión
+    var processedThisMove = new Set(); // Evita dividir el mismo objeto 2 veces en un mismo movimiento
+
     function hexToRgba(hex, alpha) {
         var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
@@ -244,6 +247,7 @@ window.addEventListener('load', function() {
             // Borrador unificado: SIN pincel fantasma; borra al contacto
             // (incluso en el primer tap) y el historial se guarda en mouse:up.
             evt.preventDefault();
+            processedThisMove.clear();
             lastEraseP = null;
             eraseAt(opt);
             return;
@@ -692,6 +696,7 @@ window.addEventListener('load', function() {
         var objs = canvas.getObjects().slice();
         for (var oi = objs.length - 1; oi >= 0; oi--) {
             var obj = objs[oi];
+            if (processedThisMove.has(obj)) continue; // ya fue dividido en este movimiento
             if (obj.type !== 'path' || !obj.path || obj.isBackground || obj.isEraserMask === true) continue;
             var sc = obj.strokeUniform ? 1 : Math.sqrt(Math.abs((obj.scaleX || 1) * (obj.scaleY || 1)));
             var rad = r + ((obj.strokeWidth || 0) * sc) / 2;
@@ -700,7 +705,7 @@ window.addEventListener('load', function() {
             var pts = pathCanvasPoints(obj);
             if (pts.length < 2) {
                 if (pts.length === 1 && Math.hypot(q.x - pts[0].x, q.y - pts[0].y) <= rad) {
-                    canvas.remove(obj); changed = true;
+                    canvas.remove(obj); processedThisMove.add(obj); changed = true;
                 }
                 continue;
             }
@@ -718,10 +723,14 @@ window.addEventListener('load', function() {
             runs.push(cur);
             var idx = canvas.getObjects().indexOf(obj);
             canvas.remove(obj);
+            processedThisMove.add(obj); // añadir objeto original al Set
             var at = idx;
             for (var ri = 0; ri < runs.length; ri++) {
                 var np = runToPath(runs[ri], obj);
-                if (np) { canvas.insertAt(np, at++, false); }
+                if (np) {
+                    canvas.insertAt(np, at++, false);
+                    processedThisMove.add(np); // añadir el nuevo path al Set (no volver a dividir)
+                }
             }
             changed = true;
         }
