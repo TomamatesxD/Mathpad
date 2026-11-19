@@ -4,19 +4,22 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v61'; // Versión de caché v61: goma parcial, balde sin selección, barra lateral completa
-const urlsToCache = [
+const CACHE_NAME = 'mathpad-v62'; // Versión de caché v62: carga crítica estricta + íconos opcionales
+const CORE_URLS = [
   './',
   './index.html',
   './app.min.js',
   './registro-sw.js',
-  './favicon.svg',
   './fabric.min.js',
   './math.min.js',
-  './jspdf.umd.min.js',
   './dexie.min.js',
+  './manifest.json'
+];
+
+const OPTIONAL_URLS = [
+  './jspdf.umd.min.js',
   './tex-svg.js',
-  './manifest.json',
+  './favicon.svg',
   './icono-192.png',
   './icono-512.png',
   './icono-512-maskable.png',
@@ -27,16 +30,21 @@ const urlsToCache = [
 // Instalación: precarga la caché con los recursos del proyecto
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        // Usamos addAll con tolerancia a fallos individuales (iconos pueden faltar)
-        return Promise.allSettled(
-          urlsToCache.map(url =>
-            cache.add(new Request(url, { cache: 'reload' })).catch(err => console.warn('No se pudo cachear:', url, err))
-          )
-        );
-      })
-      .then(() => self.skipWaiting())
+    Promise.all(
+      CORE_URLS.map(url =>
+        cache.add(new Request(url, { cache: 'reload' }))
+      )
+    )
+    .then(() => {
+      // Opcional: íconos y recursos adicionales; si falla uno, se campa y el SW sigue activo
+      return Promise.allSettled(
+        OPTIONAL_URLS.map(url =>
+          cache.add(new Request(url, { cache: 'reload' }))
+            .catch(err => console.warn('No se pudo cachear (opcional):', url, err))
+        )
+      );
+    })
+    .then(() => self.skipWaiting())
   );
 });
 
@@ -63,14 +71,17 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) {
-        // Actualiza en segundo plano (stale-while-revalidate suave)
-        fetch(event.request).then(response => {
-          if (response && response.status === 200) {
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, response.clone());
-            });
-          }
-        }).catch(() => {});
+        // stale-while-revalidate: actualizar en segundo plano dentro de waitUntil
+        event.waitUntil(
+          fetch(event.request).then(response => {
+            if (response && response.status === 200 && response.type === 'basic') {
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, response.clone());
+              });
+            }
+            return response;
+          }).catch(() => {})
+        );
         return cached;
       }
       return fetch(event.request).then(response => {

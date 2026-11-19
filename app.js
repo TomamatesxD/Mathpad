@@ -78,8 +78,7 @@ window.addEventListener('load', function() {
     let pagePlots = [[]];
     let pagePlotViews = [{ xMin: -5, xMax: 5, yMin: -5, yMax: 5 }];
 
-    // Variables para herramienta de borrador de precisión
-    var processedThisMove = new Set(); // Evita dividir el mismo objeto 2 veces en un mismo movimiento
+
 
     function hexToRgba(hex, alpha) {
         var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
@@ -246,10 +245,7 @@ window.addEventListener('load', function() {
         if (currentTool === 'eraser') {
             // Borrador unificado: SIN pincel fantasma; borra al contacto
             // (incluso en el primer tap) y el historial se guarda en mouse:up.
-            evt.preventDefault();
-            processedThisMove.clear();
-            lastEraseP = null;
-            eraseAt(opt);
+
             return;
         }
 
@@ -563,79 +559,82 @@ window.addEventListener('load', function() {
 
         suppressRemoveHistory = true; // el historial se guarda UNA vez en mouse:up
         try {
-            for (var i = objects.length - 1; i >= 0; i--) {
-                var obj = objects[i];
-                if (obj.isBackground || obj.isEraserMask === true) continue;
+            var pass, i, obj, tol, b, hit, isSolid, pts, ci, j, pi, segs, si, lp, sx, sy, lx, ly, localTol;
+            var erased = false;
 
-                var b = obj.getBoundingRect(true);
-                if (pointer.x < b.left - radius || pointer.x > b.left + b.width + radius ||
-                    pointer.y < b.top - radius || pointer.y > b.top + b.height + radius) {
-                    continue;
-                }
+            for (pass = 0; pass < 2; pass++) {
+                for (i = objects.length - 1; i >= 0; i--) {
+                    obj = objects[i];
+                    if (obj.isBackground || obj.isEraserMask === true) continue;
 
-                // Si el puntero está dentro del objeto, se borra entero
-                var hit = false;
-                try { hit = obj.containsPoint(pointer, null, true); } catch (err) { hit = false; }
+                    tol = radius + (obj.strokeWidth || 0) / 2;
+                    b = obj.getBoundingRect(true);
+                    if (pointer.x < b.left - tol || pointer.x > b.left + b.width + tol ||
+                        pointer.y < b.top - tol || pointer.y > b.top + b.height + tol) {
+                        continue;
+                    }
 
-                if (!hit) {
-                    // Fallback para figuras trazadas (contornos) sin fill
-                    if (obj.type === 'path' && obj.path) {
-                        var pts = [];
-                        for (var ci = 0; ci < obj.path.length && !hit; ci++) {
-                            var cmd = obj.path[ci];
-                            for (var j = 1; j < cmd.length - 1; j += 2) {
-                                pts.push({ x: cmd[j], y: cmd[j + 1] });
+                    isSolid = obj.isFillPatch || ['i-text', 'text', 'image', 'group'].includes(obj.type) ||
+                        (['rect', 'triangle', 'ellipse', 'circle', 'polygon'].includes(obj.type) &&
+                            obj.fill && obj.fill !== 'transparent' && obj.fill !== 'none');
+
+                    // Primera pasada: se ignoran los sólidos; segunda pasada: se procesan
+                    if (pass === 0 && isSolid) continue;
+
+                    if (isSolid) {
+                        try { hit = obj.containsPoint(pointer, null, true); } catch (err) { hit = false; }
+                    } else {
+                        hit = false;
+                        if (obj.type === 'path' && obj.path) {
+                            lp = obj.toLocalPoint(new fabric.Point(pointer.x, pointer.y), 'center', 'center');
+                            sx = obj.scaleX || 1, sy = obj.scaleY || 1;
+                            lx = lp.x / sx + (obj.pathOffset ? obj.pathOffset.x : 0);
+                            ly = lp.y / sy + (obj.pathOffset ? obj.pathOffset.y : 0);
+                            localTol = tol / Math.min(Math.abs(sx), Math.abs(sy));
+                            pts = [];
+                            for (ci = 0; ci < obj.path.length; ci++) {
+                                var cmd = obj.path[ci];
+                                for (j = 1; j < cmd.length - 1; j += 2) {
+                                    pts.push({ x: cmd[j], y: cmd[j + 1] });
+                                }
+                            }
+                            if (pts.length === 1) {
+                                hit = Math.hypot(lx - pts[0].x, ly - pts[0].y) <= localTol;
+                            } else if (pts.length > 1) {
+                                for (pi = 0; pi < pts.length - 1; pi++) {
+                                    if (distToSegment({ x: lx, y: ly }, pts[pi], pts[pi + 1]) <= localTol) {
+                                        hit = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
-                        if (pts.length > 1) {
-                            for (var pi = 0; pi < pts.length - 1 && !hit; pi++) {
-                                if (Math.hypot(pointer.x - pts[pi].x, pointer.y - pts[pi].y) <= radius) {
+                        if (!hit) {
+                            segs = getShapeSegmentsInCanvasSpace(obj);
+                            for (si = 0; si < segs.length && !hit; si++) {
+                                if (distToSegment(pointer, segs[si].a, segs[si].b) <= tol) {
                                     hit = true;
                                 }
                             }
                         }
                     }
-                }
 
-                if (hit) {
-                    canvas.remove(obj);
-                    hasErasedObjects = true;
-                    break;
+                    if (hit) {
+                        canvas.remove(obj);
+                        hasErasedObjects = true;
+                        erased = true;
+                        break;
+                    }
                 }
+                if (erased) break;
             }
         } finally {
             suppressRemoveHistory = false;
         }
-        if (hasErasedObjects) { canvas.requestRenderAll(); }
+        if (erased) { canvas.requestRenderAll(); }
     }
 
-    // ── Goma parcial: corta solo la parte del trazo que toca el dedo/lápiz ──
-    var eraserMode = 'object';   // 'object' = borra el objeto entero | 'partial' = goma
 
-    function runToPath(run, src) {
-        if (run.length < 2) return null;
-        var d;
-        try {
-            var fp = run.map(function(p) { return new fabric.Point(p.x, p.y); });
-            d = new fabric.PencilBrush(canvas).convertPointsToSVGPath(fp).join('');
-        } catch (e) { d = null; }
-        if (!d) {
-            d = 'M ' + run[0].x + ' ' + run[0].y;
-            for (var i = 1; i < run.length; i++) d += ' L ' + run[i].x + ' ' + run[i].y;
-        }
-        var sc = src.strokeUniform ? 1 : Math.sqrt(Math.abs((src.scaleX || 1) * (src.scaleY || 1)));
-        return new fabric.Path(d, {
-            fill: src.fill || null,
-            stroke: src.stroke,
-            strokeWidth: (src.strokeWidth || 1) * sc,
-            strokeLineCap: src.strokeLineCap,
-            strokeLineJoin: src.strokeLineJoin,
-            strokeDashArray: src.strokeDashArray,
-            opacity: src.opacity,
-            globalCompositeOperation: src.globalCompositeOperation,
-            selectable: false, evented: true
-        });
-    }
 
     function eraseAt(opt) {
         instantEraseAt(opt);
@@ -779,10 +778,7 @@ window.addEventListener('load', function() {
             hasErasedObjects = false;
         }
 
-        // PressureBrush no dispara 'path:created'; guardar historial al soltar
-        if (currentTool === 'pen' && canvas.freeDrawingBrush && canvas.freeDrawingBrush.type === 'PressureBrush') {
-            if (typeof saveHistory === 'function') saveHistory();
-        }
+
 
         if (isPanning) {
             canvas.setViewportTransform(canvas.viewportTransform);
@@ -1262,6 +1258,8 @@ window.addEventListener('load', function() {
     }
 
 
+    var lastModalTrigger = null;
+
     function showConfirm(msg, onOk) {
         let modal = document.getElementById('mpConfirm');
         if (!modal) {
@@ -1284,96 +1282,18 @@ window.addEventListener('load', function() {
         };
         document.getElementById('mpConfirmOk').focus();
     }
+    function closeConfirmModal() {
+        var modal = document.getElementById('mpConfirm');
+        if (modal) modal.style.display = 'none';
+        if (lastModalTrigger && lastModalTrigger.focus) lastModalTrigger.focus();
+    }
     window.showConfirm = showConfirm;
     window.showToast = showToast;
 
     // Estado del menú contextual (cerrado por defecto para no invadir la hoja)
     let contextMenuOpen = false;
 
-function PressureBrush(canvas) {
-    fabric.BaseBrush.call(this, canvas);
-    this._segments = [];
-    this._lastPoint = null;
-}
-PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
-    type: 'PressureBrush',
-    
-    _getPressure: function(options) {
-        var nativeEvent = options && options.e ? options.e : options;
-        if (!nativeEvent) return 0.5;
-        // Android / PC / Pointer Events
-        if (nativeEvent.pressure !== undefined && nativeEvent.pressure > 0) {
-            return nativeEvent.pressure;
-        }
-        // iOS / Safari (Touch Events)
-        if (nativeEvent.touches && nativeEvent.touches.length > 0 && nativeEvent.touches[0].force !== undefined) {
-            var f = nativeEvent.touches[0].force;
-            if (f > 0) return f;
-        }
-        return 0.5; // Fallback: mouse o touch sin presión
-    },
-    
-    onMouseDown: function(pointer, options) {
-        this._segments = [];
-        this._lastPoint = pointer;
-        var pressure = this._getPressure(options);
-        var w = this.width * (0.3 + (0.7 * pressure)); // Mínimo 30% del grosor
-        this._addSegment(pointer, pointer, w);
-    },
-    
-    onMouseMove: function(pointer, options) {
-        if (!this._lastPoint) return;
-        
-        var pressure = this._getPressure(options);
-        var newWidth = this.width * (0.3 + (0.7 * pressure));
-        
-        var dist = Math.hypot(pointer.x - this._lastPoint.x, pointer.y - this._lastPoint.y);
-        if (dist > 2) {
-            this._addSegment(this._lastPoint, pointer, newWidth);
-            this._lastPoint = pointer;
-        }
-    },
-    
-    onMouseUp: function(pointer, options) {
-        if (this._segments.length > 0) {
-            // Fabric remueve automáticamente las líneas del canvas al agruparlas.
-            // Pero por seguridad, las removemos primero:
-            var _this = this;
-            this._segments.forEach(function(seg) {
-                if (seg.canvas) seg.canvas.remove(seg);
-            });
 
-            var group = new fabric.Group(this._segments, {
-                selectable: false,
-                evented: true,
-                strokeUniform: true,
-                perPixelTargetFind: false, // CRÍTICO: acelera el borrador
-                objectCaching: false,      // CRÍTICO: no cachear imágenes grandes en RAM
-                noScaleCache: true
-            });
-            this.canvas.add(group);
-            this.canvas.requestRenderAll();
-        }
-        this._segments = [];
-        this._lastPoint = null;
-    },
-    
-    _addSegment: function(from, to, width) {
-        var segment = new fabric.Line([from.x, from.y, to.x, to.y], {
-            stroke: this.color,
-            strokeWidth: width,
-            strokeLineCap: 'round',
-            strokeLineJoin: 'round',
-            selectable: false,
-            evented: false,
-            strokeUniform: true,
-            objectCaching: false
-        });
-        this._segments.push(segment);
-        this.canvas.add(segment);
-        this.canvas.requestRenderAll();
-    }
-});
 
     function setTool(tool) {
         var prevTool = currentTool;
@@ -1406,17 +1326,16 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
         }
         if (tool === 'eraser') {
             var bObj = document.getElementById('btnEraserStroke');
-            if (bObj) bObj.classList.toggle('active', eraserMode === 'object');
+            if (bObj) bObj.classList.add('active');
         }
 
         if (tool === 'pen') {
-            canvas.isDrawingMode = false; 
-            var pressureBrush = new PressureBrush(canvas);
-            pressureBrush.color = document.getElementById('colorPicker') ? document.getElementById('colorPicker').value : '#e0e0e0';
-            pressureBrush.width = parseInt(document.getElementById('widthPicker') ? document.getElementById('widthPicker').value : 3, 10);
-            canvas.freeDrawingBrush = pressureBrush;
-            canvas.isDrawingMode = true; 
-            if(canvasWrapper) canvasWrapper.classList.add('cursor-pen');
+            canvas.isDrawingMode = true;
+            canvas.freeDrawingBrush = standardBrush;
+            canvas.freeDrawingBrush.color = document.getElementById('colorPicker').value;
+            canvas.freeDrawingBrush.width = parseInt(document.getElementById('widthPicker').value, 10);
+            canvasWrapper.classList.add('cursor-pen');
+            canvas.renderAll();
         }
         else if (tool === 'highlight') {
             canvas.isDrawingMode = true; canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
@@ -1510,7 +1429,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
     document.getElementById('btnFill').onclick = () => setTool('fill');
     document.getElementById('btnText').onclick = () => setTool('text');
 
-    document.getElementById('btnEraserStroke').onclick = () => { eraserMode = 'object'; setTool('eraser'); };
+    document.getElementById('btnEraserStroke').onclick = () => setTool('eraser');
     document.getElementById('btnSelect').onclick = () => setTool('select');
     document.getElementById('btnPan').onclick = () => setTool('pan');
     document.getElementById('btnRuler').onclick = () => setTool('ruler');
@@ -1684,6 +1603,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
         if (pdfBusy) return;
         pdfBusy = true;
         var vpt = null, restore = false;
+        var prevAxes = showAxes;
         try {
             showToast('Preparando PDF…', 'ok', 2500);
             await loadJsPDF();
@@ -1694,6 +1614,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
             var exportBg = getExportBgColor();
             isHistoryAction = true;
             restore = true;
+            showAxes = false;
             for (let i = 0; i < pages.length; i++) {
                 if (pages.length > 1) showToast('Generando PDF… página ' + (i + 1) + ' de ' + pages.length, 'ok', 2500);
                 await new Promise(r => setTimeout(r, 30)); // deja respirar al celular
@@ -1730,8 +1651,12 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
             showToast('No se pudo crear el PDF: ' + (err && err.message ? err.message : 'error desconocido'), 'err', 6000);
         } finally {
             if (restore) {
-                canvas.loadFromJSON(pages[currentPage], function() { isHistoryAction = false; canvas.setViewportTransform(vpt); canvas.renderAll(); });
+                await new Promise(resolve => canvas.loadFromJSON(pages[currentPage], resolve));
+                isHistoryAction = false;
+                if (vpt) canvas.setViewportTransform(vpt);
             }
+            showAxes = prevAxes;
+            if (restore) canvas.renderAll();
             pdfBusy = false;
         }
     }
@@ -1741,6 +1666,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
     document.getElementById('btnExport').onclick = function() {
         var vpt = canvas.viewportTransform.slice(0); canvas.setViewportTransform([1,0,0,1,0,0]);
         var exportBg = getExportBgColor();
+        var prevAxes = showAxes; showAxes = false;
         canvas.setBackgroundColor(exportBg, function() {
             try {
                 var bounds = getCanvasBounds(canvas);
@@ -1753,6 +1679,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
             } catch (e) {
                 console.error('Error al exportar PNG:', e);
             } finally {
+                showAxes = prevAxes;
                 canvas.setBackgroundColor('', canvas.renderAll.bind(canvas)); canvas.setViewportTransform(vpt);
             }
         });
@@ -1760,8 +1687,10 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
 
     document.getElementById('btnSaveProj').onclick = function() {
         var json = serializeProject();
+        var url = URL.createObjectURL(new Blob([json], {type: "application/json"}));
         var link = document.createElement('a'); link.download = 'sesion_mate.json';
-        link.href = URL.createObjectURL(new Blob([json], {type: "application/json"})); link.click();
+        link.href = url; link.click();
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
     };
 
     var fileInput = document.getElementById('fileInput');
@@ -1813,9 +1742,14 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
 
     document.getElementById('imgFileInput').onchange = async function() {
       if (!this.files[0]) return;
-      const url = await fileToDataURL(this.files[0]);
-      insertImageOnCanvas(url);
-      this.value = '';
+      try {
+        const url = await fileToDataURL(this.files[0]);
+        insertImageOnCanvas(url);
+      } catch (err) {
+        showToast(typeof err === 'string' ? err : 'No se pudo cargar la imagen', 'warn');
+      } finally {
+        this.value = '';
+      }
     };
 
     const cw = document.getElementById('canvasWrapper');
@@ -2605,10 +2539,11 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
       if (!sel.value && activePlotFunctions.length > 0) sel.value = '0';
       if (!f1.value && activePlotFunctions.length > 0) f1.value = '0';
       if (!f2.value && activePlotFunctions.length > 1) f2.value = '1';
+      var tabPanel = document.getElementById('plotPanelAnalisis');
       var panel = document.getElementById('plotAnalysisPanel');
       var insertBtn = document.getElementById('plotAnalysisInsertBtn');
       if (insertBtn) insertBtn.disabled = (activePlotFunctions.length === 0);
-      if (panel && !panel.hidden) recomputeAnalysis();
+      if (tabPanel && !tabPanel.hidden && panel && !panel.hidden && typeof recomputeAnalysis === 'function') recomputeAnalysis();
       if (typeof updateTangentUI === 'function') updateTangentUI();
       if (typeof updateAreaUI === 'function') updateAreaUI();
     }
@@ -3009,8 +2944,9 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
       });
       if (typeof updateTangentUI === 'function') updateTangentUI();
       if (typeof updateAreaUI === 'function') updateAreaUI();
+      var tabPanel = document.getElementById('plotPanelAnalisis');
       var panel = document.getElementById('plotAnalysisPanel');
-      if (panel && !panel.hidden && typeof recomputeAnalysis === 'function') recomputeAnalysis();
+      if (tabPanel && !tabPanel.hidden && panel && !panel.hidden && typeof recomputeAnalysis === 'function') recomputeAnalysis();
       requestDrawPlot();
     }
     document.getElementById('plotXMin').addEventListener('input', syncRangeInputsToView);
@@ -3112,7 +3048,12 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
       onlyLineEl.checked = prevOnlyLine;
 
       var dataURL = plotCanvasEl.toDataURL('image/png');
-      fabric.Image.fromURL(dataURL, function(img) {
+      fabric.Image.fromURL(dataURL, function(img, isError) {
+        if (isError || !img || !img.width || !img.height) {
+          errEl.textContent = 'No se pudo generar la imagen del gráfico.';
+          errEl.style.display = 'block';
+          return;
+        }
         var vpt = canvas.viewportTransform;
         var maxW = 500 / (canvas.getZoom() || 1);
         if (img.width > maxW) img.scaleToWidth(maxW);
@@ -3128,9 +3069,6 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
         saveHistory();
         document.getElementById('plotModal').style.display = 'none';
         showToast(activePlotFunctions.length ? '📈 Gráfico insertado' : '📐 Ejes cartesianos insertados', 'ok');
-      }, function() {
-        errEl.textContent = 'No se pudo generar la imagen del gráfico.';
-        errEl.style.display = 'block';
       });
     };
 
@@ -3210,7 +3148,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
       var open = panel.hidden;
       panel.hidden = !open;
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
-      txt.textContent = open ? 'Ocultar análisis' : 'Mostrar análisis';
+      if (txt) txt.textContent = open ? 'Ocultar análisis' : 'Mostrar análisis';
       if (open) {
         updateAnalysisSelectors();
         recomputeAnalysis();
@@ -3631,7 +3569,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
         '!': { show: '!', js: '!', kind: 'post' },
         'nPr': { show: 'P', js: 'NPR', kind: 'infix' },
         'nCr': { show: 'C', js: 'NCR', kind: 'infix' },
-        'root': { show: '\u02B8\u221A(', js: 'ROOT', kind: 'infix' },
+        'root': { show: '\u02B8\u221A(', js: 'ROOT(', kind: 'infix' },
         'sqrt(': { show: '\u221A(', js: 'sqrt(', kind: 'func' },
         'cbrt(': { show: '\u221B(', js: 'cbrt(', kind: 'func' },
         'sin(': { show: 'sin(', js: 'sin(', kind: 'func' },
@@ -3653,6 +3591,7 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
         '(': { show: '(', js: '(', kind: 'open' },
         ')': { show: ')', js: ')', kind: 'close' },
         'pi': { show: '\u03C0', js: 'pi', kind: 'const' },
+        'EXP': { show: 'E', js: 'EXP', kind: 'exp' },
         'e': { show: 'e', js: 'e', kind: 'const' },
         'Ans': { show: 'Ans', js: 'Ans', kind: 'const' },
         'EXP': { show: 'E', js: '*10^(', kind: 'exp' }
@@ -3985,23 +3924,42 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
     }
 
     // Funciones de memoria
+    function parseCalcDisplayNumber(str) {
+        if (!str || str === 'Math ERROR' || str === 'Syntax ERROR') return NaN;
+        if (str.indexOf('/') !== -1) {
+            var parts = str.split('/');
+            if (parts.length === 2) {
+                var num = parseFloat(parts[0]), den = parseFloat(parts[1]);
+                if (isFinite(num) && isFinite(den) && den !== 0) return num / den;
+            }
+            return NaN;
+        }
+        return parseFloat(str);
+    }
+
     window.calcMemoryAdd = function() {
         const currentResult = resDisplay.textContent;
         if (currentResult && currentResult !== 'Math ERROR' && currentResult !== 'Syntax ERROR' && currentResult !== '0') {
-            calcMemory += parseFloat(currentResult);
-            calcUpdateMemBadge();
-            showToast('M+ (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
-            calcSave();
+            var val = parseCalcDisplayNumber(currentResult);
+            if (isFinite(val) && val !== 0) {
+                calcMemory += val;
+                calcUpdateMemBadge();
+                showToast('M+ (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
+                calcSave();
+            }
         }
     };
 
     window.calcMemorySub = function() {
         const currentResult = resDisplay.textContent;
         if (currentResult && currentResult !== 'Math ERROR' && currentResult !== 'Syntax ERROR' && currentResult !== '0') {
-            calcMemory -= parseFloat(currentResult);
-            calcUpdateMemBadge();
-            showToast('M- (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
-            calcSave();
+            var val = parseCalcDisplayNumber(currentResult);
+            if (isFinite(val) && val !== 0) {
+                calcMemory -= val;
+                calcUpdateMemBadge();
+                showToast('M- (' + math.format(calcMemory, { precision: 14 }) + ')', 'info', 1500);
+                calcSave();
+            }
         }
     };
 
@@ -4039,25 +3997,21 @@ PressureBrush.prototype = fabric.util.createClass(fabric.BaseBrush, {
             var j = i;
             while (j - 1 >= 0 && calcTokens[j - 1].kind === 'num') j--;
             var digits = calcTokens.slice(j, i + 1).map(function(x) { return x.show; }).join('');
-            var arr = [];
-            if (digits.charAt(0) === '-') {
-                var core = digits.slice(1);
-                for (var k = 0; k < core.length; k++) arr.push({ show: core[k], js: core[k], kind: 'num' });
+            if (j > 0 && calcTokens[j - 1].kind === 'neg') {
+                calcTokens.splice(j - 1, 1);
+                if (calcCaret >= j) calcCaret = Math.max(0, calcCaret - 1);
             } else {
-                arr.push({ show: '-', js: '-', kind: 'neg' });
-                for (var k2 = 0; k2 < digits.length; k2++) arr.push({ show: digits[k2], js: digits[k2], kind: 'num' });
+                calcTokens.splice(j, 0, { show: '-', js: '-', kind: 'neg' });
+                if (calcCaret >= j) calcCaret++;
             }
-            calcTokens = calcTokens.slice(0, j).concat(arr, calcTokens.slice(i + 1));
-            var tail = calcCaret - (i + 1);
-            if (tail < 0) tail = 0;
-            if (tail > calcTokens.length - (j + arr.length)) tail = calcTokens.length - (j + arr.length);
-            calcCaret = j + arr.length + tail;
             calcRender();
             calcSave();
             return;
         }
-        calcPushToken({ show: '-', js: '-', kind: 'neg' });
-        calcSave();
+        if (calcCaret > 0 && calcTokens[calcCaret - 1].kind === 'neg') {
+            calcTokens.splice(calcCaret - 1, 1);
+            calcCaret--;
+        }
     }
     function handleCalcKey(btn) {
         if (!btn) return;
@@ -4188,8 +4142,6 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
     document.getElementById('calcNumKeys').addEventListener('click', function(e) {
         var btn = e.target.closest('button');
         if (!btn) return;
-        if (btn.id === 'calcCaretLeft') { if (e.detail === 0) calcMoveCaret(-1); return; }
-        if (btn.id === 'calcCaretRight') { if (e.detail === 0) calcMoveCaret(1); return; }
         handleCalcKey(btn);
     });
 
@@ -4244,7 +4196,10 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
         btn.addEventListener('pointerup', clearRep);
         btn.addEventListener('pointercancel', clearRep);
         btn.addEventListener('pointerleave', clearRep);
-        btn.addEventListener('click', function(e) { e.preventDefault(); });
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (e.detail === 0) calcMoveCaret(delta);
+        });
     }
     calcBindCaretRepeat('calcCaretLeft', -1);
     calcBindCaretRepeat('calcCaretRight', 1);
@@ -4447,6 +4402,13 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
     }
     function calcRewriteExpr(expr) {
         var out = expr, guard = 0;
+        var guardExp = 0;
+        while (out.indexOf('EXP') !== -1 && guardExp++ < 20) {
+            var pe = out.indexOf('EXP');
+            var Le = calcTakeLeftOperand(out.slice(0, pe));
+            var Re = calcTakeRightOperand(out.slice(pe + 3));
+            out = Le.left + '(' + Le.operand + '*10^(' + Re.operand + '))' + Re.right;
+        }
         while (out.indexOf('ROOT') !== -1 && guard++ < 20) {
             var p = out.indexOf('ROOT');
             var L = calcTakeLeftOperand(out.slice(0, p));
@@ -4483,10 +4445,10 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
         if (!calcTokens.length) { calcError = 'Syntax ERROR'; resDisplay.textContent = calcError; return; }
         try {
             var evalExpr = calcTokensToJs();
-            evalExpr = calcRewriteExpr(evalExpr);
             var openP = (evalExpr.match(/\(/g) || []).length, closeP = (evalExpr.match(/\)/g) || []).length;
-            for (var i = 0; i < openP - closeP; i++) evalExpr += ')';
             if (closeP > openP) throw new CalcSyntaxError('paren');
+            for (var i = 0; i < openP - closeP; i++) evalExpr += ')';
+            evalExpr = calcRewriteExpr(evalExpr);
             var scope = calcBuildScope();
             var res = mathEvaluate(evalExpr, scope);
             if (res === undefined || typeof res === 'function') throw new CalcSyntaxError('empty');
@@ -4868,7 +4830,9 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
     };
 
     window.addEventListener('keydown', function(e) {
-    const memMenu = document.getElementById('calcMemoryMenu');
+        var noMod = !e.ctrlKey && !e.metaKey && !e.altKey;
+        var mod = e.ctrlKey || e.metaKey;
+        const memMenu = document.getElementById('calcMemoryMenu');
         if (e.key === 'Escape' && memMenu && memMenu.style.display === 'block') {
         memMenu.style.display = 'none';
         e.preventDefault();
@@ -4948,21 +4912,23 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
             if (focusMode) toggleFocusMode(false);
         }
 
-        if (e.code === 'KeyZ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.code === 'KeyZ' && noMod) {
             toggleFocusMode();
         }
 
         if (e.code === 'Space' && !isSpaceDown) { isSpaceDown = true; if (currentTool !== 'pan') canvasWrapper.classList.add('cursor-pan'); e.preventDefault(); }
-        if (e.code === 'KeyP' && !e.ctrlKey) setTool('pen');
-        if (e.code === 'KeyF' && !e.ctrlKey) setTool('fill');
+        if (e.code === 'KeyP' && noMod) setTool('pen');
+        if (e.code === 'KeyF' && noMod) setTool('fill');
 
-        if (e.code === 'KeyE' && !e.ctrlKey) { eraserMode = e.shiftKey ? 'partial' : 'object'; setTool('eraser'); }
-        if (e.code === 'KeyV' && !e.ctrlKey) setTool('select');
-        if (e.code === 'KeyH' && !e.ctrlKey) setTool('pan');
-        if (e.code === 'KeyI' && !e.ctrlKey) document.getElementById('btnInsertImage').click();
-        if (e.code === 'KeyG' && !e.ctrlKey) document.getElementById('btnPlot').click();
-        if (e.code === 'KeyA' && !e.ctrlKey) document.getElementById('btnToggleAxes').click();
-        if (e.code === 'KeyC' && !e.ctrlKey) toggleCalc();
+        if (e.code === 'KeyE' && noMod) setTool('eraser');
+        if (e.code === 'KeyV' && noMod) setTool('select');
+        if (e.code === 'KeyH' && noMod) setTool('pan');
+        if (e.code === 'KeyI' && noMod) document.getElementById('btnInsertImage').click();
+        if (e.code === 'KeyG' && noMod) document.getElementById('btnPlot').click();
+        if (e.code === 'KeyA' && noMod) document.getElementById('btnToggleAxes').click();
+        if (e.code === 'KeyC' && noMod) toggleCalc();
+        if (e.code === 'KeyT' && noMod) setTool('text');
+        if (e.code === 'KeyR' && noMod) setTool('ruler');
 
         if ((e.code === 'Delete' || e.code === 'Backspace') && currentTool === 'select') {
             var objs = canvas.getActiveObjects();
@@ -4970,24 +4936,30 @@ if (alias[key.toLowerCase()]) key = alias[key.toLowerCase()];
         }
 
         // NUEVO: Z-Index (Capas)
-        if (e.ctrlKey && e.code === 'ArrowUp') {
+        if (mod && e.code === 'ArrowUp') {
             e.preventDefault();
             var activeObj = canvas.getActiveObject();
             if (activeObj) { canvas.bringForward(activeObj); saveHistory(); }
         }
-        if (e.ctrlKey && e.code === 'ArrowDown') {
+        if (mod && e.code === 'ArrowDown') {
             e.preventDefault();
             var activeObj = canvas.getActiveObject();
             if (activeObj) { canvas.sendBackwards(activeObj); saveHistory(); }
         }
 
-        if (e.ctrlKey && e.code === 'KeyS') {
+        if (mod && e.code === 'KeyS') {
             e.preventDefault();
             doAutoSave();
             showToast('💾 Proyecto guardado (Ctrl+S)', 'ok');
         }
-        if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); document.getElementById('btnUndo').click(); }
-        if (e.ctrlKey && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) { e.preventDefault(); document.getElementById('btnRedo').click(); }
+        if (mod && e.code === 'KeyZ' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('btnUndo').click();
+        }
+        if (mod && (e.code === 'KeyY' || (e.shiftKey && e.code === 'KeyZ'))) {
+            e.preventDefault();
+            document.getElementById('btnRedo').click();
+        }
     });
     window.addEventListener('keyup', function(e) {
         if (e.code === 'Space') {

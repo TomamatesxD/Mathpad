@@ -496,6 +496,10 @@
             align-items: center;
             border-bottom: 1px solid #141619;
         }
+        :root.light-mode .calc-header {
+            background: #212121;
+            border-bottom-color: #333333;
+        }
         .calc-mode-bar {
             display: flex;
             gap: 6px;
@@ -510,8 +514,12 @@
             padding: 4px 8px;
             cursor: pointer;
         }
-        .calc-mode-btn:hover { background: #3a414d; }
-        .calc-mode-btn.active { background: #4a5360; border-color: #7c3aed; }
+        :root.light-mode .calc-mode-btn {
+            background: #3a3a3a;
+            border-color: #444444;
+        }
+        :root.light-mode .calc-mode-btn:hover { background: #4a5360; }
+        :root.light-mode .calc-mode-btn.active { background: #4a5360; border-color: #7c3aed; }
         .hidden { display: none !important; }
 
         .calc-controls {
@@ -749,12 +757,12 @@
         .calc-history-item:hover {
             color: var(--accent);
         }
-        .calc-history-item .history-expr {
-            color: #666;
+        :root.light-mode .calc-history-item .history-expr {
+            color: #555555;
             font-size: 11px;
         }
-        .calc-history-item .history-result {
-            color: #e0e0e0;
+        :root.light-mode .calc-history-item .history-result {
+            color: #212121;
             font-weight: 500;
         }
 
@@ -995,17 +1003,20 @@
             border-bottom-color: var(--border-color);
         }
 
-        :root.light-mode .calc-keys button {
+        :root.light-mode .calc-sci-keys button,
+        :root.light-mode .calc-num-keys button {
             background: rgba(0,0,0,0.04);
             border-color: var(--border-color);
             color: var(--text-main);
         }
 
-        :root.light-mode .calc-keys button:hover {
+        :root.light-mode .calc-sci-keys button:not(.orange):not(.equals):hover,
+        :root.light-mode .calc-num-keys button:not(.orange):not(.equals):hover {
             background: rgba(0,0,0,0.08);
         }
 
-        :root.light-mode .calc-keys button:active {
+        :root.light-mode .calc-sci-keys button:not(.orange):not(.equals):active,
+        :root.light-mode .calc-num-keys button:not(.orange):not(.equals):active {
             background: rgba(0,0,0,0.12);
         }
 
