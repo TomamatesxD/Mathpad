@@ -4,7 +4,7 @@
 
 
 // Versión de caché v57: íconos válidos
-const CACHE_NAME = 'mathpad-v62'; // Versión de caché v62: carga crítica estricta + íconos opcionales
+const CACHE_NAME = 'mathpad-v64'; // Versión de caché v64: tabla de valores compacta y service worker reparado
 const CORE_URLS = [
   './',
   './index.html',
@@ -27,24 +27,21 @@ const OPTIONAL_URLS = [
 ];
 
 
-// Instalación: precarga la caché con los recursos del proyecto
+// Instalación: los archivos críticos son obligatorios; los opcionales (íconos, jsPDF, MathJax) no frenan la instalación
 self.addEventListener('install', event => {
   event.waitUntil(
-    Promise.all(
-      CORE_URLS.map(url =>
-        cache.add(new Request(url, { cache: 'reload' }))
-      )
-    )
-    .then(() => {
-      // Opcional: íconos y recursos adicionales; si falla uno, se campa y el SW sigue activo
-      return Promise.allSettled(
-        OPTIONAL_URLS.map(url =>
-          cache.add(new Request(url, { cache: 'reload' }))
-            .catch(err => console.warn('No se pudo cachear (opcional):', url, err))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        CORE_URLS.map(url => cache.add(new Request(url, { cache: 'reload' })))
+      ).then(() =>
+        Promise.allSettled(
+          OPTIONAL_URLS.map(url =>
+            cache.add(new Request(url, { cache: 'reload' }))
+              .catch(err => console.warn('No se pudo cachear (opcional):', url, err))
+          )
         )
-      );
-    })
-    .then(() => self.skipWaiting())
+      )
+    ).then(() => self.skipWaiting())
   );
 });
 

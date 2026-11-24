@@ -2067,9 +2067,9 @@ window.addEventListener('load', function() {
     }
     function tableNiceStep(a, b, maxIntervals) {
       var span = b - a; if (!(span > 0)) return 1;
-      var mags = [1, 2, 5], e = Math.floor(Math.log10(span / maxIntervals)) - 1, step = 1;
-      for (var k = 0; k < 40; k++) {
-        step = mags[k % 3] * Math.pow(10, e + Math.floor(k / 3));
+      var mags = [1, 2, 2.5, 5], e = Math.floor(Math.log10(span / maxIntervals)) - 1, step = 1;
+      for (var k = 0; k < 80; k++) {
+        step = mags[k % 4] * Math.pow(10, e + Math.floor(k / 4));
         if (span / step <= maxIntervals) break;
       }
       return step;
@@ -2081,15 +2081,19 @@ window.addEventListener('load', function() {
       return r.indexOf('.') >= 0 ? r.replace(/0+$/, '').replace(/\.$/, '') : r;
     }
 
-    function buildValueTable(fn, a, b, rows) {
-      var step = tableNiceStep(a, b, (rows || 7) - 1), out = [];
+    // Tabla con valores "redondos" dentro de [a, b]; suma los extremos a y b cuando son valores limpios (ej. -5 y 5)
+    function buildValueTable(fn, a, b, maxIntervals) {
+      var step = tableNiceStep(a, b, maxIntervals || 4), xs = [];
       var first = Math.ceil(a / step - 1e-9), last = Math.floor(b / step + 1e-9);
-      for (var i = first; i <= last; i++) {
-        var x = Math.round(i * step * 1e9) / 1e9;
+      for (var i = first; i <= last; i++) xs.push(Math.round(i * step * 1e9) / 1e9);
+      var dec = tableDecimals(step) + 1, f = Math.pow(10, dec);
+      var clean = function(v) { return Math.abs(v * f - Math.round(v * f)) < 1e-6; };
+      if (clean(a) && (!xs.length || xs[0] - a > step * 0.25)) xs.unshift(Math.round(a * f) / f);
+      if (clean(b) && (!xs.length || b - xs[xs.length - 1] > step * 0.25)) xs.push(Math.round(b * f) / f);
+      return xs.map(function(x) {
         var y = fn(x);
-        out.push({ x: x, y: isFinite(y) ? y : null });
-      }
-      return out;
+        return { x: x, y: isFinite(y) ? y : null };
+      });
     }
     function findIntersections(f1, f2, a, b, samples) {
       var diff = function(x) {
@@ -2113,6 +2117,9 @@ window.addEventListener('load', function() {
       var yMaxAbs = 1e6;
       var fn = function(x) { return safeEvaluate(fObj.compiled, x); };
       var yAt0 = (a <= 0 && b >= 0) ? safeEvaluate(fObj.compiled, 0) : NaN;
+      // La tabla sigue lo que se ve en el gráfico (acotado al rango de la función)
+      var ta = Math.max(a, plotView.xMin), tb = Math.min(b, plotView.xMax);
+      if (!(tb > ta)) { ta = a; tb = b; }
       return {
         ok: true,
         expr: fObj.expr,
@@ -2124,8 +2131,9 @@ window.addEventListener('load', function() {
         monotony: computeMonotony(fn, a, b, samples, h, yMaxAbs),
         concavity: computeConcavity(fn, a, b, samples, h, yMaxAbs),
         inflections: findInflections(fn, a, b, samples, h, yMaxAbs),
-        table: buildValueTable(fn, a, b, 7),
-        tableStep: tableNiceStep(a, b, 6)
+        table: buildValueTable(fn, ta, tb, 4),
+        tableFull: buildValueTable(fn, ta, tb, 16),
+        tableStep: tableNiceStep(ta, tb, 16)
       };
     }
     function makeAnalysisRow(label, value) {
@@ -2174,39 +2182,53 @@ window.addEventListener('load', function() {
       title.style.color = 'var(--accent)';
       title.textContent = 'Tabla de valores';
       tableWrap.appendChild(title);
-      var table = document.createElement('table');
-      table.className = 'plot-value-table';
-      var thead = document.createElement('thead');
-      var trh = document.createElement('tr');
-      var th1 = document.createElement('th'); th1.textContent = 'x';
-      var th2 = document.createElement('th'); th2.textContent = 'f(x)';
-      trh.appendChild(th1); trh.appendChild(th2);
-      thead.appendChild(trh); table.appendChild(thead);
-      var tbody = document.createElement('tbody');
-      var stepX = data.tableStep || 1;
-      var dx = tableDecimals(stepX);
-      var nonNullYs = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
-      var roundedYs = nonNullYs.map(function(v) { return Math.round(v * 10) / 10; });
-      var allRoundedEqual = nonNullYs.length > 0 && roundedYs.every(function(v) { return v === roundedYs[0]; });
-      var realDistinct = nonNullYs.some(function(v) { return v !== nonNullYs[0]; });
-      var useFormatY = allRoundedEqual && realDistinct;
-      data.table.forEach(function(row) {
-        var tr = document.createElement('tr');
-        var td1 = document.createElement('td');
-        td1.textContent = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx);
-        var td2 = document.createElement('td');
-        if (row.y === null) {
-          td2.textContent = '—';
-        } else if (Math.abs(row.y) >= 1e5 || useFormatY) {
-          td2.textContent = formatNum(row.y);
-        } else {
-          td2.textContent = fmtTable(row.y, 1);
-        }
-        tr.appendChild(td1); tr.appendChild(td2);
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-      tableWrap.appendChild(table);
+      var moreBtn = document.createElement('button');
+      moreBtn.type = 'button';
+      moreBtn.className = 'plot-table-more';
+      var scrollBox = document.createElement('div');
+      scrollBox.className = 'plot-table-scroll';
+      var expanded = false;
+      function fillTable() {
+        var rowsData = expanded && data.tableFull ? data.tableFull : data.table;
+        var dx = tableDecimals(data.tableStep || 1) + 1;
+        var nonNullYs = rowsData.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
+        var roundedYs = nonNullYs.map(function(v) { return Math.round(v * 10) / 10; });
+        var allRoundedEqual = nonNullYs.length > 0 && roundedYs.every(function(v) { return v === roundedYs[0]; });
+        var realDistinct = nonNullYs.some(function(v) { return v !== nonNullYs[0]; });
+        var useFormatY = allRoundedEqual && realDistinct;
+        var table = document.createElement('table');
+        table.className = 'plot-value-table';
+        var thead = document.createElement('thead');
+        var trh = document.createElement('tr');
+        var th1 = document.createElement('th'); th1.textContent = 'x';
+        var th2 = document.createElement('th'); th2.textContent = 'f(x)';
+        trh.appendChild(th1); trh.appendChild(th2);
+        thead.appendChild(trh); table.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        rowsData.forEach(function(row) {
+          var tr = document.createElement('tr');
+          var td1 = document.createElement('td');
+          td1.textContent = (Math.abs(row.x) >= 1e5) ? formatNum(row.x) : fmtTable(row.x, dx);
+          var td2 = document.createElement('td');
+          if (row.y === null) {
+            td2.textContent = '—';
+          } else if (Math.abs(row.y) >= 1e5 || useFormatY) {
+            td2.textContent = formatNum(row.y);
+          } else {
+            td2.textContent = fmtTable(row.y, 2);
+          }
+          tr.appendChild(td1); tr.appendChild(td2);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        scrollBox.replaceChildren(table);
+        scrollBox.classList.toggle('expanded', expanded);
+        moreBtn.textContent = expanded ? 'Ver menos valores' : 'Ver más valores';
+      }
+      moreBtn.addEventListener('click', function() { expanded = !expanded; fillTable(); });
+      fillTable();
+      tableWrap.appendChild(scrollBox);
+      if (data.tableFull && data.tableFull.length > data.table.length) tableWrap.appendChild(moreBtn);
       wrap.appendChild(tableWrap);
       return wrap;
     }
@@ -2246,7 +2268,7 @@ window.addEventListener('load', function() {
       lines.push('Tabla de valores:');
       lines.push('  ' + 'x'.padStart(10) + ' | ' + 'f(x)'.padStart(10));
       var stepX2 = data.tableStep || 1;
-      var dx2 = tableDecimals(stepX2);
+      var dx2 = tableDecimals(stepX2) + 1;
       var nonNullYs2 = data.table.map(function(r) { return r.y; }).filter(function(v) { return v !== null && isFinite(v); });
       var roundedYs2 = nonNullYs2.map(function(v) { return Math.round(v * 10) / 10; });
       var allRoundedEqual2 = nonNullYs2.length > 0 && roundedYs2.every(function(v) { return v === roundedYs2[0]; });
@@ -2257,7 +2279,7 @@ window.addEventListener('load', function() {
         var yStr = '—';
         if (row.y !== null) {
           if (Math.abs(row.y) >= 1e5 || useFormatY2) yStr = formatNum(row.y);
-          else yStr = fmtTable(row.y, 1);
+          else yStr = fmtTable(row.y, 2);
         }
         lines.push('  ' + xStr.padStart(10) + ' | ' + yStr.padStart(10));
       });

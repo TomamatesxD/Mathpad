@@ -1405,6 +1405,11 @@
         .plot-value-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 12px; margin-top: 6px; }
         .plot-value-table th, .plot-value-table td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--border-color); }
         .plot-value-table th { color: var(--accent); font-weight: 600; }
+        .plot-table-scroll { max-width: 100%; overflow-x: auto; }
+        .plot-table-scroll.expanded { max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; }
+        .plot-table-scroll.expanded .plot-value-table { margin-top: 0; }
+        .plot-table-scroll.expanded .plot-value-table th { position: sticky; top: 0; background: var(--bg-panel, #1e1e1e); }
+        .plot-table-more { margin-top: 6px; background: transparent; color: var(--accent); border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; min-height: 30px; }
         .plot-label { color: #aaa; font-size: 12px; display: block; margin-bottom: 6px; }
         .plot-label-sm { color: #aaa; font-size: 12px; display: block; margin-bottom: 4px; }
         .plot-hint { color: #666; }
